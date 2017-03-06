@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\AltitudeFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\BufferFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\BuildGeometryFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\BuildTextFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\CentroidFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\ConvertTypeFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\CropFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\ExtrudeGeometryFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\Feature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureCursor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureDisplayLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureDrawSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureListSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureModelGraph.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureModelSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureSourceIndexNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FeatureTileSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\Filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\FilterContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\GeometryCompiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\GeometryUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\LabelSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\MVT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\OgrUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\OptimizerHints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\PolygonizeLines.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\ResampleFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\ScaleFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\Session.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\ScatterFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\ScriptEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\ScriptFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\SubstituteModelFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\TessellateOperator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\TextSymbolizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\TransformFilter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\VirtualFeatureSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\osgEarthFeatures\AltitudeFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\BufferFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\BuildGeometryFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\BuildTextFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\CentroidFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\Common">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\ConvertTypeFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\CropFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\ExtrudeGeometryFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\Feature">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureCursor">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureDisplayLayout">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureDrawSet">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureIndex">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureListSource">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureModelGraph">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureModelSource">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureSource">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureSourceIndexNode">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FeatureTileSource">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\Filter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\FilterContext">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\GeometryCompiler">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\GeometryUtils">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\LabelSource">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\MVT">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\OgrUtils">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\OptimizerHints">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\PolygonizeLines">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\ResampleFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\ScaleFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\Session">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\ScatterFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\Script">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\ScriptEngine">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\ScriptFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\SubstituteModelFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\TessellateOperator">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\TextSymbolizer">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\TransformFilter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\VirtualFeatureSource">
+      <Filter>Headers</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{84BD2F31-B52F-4CBE-B9B3-F1B3E71BB794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{0A955558-6510-4CA6-BFFB-082FD724B582}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

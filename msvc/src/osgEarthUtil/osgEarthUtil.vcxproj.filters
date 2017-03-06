@@ -1,0 +1,439 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\ActivityMonitorTool.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\AnnotationEvents.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\ArcGIS.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\AtlasBuilder.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\AutoClipPlaneHandler.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\ClampCallback.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\Controls.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\ContourMap.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\DataScanner.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\EarthManipulator.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\Ephemeris.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\ExampleResources.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\FeatureQueryTool.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\Fog.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\GeodeticGraticule.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\GraticuleExtension.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\GraticuleTerrainEffect.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\GraticuleNode.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\HTM.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\LatLongFormatter.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\LinearLineOfSight.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\LogarithmicDepthBuffer.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\LODBlending.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\MeasureTool.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\MGRSFormatter.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\MGRSGraticule.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\MouseCoordsTool.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\ObjectLocator.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\Ocean.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\PolyhedralLineOfSight.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\RadialLineOfSight.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\RTTPicker.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\Shadowing.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\SimplexNoise.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\SimplePager.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\SpatialData.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\Sky.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TerrainProfile.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TileIndex.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TileIndexBuilder.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TFS.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TFSPackager.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TMS.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TMSBackFiller.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\TMSPackager.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\UTMGraticule.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\VerticalScale.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\WFS.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\WMS.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoGenShaders.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\BrightnessContrastColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\CMYKColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\GammaColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\GLSLColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\HSLColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\RGBColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\ChromaKeyColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthUtil\NightColorFilter.cpp">
+      <Filter>Sources\ColorFilters</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\osgEarthUtil\Shaders.cpp.in">
+      <Filter>Template Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\CMakeFiles\b0e80560da3687ce240e83cb030e0485\AutoGenShaders.cpp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\osgEarthUtil\ActivityMonitorTool">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\AnnotationEvents">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\AutoClipPlaneHandler">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ArcGIS">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\AtlasBuilder">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Common">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Controls">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ContourMap">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ClampCallback">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\DataScanner">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\EarthManipulator">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Ephemeris">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ExampleResources">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Export">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\FeatureQueryTool">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Fog">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Formatter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\GeodeticGraticule">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\GraticuleExtension">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\GraticuleNode">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\GraticuleOptions">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\GraticuleTerrainEffect">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\HTM">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LatLongFormatter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LineOfSight">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LinearLineOfSight">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LODBlending">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LogarithmicDepthBuffer">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\MeasureTool">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\MGRSFormatter">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\MGRSGraticule">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\MouseCoordsTool">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ObjectLocator">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Ocean">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\PolyhedralLineOfSight">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\RadialLineOfSight">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\RTTPicker">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Shaders">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Shadowing">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\SimplexNoise">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\SimplePager">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Sky">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\SpatialData">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\StarData">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TerrainProfile">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TileIndex">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TileIndexBuilder">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TFS">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TFSPackager">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TMS">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TMSBackFiller">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\TMSPackager">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\UTMGraticule">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\VerticalScale">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\WFS">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\WMS">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\BrightnessContrastColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\CMYKColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\GammaColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\GLSLColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\HSLColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\RGBColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ChromaKeyColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\NightColorFilter">
+      <Filter>Headers\ColorFilters</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ContourMap.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\ContourMap.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Fog.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Fog.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Graticule.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Graticule.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LogDepthBuffer.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LogDepthBuffer.VertOnly.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\LogDepthBuffer.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Shadowing.vert.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthUtil\Shadowing.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Headers\ColorFilters">
+      <UniqueIdentifier>{D075D023-AD00-427C-869F-0FF2D6A7DD3D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources\ColorFilters">
+      <UniqueIdentifier>{D166E53F-D886-4382-BEBC-DE6F6211E25C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{7E2FE794-AF6D-4701-926B-08BE386343A5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{0A955558-6510-4CA6-BFFB-082FD724B582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{76D21E66-ECE2-4E26-9640-DA0A6222E215}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{D7F8868C-0EB4-4B69-A50F-88D1C8653E05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Template Files">
+      <UniqueIdentifier>{99122300-88D8-4B0A-8FA7-D9FF7E541E8A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

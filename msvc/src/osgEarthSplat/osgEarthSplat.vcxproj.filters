@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\Coverage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\LandCover.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\LandCoverTerrainEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\LandCoverTilePatchCallback.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\LandUseTileSource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\NoiseTextureFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\SplatExtension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\SplatCatalog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\SplatTerrainEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\SplatCoverageLegend.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\Surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthSplat\Zone.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoGenShaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\osgEarthSplat\SplatShaders.cpp.in">
+      <Filter>Template Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\CMakeFiles\033890a5eebf6714b7323618c80d57b6\AutoGenShaders.cpp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\osgEarthSplat\Coverage">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Export">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandCover">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandCoverTerrainEffect">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandCoverTilePatchCallback">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandUseTileSource">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\NoiseTextureFactory">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\SplatCoverageLegend">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\SplatCatalog">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\SplatExtension">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\SplatOptions">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\SplatShaders">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\SplatTerrainEffect">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Surface">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Zone">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Splat.types.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Splat.Noise.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Splat.vert.model.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Splat.vert.view.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Splat.frag.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Splat.frag.common.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\Splat.util.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandCover.TCS.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandCover.TES.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandCover.GS.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthSplat\LandCover.FS.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{84BD2F31-B52F-4CBE-B9B3-F1B3E71BB794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{7E2FE794-AF6D-4701-926B-08BE386343A5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{0A955558-6510-4CA6-BFFB-082FD724B582}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{D7F8868C-0EB4-4B69-A50F-88D1C8653E05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Template Files">
+      <UniqueIdentifier>{99122300-88D8-4B0A-8FA7-D9FF7E541E8A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

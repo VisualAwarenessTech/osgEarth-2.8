@@ -1,0 +1,24 @@
+<!-- 
+OpenStreetMap's Mapnik "Slippy Map" - Projected.
+See:
+http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames
+-->
+
+<map name="OpenStreetMap" type="projected" version="2">
+
+    <options>
+        <profile>spherical-mercator</profile>
+        <terrain driver="mp" 
+            tile_size="2" 
+            range_mode="PIXEL_SIZE_ON_SCREEN"
+            tile_pixel_size="400"
+            skirt_ratio="0"/>
+    </options>
+    
+    <image name="osm_mapnik" driver="xyz">
+        <url>http://[abc].tile.openstreetmap.org/{z}/{x}/{y}.png</url>
+        <profile>spherical-mercator</profile>
+        <cache_policy usage="none"/>
+    </image>
+    
+</map>
