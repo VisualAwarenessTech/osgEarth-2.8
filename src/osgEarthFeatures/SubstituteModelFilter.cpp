@@ -83,7 +83,8 @@ _cluster              ( false ),
 _useDrawInstanced     ( false ),
 _merge                ( true ),
 _normalScalingRequired( false ),
-_instanceCache        ( false )     // cache per object so MT not required
+_instanceCache        ( false ),    // cache per object so MT not required
+_GlobalModelMgr	      (GlobalModelManager::getInstance())
 {
     //NOP
 }
@@ -150,7 +151,10 @@ SubstituteModelFilter::process(const FeatureList&           features,
     // keep track of failed URIs so we don't waste time or warning messages on them
     std::set< URI > missing;
 
-    StringExpression  uriEx    = *symbol->url();
+	//CDB Model Replacement Data
+	ModelReplacmentdataPV	ReplaceModels;
+
+	StringExpression  uriEx    = *symbol->url();
     NumericExpression scaleEx  = *symbol->scale();
 
     const ModelSymbol* modelSymbol = dynamic_cast<const ModelSymbol*>(symbol);
@@ -191,14 +195,29 @@ SubstituteModelFilter::process(const FeatureList&           features,
 		}
 
 		bool feature_defined_model = input->hasAttr("osge_modelname");
+		bool replace = false;
+
+#ifdef _DEBUG
+		int fubar = 0;
+#endif
 		std::string st;
 		std::string modeltextPath;
+		std::string referenceName;
 		osg::ref_ptr<osgDB::Options> localoptions = NULL;
 		// evaluate the instance URI expression:
 		bool feature_defined_preInstanced = false;
 		if (feature_defined_model)
 		{
 			st = input->getString("osge_modelname");
+			replace = input->hasAttr("osge_referencedName");
+			if (replace)
+				referenceName = input->getString("osge_referencedName");
+#ifdef _DEBUG
+			if (replace)
+			{
+				++fubar;
+			}
+#endif
 			if (input->hasAttr("osge_texturezip"))
 			{
 				localoptions = context.getSession()->getDBOptions()->cloneOptions();
@@ -210,6 +229,12 @@ SubstituteModelFilter::process(const FeatureList&           features,
 				else
 					options_string.append(";TextureInArchive");
 				localoptions->setOptionString(options_string);
+				if (input->hasAttr("osge_gs_uses_gt"))
+				{
+					std::string archiveRefPath = input->getString("osge_gs_uses_gt");
+					osgDB::FilePathList& datapathlist = localoptions->getDatabasePathList();
+					datapathlist.push_back(archiveRefPath);
+				}
 			}
 			else if (input->hasAttr("osge_modeltexture"))
 			{
@@ -224,6 +249,12 @@ SubstituteModelFilter::process(const FeatureList&           features,
 				else
 					options_string.append(";Remap2Directory");
 				localoptions->setOptionString(options_string);
+				//add below up here??
+				if (input->hasAttr("osge_gs_uses_gt"))
+				{
+					std::string archiveRefPath = input->getString("osge_gs_uses_gt");
+					datapathlist.push_back(archiveRefPath);					
+				}
 			}
 			else if (input->hasAttr("osge_gs_uses_gt"))
 			{
@@ -238,6 +269,7 @@ SubstituteModelFilter::process(const FeatureList&           features,
 		{
 			st = input->eval(uriEx, &context);
 		}
+
 		URI& instanceURI = uriCache[st];
 		if(instanceURI.empty()) // Create a map, to reuse URI's, since they take a long time to create
 		{
@@ -349,7 +381,18 @@ SubstituteModelFilter::process(const FeatureList&           features,
                     model = at;
                 }
             }
+			if (model.valid() && feature_defined_model)
+				model->setName(st.c_str());
         }
+
+		if (replace && model.valid())
+		{
+			std::string newXformName = "";
+			if (input->hasAttr("transformname"))
+				newXformName = input->getString("transformname");
+			ModelReplacementdataP ReplaceEntry = new ModelReplacementData(st, referenceName, newXformName, model);
+			ReplaceModels.push_back(ReplaceEntry);
+		}
 
         if ( model.valid() )
         {
@@ -488,6 +531,9 @@ SubstituteModelFilter::process(const FeatureList&           features,
         // install a shader program to render draw-instanced.
         DrawInstanced::install( attachPoint->getOrCreateStateSet() );
     }
+
+	if (ReplaceModels.size() > 0)
+		_GlobalModelMgr->Add_To_Replacment_Stack(ReplaceModels);
 
     return true;
 }

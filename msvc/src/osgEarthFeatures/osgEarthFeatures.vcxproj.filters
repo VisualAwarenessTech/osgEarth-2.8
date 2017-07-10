@@ -115,6 +115,9 @@
     <ClCompile Include="..\..\..\src\osgEarthFeatures\VirtualFeatureSource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\GlobalModelManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\src\osgEarthFeatures\AltitudeFilter">
@@ -238,6 +241,9 @@
       <Filter>Headers</Filter>
     </None>
     <None Include="..\..\..\src\osgEarthFeatures\VirtualFeatureSource">
+      <Filter>Headers</Filter>
+    </None>
+    <None Include="..\..\..\src\osgEarthFeatures\GlobalModelManager">
       <Filter>Headers</Filter>
     </None>
   </ItemGroup>

@@ -71,6 +71,7 @@ using namespace osgEarth::Drivers;
 
 #define OGR_SCOPED_LOCK GDAL_SCOPED_LOCK
 
+
 struct CDBFeatureEntryData {
 	int	CDBLod;
 	std::string FullReferenceName;
@@ -109,10 +110,13 @@ public:
 	  _CDB_GS_uses_GTtex(false),
 	  _CDB_No_Second_Ref(true),
 	  _CDB_Edit_Support(false),
+	  _GT_LOD0_FullStack(false),
+	  _GS_LOD0_FullStack(false),
 	  _cur_Feature_Cnt(0),
 	  _rootString(""),
 	  _cacheDir(""),
-	  _dataSet("_S001_T001_")
+	  _dataSet("_S001_T001_"),
+	  _CDBLodNum(0)
 #ifdef _SAVE_OGR_OUTPUT
 	,_OGR_Output(NULL),
 	_OGR_OutputName("C:\\Temp\\GeoSpecificModelCapture.gpkg"),
@@ -134,12 +138,12 @@ public:
     }
 
     //override
-    Status initialize( const osgDB::Options* dbOptions )
-    {
-        _dbOptions = dbOptions ? osg::clone(dbOptions) : 0L;
+	Status initialize(const osgDB::Options* dbOptions)
+	{
+		_dbOptions = dbOptions ? osg::clone(dbOptions) : 0L;
 
-//		osgEarth::CachePolicy::NO_CACHE.apply(_dbOptions.get());
-		//ToDo when working reenable  the cache disable for development 
+		//		osgEarth::CachePolicy::NO_CACHE.apply(_dbOptions.get());
+				//ToDo when working reenable  the cache disable for development 
 #ifdef _SAVE_OGR_OUTPUT
 		bool geospecific = true;
 		if (_options.geoTypical().isSet())
@@ -172,6 +176,10 @@ public:
 			_CDB_Edit_Support = _options.Edit_Support().value();
 		if (_options.No_Second_Ref().isSet())
 			_CDB_No_Second_Ref = _options.No_Second_Ref().value();
+		if (_options.GT_LOD0_FullStack().isSet())
+			_GT_LOD0_FullStack = _options.GT_LOD0_FullStack().value();
+		if (_options.GS_LOD0_FullStack().isSet())
+			_GS_LOD0_FullStack = _options.GS_LOD0_FullStack().value();
 		if (_options.geoTypical().isSet())
 		{
 			_CDB_geoTypical = _options.geoTypical().value();
@@ -234,13 +242,13 @@ public:
 
 		// Always a WGS84 unprojected lat/lon profile.
 		if (!CDBFeatureProfile)
-			CDBFeatureProfile =osgEarth::Profile::create("EPSG:4326", "", 90U, 45U);
+			CDBFeatureProfile = osgEarth::Profile::create("EPSG:4326", "", 90U, 45U);
 
 		Feature_Profile = new FeatureProfile(CDBFeatureProfile->getExtent());
-		Feature_Profile->setTiled( true );
+		Feature_Profile->setTiled(true);
 		// Should work for now 
 		Feature_Profile->setFirstLevel(minLod);
-		Feature_Profile->setMaxLevel( maxLod);
+		Feature_Profile->setMaxLevel(maxLod);
 		Feature_Profile->setProfile(CDBFeatureProfile);
 
 		// Make sure the root directory is set
@@ -260,6 +268,18 @@ public:
 		if (!CDB_Tile::Initialize_Tile_Drivers(Errormsg))
 		{
 			errorset = true;
+		}
+
+		if (_GT_LOD0_FullStack)
+		{
+			if (_CDB_geoTypical)
+				CDB_Tile::Set_LOD0_GT_Stack(true);
+		}
+
+		if (_GS_LOD0_FullStack)
+		{
+			if (!_CDB_geoTypical)
+				CDB_Tile::Set_LOD0_GS_Stack(true);
 		}
 
 		if (Feature_Profile)
@@ -297,35 +317,36 @@ public:
 		CDB_Tile_Extent tileExtent(key_extent.north(), key_extent.south(), key_extent.east(), key_extent.west());
 
 		CDB_Tile *mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent);
-
+		_CDBLodNum = mainTile->CDB_LOD_Num();
 		int Files2check = mainTile->Model_Sel_Count();
 		int FilesChecked = 0;
 		bool dataOK = false;
 
 		FeatureList features;
+		bool have_a_file = false;
+		std::string base;
+		if (Files2check > 0)
+		{
+			base = mainTile->FileName(FilesChecked);
+			// check the blacklist:
+			if (Registry::instance()->isBlacklisted(base))
+				Files2check = 0;
+		}
+
 		while (FilesChecked < Files2check)
 		{
 			bool have_file = mainTile->Init_Model_Tile(FilesChecked);
-			std::string base = mainTile->FileName(FilesChecked);
-
 
 			OE_DEBUG << query.tileKey().get().str() << "=" << base << std::endl;
 
-			// check the blacklist:
-			if (Registry::instance()->isBlacklisted(base))
-				continue;
-
-			if (!have_file)
-			{
-				Registry::instance()->blacklist(base);
-			}
-
 			if (have_file)
 			{
+
 				bool fileOk = getFeatures(mainTile, base, features, FilesChecked);
 				if (fileOk)
 				{
 					OE_INFO << LC << "Features " << features.size() << base << std::endl;
+					have_a_file = true;
 				}
 
 				if (fileOk)
@@ -334,6 +355,11 @@ public:
 					Registry::instance()->blacklist(base);
 			}
 			++FilesChecked;
+		}
+
+		if (!have_a_file)
+		{
+			Registry::instance()->blacklist(base);
 		}
 
 		delete mainTile;
@@ -412,7 +438,7 @@ private:
 				have_texture_zipfile = mainTile->Model_Texture_Archive(TextureZipFile);
 			}
 		}
-		if (_CDB_GS_uses_GTtex)
+		if (!_CDB_geoTypical)
 			ModelZipDir = mainTile->Model_ZipDir();
 
 		bool done = false;
@@ -466,7 +492,24 @@ private:
 			{
 				f->set("osge_modelzip", ModelZipFile);
 			}//end else !cdb_inflated
+			if (valid_model)
+			{
+				if (_CDB_geoTypical)
+				{
+					if (_CDB_No_Second_Ref)
+					{
+						if (f->hasAttr("inst"))
+						{
+							int instanceType = f->getInt("inst");
+							if (instanceType == 1)
+							{
+								valid_model = false;
+							}
+						}
 
+					}
+				}
+			}
 			if (valid_model)
 			{
 				//Ok we have everthing needed to load this model at this lod
@@ -475,13 +518,17 @@ private:
 				{
 					//Normal CDB path
 					f->set("osge_modelname", ArchiveFileName);
-					if (!_CDB_GS_uses_GTtex)
+					if(have_texture_zipfile)
+						f->set("osge_texturezip", TextureZipFile);
+					f->set("osge_gs_uses_gt", ModelZipDir);
+					std::string referencedName;
+					bool instanced = false;
+					int LOD = 0;
+					if (find_PreInstance(ModelKeyName, referencedName, instanced, LOD))
 					{
-						if(have_texture_zipfile)
-							f->set("osge_texturezip", TextureZipFile);
+						if(LOD < _CDBLodNum)
+							f->set("osge_referencedName", referencedName);
 					}
-					else
-						f->set("osge_gs_uses_gt", ModelZipDir);
 				}
 				else
 				{
@@ -500,77 +547,31 @@ private:
 				{
 					//The model does not exist at this lod. It should have been loaded previously
 					//Look up the exact name used when creating the model at the lower lod
-					CDBEntryMap::iterator mi = _CDBInstances.find(ModelKeyName);
-					if (mi != _CDBInstances.end())
+					std::string referencedName;
+					bool instanced = false;
+					int LOD;
+					if (find_PreInstance(ModelKeyName, referencedName, instanced, LOD))
 					{
-						//Ok we found the model select the best lod. It must be lower than our current lod
-						//If the model is not found here then we will simply ignore the model until we get to an lod in which
-						//we find the model. If we selected to start at an lod higher than 0 there will be quite a few models
-						//that fall into this catagory
-						CDBFeatureEntryVec CurentCDBEntryMap = _CDBInstances[ModelKeyName];
-						bool have_lod = false;
-						CDBFeatureEntryVec::iterator ci;
-						int mind = 1000;
-						for (CDBFeatureEntryVec::iterator vi = CurentCDBEntryMap.begin(); vi != CurentCDBEntryMap.end(); ++vi)
-						{
-							if (vi->CDBLod <= _CDBLodNum)
-							{
-								int cind = _CDBLodNum - vi->CDBLod;
-								if (cind < mind)
-								{
-									have_lod = true;
-									ci = vi;
-								}
-							}
-						}
-						if (have_lod)
-						{
-							//Set the attribution for osgearth to find the referenced model
-							std::string referencedName = ci->FullReferenceName;
-							f->set("osge_modelname", referencedName);
-							if(_CDB_No_Second_Ref)
-								valid_model = false;
-#ifdef _DEBUG
-							OE_DEBUG << LC << "Model File " << FullModelName << " referenced" << std::endl;
-#endif
-						}
-						else
-						{
-							OE_INFO << LC << "No Instance of " << ModelKeyName << " found to reference" << std::endl;
+						f->set("osge_modelname", referencedName);
+						if (_CDB_No_Second_Ref)
 							valid_model = false;
-						}
 					}
 					else
 					{
-						if (have_archive)
+						if (instanced)
 						{
-							//now check and see if it is an unrefernced model from a lower LOD
-							CDBUnrefEntryMap::iterator ui = _CDBUnReffedInstances.find(ModelKeyName);
-							if (ui != _CDBUnReffedInstances.end())
+							valid_model = false;
+						}
+						else
+						{
+							if (have_archive)
 							{
-								//ok we found it here
-								CDBUnrefEntryVec CurentCDBUnRefMap = _CDBUnReffedInstances[ModelKeyName];
-								bool have_lod = false;
-								CDBUnrefEntryVec::iterator ci;
-								int mind = 1000;
-								for (CDBUnrefEntryVec::iterator vi = CurentCDBUnRefMap.begin(); vi != CurentCDBUnRefMap.end(); ++vi)
-								{
-									if (vi->CDBLod <= _CDBLodNum)
-									{
-										int cind = _CDBLodNum - vi->CDBLod;
-										if (cind < mind)
-										{
-											have_lod = true;
-											ci = vi;
-										}
-									}
-								}
-								if (have_lod)
+								bool urefinstance = false;
+								if (find_UnRefInstance(ModelKeyName, ModelZipFile, ArchiveFileName, TextureZipFile, urefinstance))
 								{
 									//Set the attribution for osgearth to load the previously unreference model
 									//Normal CDB path
 									valid_model = true;
-									ModelZipFile = ci->ModelZipName;
 									//A little paranoid verification
 									if (!validate_name(ModelZipFile))
 									{
@@ -578,12 +579,11 @@ private:
 									}
 									else
 										f->set("osge_modelzip", ModelZipFile);
-									ArchiveFileName = ci->ArchiveFileName;
+
 									f->set("osge_modelname", ArchiveFileName);
 
 									if (!_CDB_GS_uses_GTtex)
 									{
-										TextureZipFile = ci->TextureZipName;
 										have_texture_zipfile = true;
 										if (!TextureZipFile.empty())
 										{
@@ -597,50 +597,19 @@ private:
 									}
 									else
 										f->set("osge_gs_uses_gt", ModelZipDir);
-#ifdef _DEBUG
-									OE_DEBUG << LC << "Previously unrefferenced Model File " << ci->ArchiveFileName << " set to load" << std::endl;
-#endif
-									//Ok the model is now set to load and will be added to the referenced list 
-									//lets remove it from the unreferenced list
-									CurentCDBUnRefMap.erase(ci);
-									if (CurentCDBUnRefMap.size() == 0)
-									{
-										_CDBUnReffedInstances.erase(ui);
-									}
 								}
 								else
 								{
-									OE_INFO << LC << "No Instance of " << ModelKeyName << " found to reference" << std::endl;
+									//Its toast and will be a red flag in the database
+									OE_INFO << LC << "Model File " << FullModelName << " not found in archive" << std::endl;
 								}
-
 							}
 							else
 							{
 								//Its toast and will be a red flag in the database
-								OE_INFO << LC << "Model File " << FullModelName << " not found in archive" << std::endl;
+								OE_INFO << LC << " GeoTypical Model File " << FullModelName << " not found " << std::endl;
 							}
 						}
-						else
-						{
-							//Its toast and will be a red flag in the database
-							OE_INFO << LC << " GeoTypical Model File " << FullModelName << " not found " << std::endl;
-						}
-					}
-				}
-				else
-				{
-					//This is a GeoTypical Model
-					if (_CDB_No_Second_Ref)
-					{
-						if (f->hasAttr("inst"))
-						{
-							int instanceType = f->getInt("inst");
-							if (instanceType == 1)
-							{
-								valid_model = false;
-							}
-						}
-
 					}
 				}
 			}
@@ -722,8 +691,8 @@ private:
 					{
 						//The model is not in our refernced models so add it to the unreferenced list
 						//so we can find it later when it is referenced.
-						//This really shouldn't happen and perhaps we will make this an optiont to speed things 
-						//up in the future but there are unfortunatly publised datasets with this condition
+						//This really shouldn't happen and perhaps we will make this an option to speed things 
+						//up in the future but there are unfortunatly published datasets with this condition
 						//Colorodo Springs is and example
 						CDBUnrefEntryMap::iterator ui = _CDBUnReffedInstances.find(KeyName);
 						CDBUnrefEntry NewCDBUnRefEntry;
@@ -759,7 +728,114 @@ private:
 		return true;
 	}
 
+	bool find_PreInstance(std::string &ModelKeyName, std::string &ModelReferenceName, bool &instanced, int &LOD)
+	{
+		//The model does not exist at this lod. It should have been loaded previously
+		//Look up the exact name used when creating the model at the lower lod
+		CDBEntryMap::iterator mi = _CDBInstances.find(ModelKeyName);
+		if (mi != _CDBInstances.end())
+		{
+			//Ok we found the model select the best lod. It must be lower than our current lod
+			//If the model is not found here then we will simply ignore the model until we get to an lod in which
+			//we find the model. If we selected to start at an lod higher than 0 there will be quite a few models
+			//that fall into this catagory
+			instanced = true;
+			CDBFeatureEntryVec CurentCDBEntryMap = _CDBInstances[ModelKeyName];
+			bool have_lod = false;
+			CDBFeatureEntryVec::iterator ci;
+			int mind = 1000;
+			for (CDBFeatureEntryVec::iterator vi = CurentCDBEntryMap.begin(); vi != CurentCDBEntryMap.end(); ++vi)
+			{
+				if (vi->CDBLod <= _CDBLodNum)
+				{
+					int cind = _CDBLodNum - vi->CDBLod;
+					if (cind < mind)
+					{
+						LOD = vi->CDBLod;
+						have_lod = true;
+						ci = vi;
+					}
+				}
+			}
+			if (have_lod)
+			{
+				//Set the attribution for osgearth to find the referenced model
+				ModelReferenceName = ci->FullReferenceName;
+#ifdef _DEBUG
+				OE_DEBUG << LC << "Model File " << ModelReferenceName << " referenced" << std::endl;
+#endif
+				return true;
+			}
+			else
+			{
+				OE_INFO << LC << "No Instance of " << ModelKeyName << " found to reference" << std::endl;
+				return false;
+			}
+		}
+		else
+			instanced = false;
+		return false;
+	}
 
+	bool find_UnRefInstance(std::string &ModelKeyName, std::string &ModelZipFile, std::string &ArchiveFileName, std::string &TextureZipFile, bool &instance)
+	{
+		//now check and see if it is an unrefernced model from a lower LOD
+		CDBUnrefEntryMap::iterator ui = _CDBUnReffedInstances.find(ModelKeyName);
+		if (ui != _CDBUnReffedInstances.end())
+		{
+			instance = true;
+			//ok we found it here
+			CDBUnrefEntryVec CurentCDBUnRefMap = _CDBUnReffedInstances[ModelKeyName];
+			bool have_lod = false;
+			CDBUnrefEntryVec::iterator ci;
+			int mind = 1000;
+			for (CDBUnrefEntryVec::iterator vi = CurentCDBUnRefMap.begin(); vi != CurentCDBUnRefMap.end(); ++vi)
+			{
+				if (vi->CDBLod <= _CDBLodNum)
+				{
+					int cind = _CDBLodNum - vi->CDBLod;
+					if (cind < mind)
+					{
+						have_lod = true;
+						ci = vi;
+					}
+				}
+			}
+			if (have_lod)
+			{
+				//Set the attribution for osgearth to load the previously unreference model
+				//Normal CDB path
+				ModelZipFile = ci->ModelZipName;
+				ArchiveFileName = ci->ArchiveFileName;
+
+				if (!_CDB_GS_uses_GTtex)
+				{
+					TextureZipFile = ci->TextureZipName;
+				}
+#ifdef _DEBUG
+				OE_DEBUG << LC << "Previously unrefferenced Model File " << ci->ArchiveFileName << " set to load" << std::endl;
+#endif
+				//Ok the model is now set to load and will be added to the referenced list 
+				//lets remove it from the unreferenced list
+				CurentCDBUnRefMap.erase(ci);
+				if (CurentCDBUnRefMap.size() == 0)
+				{
+					_CDBUnReffedInstances.erase(ui);
+				}
+				return true;
+			}
+			else
+			{
+				OE_INFO << LC << "No Instance of " << ModelKeyName << " found to reference" << std::endl;
+				return false;
+			}
+
+		}
+		else
+			instance = false;
+
+		return false;
+	}
 
 	bool validate_name(std::string &filename)
 	{
@@ -796,6 +872,8 @@ private:
 	bool							_CDB_GS_uses_GTtex;
 	bool							_CDB_No_Second_Ref;
 	bool							_CDB_Edit_Support;
+	bool							_GS_LOD0_FullStack;
+	bool							_GT_LOD0_FullStack;
     osg::ref_ptr<CacheBin>          _cacheBin;
     osg::ref_ptr<osgDB::Options>    _dbOptions;
 	int								_CDBLodNum;

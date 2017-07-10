@@ -1007,6 +1007,7 @@
     <ClCompile Include="..\..\..\src\osgEarthFeatures\OgrUtils.cpp" />
     <ClCompile Include="..\..\..\src\osgEarthFeatures\OptimizerHints.cpp" />
     <ClCompile Include="..\..\..\src\osgEarthFeatures\PolygonizeLines.cpp" />
+    <ClCompile Include="..\..\..\src\osgEarthFeatures\GlobalModelManager.cpp" />
     <ClCompile Include="..\..\..\src\osgEarthFeatures\ResampleFilter.cpp" />
     <ClCompile Include="..\..\..\src\osgEarthFeatures\ScaleFilter.cpp" />
     <ClCompile Include="..\..\..\src\osgEarthFeatures\Session.cpp" />
@@ -1047,6 +1048,7 @@
     <None Include="..\..\..\src\osgEarthFeatures\OgrUtils" />
     <None Include="..\..\..\src\osgEarthFeatures\OptimizerHints" />
     <None Include="..\..\..\src\osgEarthFeatures\PolygonizeLines" />
+    <None Include="..\..\..\src\osgEarthFeatures\GlobalModelManager" />
     <None Include="..\..\..\src\osgEarthFeatures\ResampleFilter" />
     <None Include="..\..\..\src\osgEarthFeatures\ScaleFilter" />
     <None Include="..\..\..\src\osgEarthFeatures\Session" />

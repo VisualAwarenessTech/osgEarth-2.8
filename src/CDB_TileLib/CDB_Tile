@@ -209,6 +209,9 @@ struct CDB_Model_Tile_Set
 		clsMap.clear();
 	}
 };
+typedef CDB_Model_Tile_Set * CDB_Model_Tile_SetP;
+typedef std::vector<CDB_Model_Tile_Set> CDB_Model_Tile_SetV;
+typedef std::vector<CDB_Model_Tile_SetP> CDB_Model_Tile_SetPV;
 
 struct CDB_GT_Model_Tile_Selector
 {
@@ -295,11 +298,11 @@ public:
 	OGRFeature * Next_Valid_Feature(int sel, bool inflated, std::string &ModelKeyName, std::string &FullModelName, 
 									std::string &ArchiveFileName, bool &Model_in_Archive);
 
-	bool Model_Geometry_Name(std::string &GeometryName);
+	bool Model_Geometry_Name(std::string &GeometryName, unsigned int pos = 0);
 
 	bool Model_Texture_Directory(std::string &TextureDir);
 
-	bool Model_Texture_Archive(std::string &TextureArchive);
+	bool Model_Texture_Archive(std::string &TextureArchive, unsigned int pos = 0);
 
 	std::string Model_HeaderName(void);
 
@@ -309,7 +312,7 @@ public:
 
 	int Model_Sel_Count(void);
 
-	osgDB::Archive::FileNameList * Model_Archive_List(void);
+	osgDB::Archive::FileNameList * Model_Archive_List(unsigned int pos = 0);
 
 	OGRLayer * Map_Tile_Layer(std::string LayerName);
 
@@ -317,11 +320,16 @@ public:
 
 	static double Get_Lon_Step(double Latitude);
 
+
 	static bool Initialize_Tile_Drivers(std::string &ErrorMsg);
 
 	static void Disable_Bathyemtry(bool value);
 
 	static bool validate_tile_name(std::string &filename);
+
+	static void Set_LOD0_GS_Stack(bool value);
+
+	static void Set_LOD0_GT_Stack(bool value);
 
 private:
 	std::string				m_cdbRootDir;
@@ -346,7 +354,7 @@ private:
 	CDB_GDAL_Access			m_GDAL;
 	bool					m_Subordinate_Exists;
 	bool					m_Subordinate_Tile;
-	CDB_Model_Tile_Set		m_ModelSet;
+	CDB_Model_Tile_SetV		m_ModelSet;
 	CDB_GT_Tile_SelectorV	m_GTModelSet;
 
 	int GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
@@ -388,7 +396,7 @@ private:
 
 	std::string Set_FileType(std::string Name, std::string type);
 
-	bool Init_GS_Model_Tile(void);
+	bool Init_GS_Model_Tile(unsigned int pos = 0);
 
 	bool Init_GT_Model_Tile(int sel);
 
@@ -397,6 +405,10 @@ private:
 	int Find_Field_Index(OGRFeatureDefn *poFDefn, std::string fieldname, OGRFieldType Type);
 
 	bool Load_Archive(std::string ArchiveName, osgDB::Archive::FileNameList &archiveFileList);
+
+	bool Build_GS_Stack(void);
+
+	bool Build_GT_Stack(void);
 
 	std::string archive_validate_modelname(osgDB::Archive::FileNameList &archiveFileList, std::string &filename);
 
@@ -409,7 +421,7 @@ private:
 	std::string Model_FileName(std::string &FACC_value, std::string &FSC_value, std::string &BaseFileName);
 
 	OGRFeature * Next_Valid_Geospecific_Feature(bool inflated, std::string &ModelKeyName, std::string &FullModelName, std::string &ArchiveFileName,
-												bool &Model_in_Archive);
+												bool &Model_in_Archive, unsigned int pos = 0);
 
 	OGRFeature * Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, bool &Model_in_Archive);
 

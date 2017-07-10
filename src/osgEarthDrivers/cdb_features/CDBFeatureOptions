@@ -56,6 +56,10 @@ namespace osgEarth { namespace Drivers
 		const optional<bool>& Edit_Support() const { return _Edit_Support; }
 		optional<bool>& No_Second_Ref() { return _No_Second_Ref; }
 		const optional<bool>& No_Second_Ref() const { return _No_Second_Ref; }
+		optional<bool>& GT_LOD0_FullStack() { return _GT_LOD0_FullStack; }
+		const optional<bool>& GT_LOD0_FullStack() const { return _GT_LOD0_FullStack; }
+		optional<bool>& GS_LOD0_FullStack() { return _GS_LOD0_FullStack; }
+		const optional<bool>& GS_LOD0_FullStack() const { return _GS_LOD0_FullStack; }
 	public:
         CDBFeatureOptions( const ConfigOptions& opt =ConfigOptions() ) :
           FeatureSourceOptions( opt )
@@ -78,6 +82,8 @@ namespace osgEarth { namespace Drivers
 			conf.updateIfSet("gs_uses_gttex", _GS_uses_GTtex);
 			conf.updateIfSet("edit_support", _Edit_Support);
 			conf.updateIfSet("no_second_ref", _No_Second_Ref);
+			conf.updateIfSet("gt_lod0_full_stack", _GT_LOD0_FullStack);
+			conf.updateIfSet("gs_lod0_full_stack", _GS_LOD0_FullStack);
 			return conf;
         }
 
@@ -98,6 +104,8 @@ namespace osgEarth { namespace Drivers
 			conf.getIfSet("gs_uses_gttex", _GS_uses_GTtex);
 			conf.getIfSet("edit_support", _Edit_Support);
 			conf.getIfSet("no_second_ref", _No_Second_Ref);
+			conf.getIfSet("gt_lod0_full_stack", _GT_LOD0_FullStack);
+			conf.getIfSet("gs_lod0_full_stack", _GS_LOD0_FullStack);
 		}
 
 		optional<std::string> _rootDir;
@@ -109,6 +117,8 @@ namespace osgEarth { namespace Drivers
 		optional<bool>_GS_uses_GTtex;
 		optional<bool>_Edit_Support;
 		optional<bool>_No_Second_Ref;
+		optional<bool>_GT_LOD0_FullStack;
+		optional<bool>_GS_LOD0_FullStack;
 	};
 
 } } // namespace osgEarth::Drivers
