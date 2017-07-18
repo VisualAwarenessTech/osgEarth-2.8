@@ -59,8 +59,13 @@ namespace osgEarth { namespace Drivers
 
         optional<URI>& url() { return _url; }
         const optional<URI>& url() const { return _url; }
+		/*
+		 * If the source is a geopackage file a table name to open may also be required
+         */
+		optional<std::string>& table() { return _table; }
+		const optional<std::string>& table() const { return _table; }
 
-        /*
+		/*
          * If the data source is a database (e.g., PostGIS), the connection
          * string to use to open the database table.
          */
@@ -157,6 +162,7 @@ namespace osgEarth { namespace Drivers
         {
             Config conf = TileSourceOptions::getConfig();
             conf.updateIfSet( "url", _url );
+			conf.updateIfSet("table", _table);
             conf.updateIfSet( "connection", _connection );
             conf.updateIfSet( "extensions", _extensions );
             conf.updateIfSet( "black_extensions", _blackExtensions );
@@ -171,7 +177,7 @@ namespace osgEarth { namespace Drivers
             conf.updateIfSet( "subdataset", _subDataSet);
 
             conf.updateIfSet( "interp_imagery", _interpolateImagery);
-	    conf.updateIfSet("nearir", _nearIR);
+			conf.updateIfSet("nearir", _nearIR);
 
             conf.updateObjIfSet( "warp_profile", _warpProfile );
 
@@ -187,6 +193,7 @@ namespace osgEarth { namespace Drivers
 
         void fromConfig( const Config& conf ) {
             conf.getIfSet( "url", _url );
+			conf.getIfSet("table", _table);
             conf.getIfSet( "connection", _connection );
             conf.getIfSet( "extensions", _extensions );
             conf.getIfSet( "black_extensions", _blackExtensions );
@@ -198,7 +205,7 @@ namespace osgEarth { namespace Drivers
             conf.getIfSet( "subdataset", _subDataSet);
 
             conf.getIfSet("interp_imagery", _interpolateImagery);
-	    conf.getIfSet("nearir", _nearIR);
+			conf.getIfSet("nearir", _nearIR);
 
             conf.getObjIfSet( "warp_profile", _warpProfile );
 
@@ -206,6 +213,7 @@ namespace osgEarth { namespace Drivers
         }
 
         optional<URI>                    _url;
+		optional<std::string>			 _table;
         optional<std::string>            _connection;
         optional<std::string>            _extensions;
         optional<std::string>            _blackExtensions;

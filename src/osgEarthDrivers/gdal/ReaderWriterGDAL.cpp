@@ -708,9 +708,13 @@ public:
 
         // source connection:
         std::string source;
-
-        if ( _options.url().isSet() )
-            source = _options.url()->full();
+		std::string source_table = "";
+		if (_options.url().isSet())
+		{
+			source = _options.url()->full();
+			if (_options.table().isSet())
+				source_table = _options.table().value();
+		}
         else if ( _options.connection().isSet() )
             source = _options.connection().value();
 
@@ -833,7 +837,20 @@ public:
             {
                 //If we couldn't build a VRT, just try opening the file directly
                 //Open the dataset
-                _srcDS = (GDALDataset*)GDALOpen( files[0].c_str(), GA_ReadOnly );
+				if(source_table.empty())
+					_srcDS = (GDALDataset*)GDALOpen( files[0].c_str(), GA_ReadOnly );
+				else
+				{
+					std::string OpTablestr = "TABLE=" + source_table;
+					char * ilayer = new char[OpTablestr.length() + 1];
+					strncpy_s(ilayer, OpTablestr.length() + 1, OpTablestr.c_str(), OpTablestr.length());
+					ilayer[OpTablestr.length()] = 0;
+					char *papszOptions[2];
+					papszOptions[0] = ilayer;
+					papszOptions[1] = NULL;
+					_srcDS = (GDALDataset *)GDALOpenEx(files[0].c_str(), GA_ReadOnly, NULL, papszOptions, NULL);
+					delete ilayer;
+				}
 
                 if (_srcDS)
                 {

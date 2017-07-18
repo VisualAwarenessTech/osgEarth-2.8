@@ -75,6 +75,45 @@ namespace
     };
 }
 
+
+class MultipleTextureVisitor : public osg::NodeVisitor {
+public:
+	MultipleTextureVisitor()
+		: osg::NodeVisitor(TRAVERSE_ALL_CHILDREN)
+	{
+	}
+
+	virtual void apply(osg::Geode& geode)
+	{
+		apply(geode.getStateSet());
+		for (unsigned int i = 0; i < geode.getNumDrawables(); ++i)
+		{
+			osg::Drawable* drawable = geode.getDrawable(i);
+			apply(drawable->getStateSet());
+		}
+		osg::NodeVisitor::apply(geode);
+	}
+
+	void apply(osg::StateSet* ss)
+	{
+		if (ss)
+		{
+#ifdef _DEBUG
+			int numTexModes = ss->getNumTextureModeLists();
+#endif
+			for (unsigned int i = 1; i<ss->getNumTextureModeLists(); i++)
+			{
+				const osg::Texture* texture = dynamic_cast<osg::Texture*>(ss->getTextureAttribute(i, osg::StateAttribute::TEXTURE));
+				if (texture)
+				{
+					ss->setTextureMode(i, GL_TEXTURE_2D, osg::StateAttribute::OFF | osg::StateAttribute::OVERRIDE);
+				}
+			}
+		}
+	}
+};
+
+
 //------------------------------------------------------------------------
 
 SubstituteModelFilter::SubstituteModelFilter( const Style& style ) :
@@ -175,6 +214,9 @@ SubstituteModelFilter::process(const FeatureList&           features,
 	osg::ref_ptr<osgDB::Archive> ar = NULL;
 
 	bool Do_Editing_Support = false;
+
+	MultipleTextureVisitor v;
+
     for( FeatureList::const_iterator f = features.begin(); f != features.end(); ++f )
     {
         Feature* input = f->get();
@@ -363,7 +405,9 @@ SubstituteModelFilter::process(const FeatureList&           features,
 			if (feature_defined_model)
 				context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, localoptions, ar);
 			else
-            	context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, context.getDBOptions());
+            	context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, context.getDBOptions());	
+
+			model->accept(v);
 
             // if icon decluttering is off, install an AutoTransform.
             if ( iconSymbol )
