@@ -96,6 +96,7 @@ public:
 
 	void apply(osg::StateSet* ss)
 	{
+
 		if (ss)
 		{
 #ifdef _DEBUG
@@ -342,7 +343,7 @@ SubstituteModelFilter::process(const FeatureList&           features,
 			if ((scaleX != 1.0) || (scaleY != 1.0) || (scaleZ != 1.0))
 				_normalScalingRequired = true;
 			scaleMatrix = osg::Matrix::scale(scaleX, scaleY, scaleZ);
-		}
+			}
 		else 
 		{
  
@@ -458,33 +459,35 @@ SubstituteModelFilter::process(const FeatureList&           features,
                     // need to recalcluate expression-based data per-point, not just per-feature!
                     float scale = 1.0f;
                     osg::Vec3d scaleVec(1.0, 1.0, 1.0);
-                    osg::Matrixd scaleMatrix;
-                    if ( symbol->scale().isSet() )
-                    {
-                        scale = input->eval( scaleEx, &context );
-                        scaleVec.set(scale, scale, scale);
-                    }
-                    if ( modelSymbol )
-                    {
-                        if ( modelSymbol->scaleX().isSet() )
-                        {
-                            scaleVec.x() *= input->eval( scaleXEx, &context );
-                        }
-                        if ( modelSymbol->scaleY().isSet() )
-                        {
-                            scaleVec.y() *= input->eval( scaleYEx, &context );
-                        }
-                        if ( modelSymbol->scaleZ().isSet() )
-                        {
-                            scaleVec.z() *= input->eval( scaleZEx, &context );
-                        }
-                    }
+					if (!feature_defined_model)
+					{
+						if (symbol->scale().isSet())
+						{
+							scale = input->eval(scaleEx, &context);
+							scaleVec.set(scale, scale, scale);
+						}
+						if (modelSymbol)
+						{
+							if (modelSymbol->scaleX().isSet())
+							{
+								scaleVec.x() *= input->eval(scaleXEx, &context);
+							}
+							if (modelSymbol->scaleY().isSet())
+							{
+								scaleVec.y() *= input->eval(scaleYEx, &context);
+							}
+							if (modelSymbol->scaleZ().isSet())
+							{
+								scaleVec.z() *= input->eval(scaleZEx, &context);
+							}
+						}
 
-                    if ( scaleVec.x() == 0.0 ) scaleVec.x() = 1.0;
-                    if ( scaleVec.y() == 0.0 ) scaleVec.y() = 1.0;
-                    if ( scaleVec.z() == 0.0 ) scaleVec.z() = 1.0;
+						if (scaleVec.x() == 0.0) scaleVec.x() = 1.0;
+						if (scaleVec.y() == 0.0) scaleVec.y() = 1.0;
+						if (scaleVec.z() == 0.0) scaleVec.z() = 1.0;
 
-                    scaleMatrix = osg::Matrix::scale( scaleVec );
+						scaleMatrix = osg::Matrix::scale(scaleVec);
+					}
 
                     if ( modelSymbol->heading().isSet() )
                     {

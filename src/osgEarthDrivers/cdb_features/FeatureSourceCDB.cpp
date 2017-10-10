@@ -116,7 +116,8 @@ public:
 	  _rootString(""),
 	  _cacheDir(""),
 	  _dataSet("_S001_T001_"),
-	  _CDBLodNum(0)
+	  _CDBLodNum(0),
+	  _BE_Verbose(false)
 #ifdef _SAVE_OGR_OUTPUT
 	,_OGR_Output(NULL),
 	_OGR_OutputName("C:\\Temp\\GeoSpecificModelCapture.gpkg"),
@@ -191,6 +192,12 @@ public:
 					_CDB_inflated = true;
 				}
 			}
+		}
+		if (_options.Verbose().isSet())
+		{
+			bool verbose = _options.Verbose().value();
+			if (verbose)
+				_BE_Verbose = true;
 		}
 
 		if (_options.Limits().isSet())
@@ -341,10 +348,20 @@ public:
 
 			if (have_file)
 			{
-
+				if (_BE_Verbose)
+				{
+					if (_CDB_geoTypical)
+						printf("Feature tile loding GeoTypical Tile %s\n", base.c_str());
+					else
+						printf("Feature tile loding GeoSpecific Tile %s\n", base.c_str());
+				}
 				bool fileOk = getFeatures(mainTile, base, features, FilesChecked);
 				if (fileOk)
 				{
+					if (_BE_Verbose)
+					{
+						printf("File %s has %d Features\n", base.c_str(), (int)features.size());
+					}
 					OE_INFO << LC << "Features " << features.size() << base << std::endl;
 					have_a_file = true;
 				}
@@ -359,7 +376,8 @@ public:
 
 		if (!have_a_file)
 		{
-			Registry::instance()->blacklist(base);
+			if(Files2check > 0)
+				Registry::instance()->blacklist(base);
 		}
 
 		delete mainTile;
@@ -874,6 +892,7 @@ private:
 	bool							_CDB_Edit_Support;
 	bool							_GS_LOD0_FullStack;
 	bool							_GT_LOD0_FullStack;
+	bool							_BE_Verbose;
     osg::ref_ptr<CacheBin>          _cacheBin;
     osg::ref_ptr<osgDB::Options>    _dbOptions;
 	int								_CDBLodNum;

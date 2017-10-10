@@ -43,6 +43,7 @@
 #include <ogr_spatialref.h>
 
 #include "GDALOptions"
+#include <CDB_TileLib/CDB_Tile>
 
 #define LC "[GDAL driver] "
 
@@ -196,7 +197,7 @@ getFiles(const std::string &file, const std::vector<std::string> &exts, const st
  * DEALINGS IN THE SOFTWARE.
  ****************************************************************************/
 static GDALDatasetH
-build_vrt(std::vector<std::string> &files, ResolutionStrategy resolutionStrategy)
+build_vrt(std::vector<std::string> &files, ResolutionStrategy resolutionStrategy, std::string table)
 {
     GDAL_SCOPED_LOCK;
 
@@ -218,17 +219,44 @@ build_vrt(std::vector<std::string> &files, ResolutionStrategy resolutionStrategy
     DatasetProperty* psDatasetProperties =
             (DatasetProperty*) CPLMalloc(nInputFiles*sizeof(DatasetProperty));
 
+	char * ilayer = NULL;
+	char *papszOptions[3];
+	bool openwithoptions = false;
+	if (!table.empty())
+	{
+		std::string OpTablestr = "TABLE=" + table;
+		ilayer = new char[OpTablestr.length() + 1];
+		strncpy_s(ilayer, OpTablestr.length() + 1, OpTablestr.c_str(), OpTablestr.length());
+		ilayer[OpTablestr.length()] = 0;
+		papszOptions[0] = ilayer;
+		papszOptions[1] = NULL;
+		papszOptions[2] = NULL;
+		openwithoptions = true;
+	}
+#ifdef _DEBUG
+	int fopenCount = 0;
+#endif
     for(i=0;i<nInputFiles;i++)
     {
         const char* dsFileName = files[i].c_str();
 
         GDALTermProgress( 1.0 * (i+1) / nInputFiles, NULL, NULL);
-
-        GDALDatasetH hDS = GDALOpen(dsFileName, GA_ReadOnly );
+		GDALDatasetH hDS;
+		if (!openwithoptions)
+		{
+			hDS = GDALOpen(dsFileName, GA_ReadOnly);
+		}
+		else
+		{
+			hDS = GDALOpenEx(dsFileName, GA_ReadOnly, NULL, papszOptions, NULL);
+		}
         psDatasetProperties[i].isFileOK = FALSE;
 
         if (hDS)
         {
+#ifdef _DEBUG
+			++fopenCount;
+#endif
             const char* proj = GDALGetProjectionRef(hDS);
             if (!proj || strlen(proj) == 0)
             {
@@ -437,19 +465,19 @@ build_vrt(std::vector<std::string> &files, ResolutionStrategy resolutionStrategy
 #if GDAL_VERSION_1_6_OR_NEWER
 
         //Use a proxy dataset if possible.  This helps with huge amount of files to keep the # of handles down
-        GDALProxyPoolDatasetH hDS =
-               GDALProxyPoolDatasetCreate(dsFileName,
+        GDALProxyPoolDataset * hDS = new GDALProxyPoolDataset(dsFileName,
                                          psDatasetProperties[i].nRasterXSize,
                                          psDatasetProperties[i].nRasterYSize,
                                          GA_ReadOnly, TRUE, projectionRef,
                                          psDatasetProperties[i].adfGeoTransform);
+		if (openwithoptions)
+			hDS->SetOpenOptions(papszOptions);
 
         for(j=0;j<nBands;j++)
         {
-            GDALProxyPoolDatasetAddSrcBandDescription(hDS,
-                                            bandProperties[j].dataType,
-                                            psDatasetProperties[i].nBlockXSize,
-                                            psDatasetProperties[i].nBlockYSize);
+            hDS->AddSrcBandDescription( bandProperties[j].dataType,
+                                        psDatasetProperties[i].nBlockXSize,
+                                        psDatasetProperties[i].nBlockYSize);
         }
         isProxy = true;
         OE_DEBUG << LC << "Using GDALProxyPoolDatasetH" << std::endl;
@@ -492,7 +520,9 @@ build_vrt(std::vector<std::string> &files, ResolutionStrategy resolutionStrategy
         }
     }
 end:
-    CPLFree(psDatasetProperties);
+	if (ilayer)
+		delete ilayer;
+	CPLFree(psDatasetProperties);
     for(j=0;j<nBands;j++)
     {
         GDALDestroyColorTable(bandProperties[j].colorTable);
@@ -701,7 +731,8 @@ public:
 
         if (useExternalDataset == false &&
             (!_options.url().isSet() || _options.url()->empty()) &&
-            (!_options.connection().isSet() || _options.connection()->empty()) )
+            (!_options.connection().isSet() || _options.connection()->empty()) && 
+			(!_options.rootDir().isSet() || !_options.Limits().isSet()))
         {
             return Status::Error(Status::ConfigurationError, "No URL, directory, or connection string specified" );
         }
@@ -709,14 +740,34 @@ public:
         // source connection:
         std::string source;
 		std::string source_table = "";
+		double	min_lon,
+				max_lon,
+				min_lat,
+				max_lat;
+		bool	limits_valid = false;
+
 		if (_options.url().isSet())
 		{
 			source = _options.url()->full();
 			if (_options.table().isSet())
 				source_table = _options.table().value();
 		}
-        else if ( _options.connection().isSet() )
-            source = _options.connection().value();
+		else if (_options.connection().isSet())
+		{
+			source = _options.connection().value();
+		}
+		else if (_options.rootDir().isSet() && _options.Limits().isSet())
+		{
+			source = _options.rootDir().value();
+			if (_options.table().isSet())
+				source_table = _options.table().value();
+			std::string cdbLimits = _options.Limits().value();
+			int count = sscanf(cdbLimits.c_str(), "%lf,%lf,%lf,%lf", &min_lon, &min_lat, &max_lon, &max_lat);
+			if (count == 4)
+				limits_valid = true;
+			else
+				return Status::Error(Status::ConfigurationError, "Limits for CDB BaseMap tiles are invalid");
+		}
 
         //URI uri = _options.url().value();
 
@@ -752,6 +803,15 @@ public:
                     OE_INFO << LC << INDENT << files[i] << std::endl;
                 }
             }
+			else if (_options.rootDir().isSet() && limits_valid)
+			{
+				CDB_Tile_Extent extent_to_load;
+				extent_to_load.West = min_lon;
+				extent_to_load.East = max_lon;
+				extent_to_load.North = max_lat;
+				extent_to_load.South = min_lat;
+				CDB_Tile::Get_BaseMap_Files(source, extent_to_load, files);
+			}
             else
             {
                 // just add the connection string as the single source.
@@ -790,7 +850,7 @@ public:
                 {
                     //We couldn't get the VRT from the cache, so build it
                     osg::Timer_t startTime = osg::Timer::instance()->tick();
-                    _srcDS = (GDALDataset*)build_vrt(files, HIGHEST_RESOLUTION);
+                    _srcDS = (GDALDataset*)build_vrt(files, HIGHEST_RESOLUTION, source_table);
                     osg::Timer_t endTime = osg::Timer::instance()->tick();
                     OE_INFO << LC << INDENT << "Built VRT in " << osg::Timer::instance()->delta_s(startTime, endTime) << " s" << std::endl;
 

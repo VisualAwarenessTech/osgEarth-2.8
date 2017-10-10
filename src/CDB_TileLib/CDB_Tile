@@ -318,8 +318,9 @@ public:
 
 	GDALDataset * Map_Tile_Dataset(void);
 
-	static double Get_Lon_Step(double Latitude);
+	static bool Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, std::vector<std::string> &files);
 
+	static double Get_Lon_Step(double Latitude);
 
 	static bool Initialize_Tile_Drivers(std::string &ErrorMsg);
 

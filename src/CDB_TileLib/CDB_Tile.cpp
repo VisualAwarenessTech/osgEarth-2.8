@@ -19,6 +19,7 @@
 // Modified for General Incorporation of Common Database (CDB) support within osgEarth
 //
 #include "CDB_Tile"
+#include <osgEarth/XmlUtils>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -1625,6 +1626,77 @@ bool CDB_Tile::Build_Earth_Tile(void)
 	Tiles.clear();
 
 	return true;
+}
+
+bool CDB_Tile::Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, std::vector<std::string> &files)
+{
+	//
+	//	Make Extent a CDB GeoCell
+	// 
+	CDB_Tile_Extent L0_Extent;
+	L0_Extent.South = round(Extent.South);
+	L0_Extent.North = L0_Extent.South + 1.0;
+	L0_Extent.West = round(Extent.West);
+	L0_Extent.East = L0_Extent.West + Get_Lon_Step(Extent.South);
+	std::string dataset = "_S001_T001_";
+	std::string CacheDir = "";
+
+	CDB_Tile_Type Type = GeoPackageMap;
+	int BaseNumSave = s_BaseMapLodNum;
+	s_BaseMapLodNum = 3;
+	CDB_Tile * LOD0BM = new CDB_Tile(rootDir, CacheDir, Type, dataset, &L0_Extent);
+	s_BaseMapLodNum = BaseNumSave;
+	bool ret = true;
+	if (LOD0BM->Tile_Exists())
+	{
+		std::string xmlFileName = LOD0BM->FileName();
+		osgEarth::XmlDocument * xmld = new osgEarth::XmlDocument();
+		osgEarth::XmlDocument * xmlData = xmld->load(xmlFileName);
+		if (xmlData)
+		{
+			osgEarth::XmlElement * LODE = (osgEarth::XmlElement *)xmlData->findElement("CDB_Map_Lod");
+			if (LODE)
+			{
+				std::string LODstr = LODE->getText();
+				int baseLod = atoi(LODstr.c_str());
+				s_BaseMapLodNum = baseLod;
+				//Adjust extent to be on baseMap lod tile boundary
+				double degpertileY = 1.0 / Gbl_CDB_Tiles_Per_LOD[baseLod];
+				double degpertileX = Get_Lon_Step(Extent.South) / Gbl_CDB_Tiles_Per_LOD[baseLod];
+				bool done = false;
+				CDB_Tile_Extent T;
+				T.South = Extent.South;
+				T.West = Extent.West;
+				while (!done)
+				{
+					T.North = T.South + degpertileY;
+					T.East = T.West + degpertileX;
+					CDB_Tile * MapTile = new CDB_Tile(rootDir, CacheDir, Type, dataset, &T);
+					if (MapTile->Tile_Exists())
+					{
+						files.push_back(MapTile->FileName());
+					}
+					delete MapTile;
+					T.West += degpertileX;
+					if (T.West >= Extent.East)
+					{
+						T.West = Extent.West;
+						T.South += degpertileY;
+						if (T.South >= Extent.North)
+							done = true;
+					}
+				}
+			}
+		}
+		delete xmlData;
+		delete xmld;
+	}
+	else
+		ret = false;
+
+	delete LOD0BM;
+
+	return ret;
 }
 
 double CDB_Tile::Get_Lon_Step(double Latitude)
