@@ -1575,7 +1575,7 @@ bool CDB_Tile::Build_Earth_Tile(void)
 	double lonstep = Get_Lon_Step(m_TileExtent.South);
 	lonstep /= Gbl_CDB_Tiles_Per_LOD[m_CDB_LOD_Num];
 
-	double incrs = round(MinLon / lonstep);
+	double incrs = floor(MinLon / lonstep);
 	double test = incrs * lonstep;
 	if (test != MinLon)
 	{

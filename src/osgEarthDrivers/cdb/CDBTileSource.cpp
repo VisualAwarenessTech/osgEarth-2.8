@@ -253,8 +253,6 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 	std::string base = mainTile->FileName();
 	int cdbLod = mainTile->CDB_LOD_Num();
 
-	if(_Be_Verbose)
-		printf("Imagery: %s\n", base.c_str());
 
 	if (cdbLod >= 0)
 	{
@@ -262,14 +260,24 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 		{
 			if (mainTile->Tile_Exists())
 			{
+				if (_Be_Verbose)
+					printf("Imagery: Loading %s\n", base.c_str());
 				mainTile->Load_Tile();
 				ret_Image = mainTile->Image_From_Tile();
+			}
+			else
+			{
+				if (_Be_Verbose)
+					printf("Imagery: Blacklisting %s\n", base.c_str());
+				Registry::instance()->blacklist(base);
 			}
 		}
 		else
 		{
 			if (mainTile->Build_Earth_Tile())
 			{
+				if (_Be_Verbose)
+					printf("Imagery: Building %s\n", base.c_str());
 				OE_DEBUG "Imagery Built Earth Tile " << key.str() << "=" << base << std::endl;
 				ret_Image = mainTile->Image_From_Tile();
 			}
@@ -279,6 +287,8 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 	{
 		if (mainTile->Tile_Exists())
 		{
+			if (_Be_Verbose)
+				printf("Imagery: Loading %s\n", base.c_str());
 			mainTile->Load_Tile();
 			ret_Image = mainTile->Image_From_Tile();
 		}
@@ -286,6 +296,8 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 		{
 			if (mainTile->Build_Cache_Tile(_UseCache))
 			{
+				if (_Be_Verbose)
+					printf("Imagery: Built Cache tile %s\n", base.c_str());
 				ret_Image = mainTile->Image_From_Tile();
 			}
 		}
@@ -316,8 +328,6 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 	CDB_Tile *mainTile = new CDB_Tile(_rootDir, _cacheDir, tiletype, _dataSet, &tileExtent);
 	std::string base = mainTile->FileName();
 	int cdbLod = mainTile->CDB_LOD_Num();
-	if (_Be_Verbose)
-		printf("Elevation: %s\n", base.c_str());
 
 	if (cdbLod >= 0)
 	{
@@ -325,8 +335,16 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 		{
 			if (mainTile->Tile_Exists())
 			{
+				if (_Be_Verbose)
+					printf("Elevation: Loading %s\n", base.c_str());
 				mainTile->Load_Tile();
 				ret_Field = mainTile->HeightField_From_Tile();
+			}
+			else
+			{
+				if (_Be_Verbose)
+					printf("Elevation: Blacklisting %s\n", base.c_str());
+				Registry::instance()->blacklist(base);
 			}
 		}
 		else
@@ -342,6 +360,8 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 	{
 		if (mainTile->Tile_Exists())
 		{
+			if (_Be_Verbose)
+				printf("Elevation: Loading %s\n", base.c_str());
 			mainTile->Load_Tile();
 			ret_Field = mainTile->HeightField_From_Tile();
 		}
@@ -349,6 +369,8 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 		{
 			if (mainTile->Build_Cache_Tile(_UseCache))
 			{
+				if (_Be_Verbose)
+					printf("Elevation: Built Cache tile %s\n", base.c_str());
 				ret_Field = mainTile->HeightField_From_Tile();
 			}
 		}
