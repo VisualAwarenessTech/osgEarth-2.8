@@ -172,7 +172,13 @@ struct CDB_Tile_Extent
 	CDB_Tile_Extent(double n, double s, double e, double w) : North(n), South(s), East(e), West(w)
 	{
 	}
-
+	bool Contains(double x, double y)
+	{
+		if ((x >= West) && (x <= East) && (y >= South) && (y <= North))
+			return true;
+		else
+			return false;
+	}
 };
 
 typedef CDB_Tile_Extent * CDB_Tile_ExtentP;
@@ -298,6 +304,8 @@ public:
 	OGRFeature * Next_Valid_Feature(int sel, bool inflated, std::string &ModelKeyName, std::string &FullModelName, 
 									std::string &ArchiveFileName, bool &Model_in_Archive);
 
+	bool Set_SpatialFilter_Extent(CDB_Tile_Extent &SpatialExtent);
+
 	bool Model_Geometry_Name(std::string &GeometryName, unsigned int pos = 0);
 
 	bool Model_Texture_Directory(std::string &TextureDir);
@@ -332,6 +340,10 @@ public:
 
 	static void Set_LOD0_GT_Stack(bool value);
 
+	static CDB_Tile_Extent Actual_Extent_For_Tile(CDB_Tile_Extent &TileExtent);
+
+	static int LodNumFromExtent(CDB_Tile_Extent &Tile_Extent);
+
 private:
 	std::string				m_cdbRootDir;
 	std::string				m_cdbCacheDir;
@@ -357,6 +369,8 @@ private:
 	bool					m_Subordinate_Tile;
 	CDB_Model_Tile_SetV		m_ModelSet;
 	CDB_GT_Tile_SelectorV	m_GTModelSet;
+	CDB_Tile_Extent			m_SpatialRectExtent;
+	bool					m_Use_Spatial_Rect;
 
 	int GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
 						  std::string& uref_str, std::string& rref_str);

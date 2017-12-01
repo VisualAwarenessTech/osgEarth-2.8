@@ -77,7 +77,9 @@ FeatureCursorCDBV::FeatureCursorCDBV(OGRDataSourceH              dsHandle,
                                    const FeatureSource*        source,
                                    const FeatureProfile*       profile,
                                    const Symbology::Query&     query,
-                                   const FeatureFilterList&    filters) :
+                                   const FeatureFilterList&    filters,
+								   bool						   use_spatial_rect,
+							       CDB_Tile_ExtentP			   rect_extent) :
 _source           ( source ),
 _dsHandle         ( dsHandle ),
 _layerHandle      ( layerHandle ),
@@ -87,7 +89,9 @@ _query            ( query ),
 _chunkSize        ( 500 ),
 _nextHandleToQueue( 0L ),
 _profile          ( profile ),
-_filters          ( filters )
+_filters          ( filters ),
+_use_Spatial_Rect (use_spatial_rect),
+_Spatial_Rect     (rect_extent)
 {
 	Set_And_Read_Data();
 }
@@ -164,7 +168,19 @@ void FeatureCursorCDBV::Set_And_Read_Data(void)
 		}
 
 		// if there's a spatial extent in the query, build the spatial filter:
-		if (_query.bounds().isSet())
+		if (_use_Spatial_Rect)
+		{
+			OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
+			OGR_G_AddPoint(ring, _Spatial_Rect->West, _Spatial_Rect->South, 0);
+			OGR_G_AddPoint(ring, _Spatial_Rect->West, _Spatial_Rect->North, 0);
+			OGR_G_AddPoint(ring, _Spatial_Rect->East, _Spatial_Rect->North, 0);
+			OGR_G_AddPoint(ring, _Spatial_Rect->East, _Spatial_Rect->South, 0);
+			OGR_G_AddPoint(ring, _Spatial_Rect->West, _Spatial_Rect->South, 0);
+
+			_spatialFilter = OGR_G_CreateGeometry(wkbPolygon);
+			OGR_G_AddGeometryDirectly(_spatialFilter, ring);
+		}
+		else if (_query.bounds().isSet())
 		{
 			OGRGeometryH ring = OGR_G_CreateGeometry(wkbLinearRing);
 			OGR_G_AddPoint(ring, _query.bounds()->xMin(), _query.bounds()->yMin(), 0);

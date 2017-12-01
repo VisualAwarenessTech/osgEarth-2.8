@@ -62,6 +62,8 @@ namespace osgEarth { namespace Drivers
 		const optional<bool>& GS_LOD0_FullStack() const { return _GS_LOD0_FullStack; }
 		optional<bool>& Verbose() { return _Verbose; }
 		const optional<bool>& Verbose() const { return _Verbose; }
+		optional<bool>& ABS_Z_in_M() { return _ABS_Z_in_M; }
+		const optional<bool>& ABS_Z_in_M() const { return _ABS_Z_in_M; }
 	public:
         CDBFeatureOptions( const ConfigOptions& opt =ConfigOptions() ) :
           FeatureSourceOptions( opt )
@@ -87,6 +89,7 @@ namespace osgEarth { namespace Drivers
 			conf.updateIfSet("gt_lod0_full_stack", _GT_LOD0_FullStack);
 			conf.updateIfSet("gs_lod0_full_stack", _GS_LOD0_FullStack);
 			conf.updateIfSet("verbose", _Verbose);
+			conf.updateIfSet("abszinm", _ABS_Z_in_M);
 			return conf;
         }
 
@@ -110,6 +113,7 @@ namespace osgEarth { namespace Drivers
 			conf.getIfSet("gt_lod0_full_stack", _GT_LOD0_FullStack);
 			conf.getIfSet("gs_lod0_full_stack", _GS_LOD0_FullStack);
 			conf.getIfSet("verbose", _Verbose);
+			conf.getIfSet("abszinm", _ABS_Z_in_M);
 		}
 
 		optional<std::string> _rootDir;
@@ -124,6 +128,7 @@ namespace osgEarth { namespace Drivers
 		optional<bool>_GT_LOD0_FullStack;
 		optional<bool>_GS_LOD0_FullStack;
 		optional<bool> _Verbose;
+		optional<bool> _ABS_Z_in_M;
 	};
 
 } } // namespace osgEarth::Drivers

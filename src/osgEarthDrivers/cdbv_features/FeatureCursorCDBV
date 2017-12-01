@@ -28,6 +28,7 @@
 #include <osgEarthSymbology/Query>
 #include <ogr_api.h>
 #include <queue>
+#include <CDB_TileLib/CDB_Tile>
 
 using namespace osgEarth;
 using namespace osgEarth::Features;
@@ -56,7 +57,9 @@ public:
         const FeatureSource*     source,
         const FeatureProfile*    profile,
         const Symbology::Query&  query,
-        const FeatureFilterList& filters );
+        const FeatureFilterList& filters,
+	bool			 use_spatial_rect,
+	CDB_Tile_ExtentP	 rect_extent);
 
 	void Add_Layer_to_Cursor(OGRDataSourceH dsHandle, OGRLayerH layerHandle);
 
@@ -82,6 +85,8 @@ private:
     std::queue< osg::ref_ptr<Feature> > _queue;
     osg::ref_ptr<Feature>               _lastFeatureReturned;
     const FeatureFilterList&            _filters;
+    bool				_use_Spatial_Rect;
+    CDB_Tile_ExtentP			_Spatial_Rect;
 
 private:
     void readChunk();    

@@ -252,8 +252,26 @@ public:
 		const GeoExtent key_extent = key.getExtent();
 		CDB_Tile_Type tiletype = GeoPackageMap;
 		CDB_Tile_Extent tileExtent(key_extent.north(), key_extent.south(), key_extent.east(), key_extent.west());
+		CDB_Tile *mainTile = NULL;
+		bool subtile = false;
+		if (CDB_Tile::Get_Lon_Step(tileExtent.South) == 1.0)
+		{
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent);
+		}
+		else
+		{
+			CDB_Tile_Extent  CDBTile_Tile_Extent = CDB_Tile::Actual_Extent_For_Tile(tileExtent);
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &CDBTile_Tile_Extent);
+			mainTile->Set_SpatialFilter_Extent(tileExtent);
+			subtile = true;
+			if (_Be_Verbose)
+			{
+				printf("Sourcetile: North %lf South %lf East %lf West %lf \n", CDBTile_Tile_Extent.North, CDBTile_Tile_Extent.South,
+					CDBTile_Tile_Extent.East, CDBTile_Tile_Extent.West);
+			}
 
-		CDB_Tile *mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent);
+		}
+
 		std::string base = mainTile->FileName();
 		bool have_file = mainTile->Tile_Exists();
 		if (_Be_Verbose)
@@ -289,7 +307,9 @@ public:
 				this,
 				getFeatureProfile(),
 				query,
-				getFilters());
+				getFilters(),
+				subtile,
+				&tileExtent);
 
 			return fc;
         }

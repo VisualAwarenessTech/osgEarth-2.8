@@ -117,7 +117,8 @@ public:
 	  _cacheDir(""),
 	  _dataSet("_S001_T001_"),
 	  _CDBLodNum(0),
-	  _BE_Verbose(false)
+	  _BE_Verbose(false),
+	  _M_Contains_ABS_Z(false)
 #ifdef _SAVE_OGR_OUTPUT
 	,_OGR_Output(NULL),
 	_OGR_OutputName("C:\\Temp\\GeoSpecificModelCapture.gpkg"),
@@ -198,6 +199,12 @@ public:
 			bool verbose = _options.Verbose().value();
 			if (verbose)
 				_BE_Verbose = true;
+		}
+		if (_options.ABS_Z_in_M().isSet())
+		{
+			bool z_in_m = _options.ABS_Z_in_M().value();
+			if (z_in_m)
+				_M_Contains_ABS_Z = true;
 		}
 
 		if (_options.Limits().isSet())
@@ -322,22 +329,48 @@ public:
 		else
 			tiletype = GeoSpecificModel;
 		CDB_Tile_Extent tileExtent(key_extent.north(), key_extent.south(), key_extent.east(), key_extent.west());
-
-		CDB_Tile *mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent);
+		CDB_Tile *mainTile = NULL;
+		bool subtile = false;
+		if (CDB_Tile::Get_Lon_Step(tileExtent.South) == 1.0)
+		{
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent);
+		}
+		else
+		{
+			CDB_Tile_Extent  CDBTile_Tile_Extent = CDB_Tile::Actual_Extent_For_Tile(tileExtent);
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &CDBTile_Tile_Extent);
+			mainTile->Set_SpatialFilter_Extent(tileExtent);
+			subtile = true;
+			if (_BE_Verbose)
+			{
+				printf("Sourcetile: North %lf South %lf East %lf West %lf \n", CDBTile_Tile_Extent.North, CDBTile_Tile_Extent.South,
+					CDBTile_Tile_Extent.East, CDBTile_Tile_Extent.West);
+			}
+		}
 		_CDBLodNum = mainTile->CDB_LOD_Num();
+		if (_BE_Verbose)
+		{
+			printf("CDB Feature Cursor called with CDB LOD %d Tile\n", _CDBLodNum);
+		}
 		int Files2check = mainTile->Model_Sel_Count();
+		std::string base;
 		int FilesChecked = 0;
 		bool dataOK = false;
 
 		FeatureList features;
 		bool have_a_file = false;
-		std::string base;
 		if (Files2check > 0)
 		{
 			base = mainTile->FileName(FilesChecked);
 			// check the blacklist:
 			if (Registry::instance()->isBlacklisted(base))
+			{
 				Files2check = 0;
+				if (_BE_Verbose)
+				{
+					printf("Tile %s is blacklisted\n", base.c_str());
+				}
+			}
 		}
 
 		while (FilesChecked < Files2check)
@@ -351,9 +384,19 @@ public:
 				if (_BE_Verbose)
 				{
 					if (_CDB_geoTypical)
+					{
 						printf("Feature tile loding GeoTypical Tile %s\n", base.c_str());
+						if (subtile)
+							printf("Subtile: North %lf South %lf East %lf West %lf \n", tileExtent.North, tileExtent.South,
+								tileExtent.East, tileExtent.West);
+					}
 					else
+					{
 						printf("Feature tile loding GeoSpecific Tile %s\n", base.c_str());
+						if (subtile)
+							printf("Subtile: North %lf South %lf East %lf West %lf \n", tileExtent.North, tileExtent.South,
+								tileExtent.East, tileExtent.West);
+					}
 				}
 				bool fileOk = getFeatures(mainTile, base, features, FilesChecked);
 				if (fileOk)
@@ -462,13 +505,13 @@ private:
 		bool done = false;
 		while (!done)
 		{
-			OGRFeatureH feat_handle;
+			OGRFeature * feat_handle;
 			std::string FullModelName;
 			std::string ArchiveFileName;
 			std::string ModelKeyName;
 			bool Model_in_Archive = false;
 			bool valid_model = true;
-			feat_handle = (OGRFeatureH)mainTile->Next_Valid_Feature(sel, _CDB_inflated, ModelKeyName, FullModelName, ArchiveFileName, Model_in_Archive);
+			feat_handle = mainTile->Next_Valid_Feature(sel, _CDB_inflated, ModelKeyName, FullModelName, ArchiveFileName, Model_in_Archive);
 			if (feat_handle == NULL)
 			{
 				done = true;
@@ -477,8 +520,19 @@ private:
 			if (!Model_in_Archive)
 				valid_model = false;
 
+			if (_M_Contains_ABS_Z)
+			{
+				OGRGeometry *geo = feat_handle->GetGeometryRef();
+				if (wkbFlatten(geo->getGeometryType()) == wkbPoint)
+				{
+					OGRPoint * poPoint = (OGRPoint *)geo;
+					double Mpos = poPoint->getM();
+					poPoint->setZ(Mpos);
+				}
+			}
+
 #if OSGEARTH_VERSION_GREATER_OR_EQUAL (2,7,0)
-			osg::ref_ptr<Feature> f = OgrUtils::createFeature(feat_handle, getFeatureProfile());
+			osg::ref_ptr<Feature> f = OgrUtils::createFeature((OGRFeatureH)feat_handle, getFeatureProfile());
 #else
 			osg::ref_ptr<Feature> f = OgrUtils::createFeature(feat_handle, srs);
 #endif
@@ -893,6 +947,7 @@ private:
 	bool							_GS_LOD0_FullStack;
 	bool							_GT_LOD0_FullStack;
 	bool							_BE_Verbose;
+	bool							_M_Contains_ABS_Z;
     osg::ref_ptr<CacheBin>          _cacheBin;
     osg::ref_ptr<osgDB::Options>    _dbOptions;
 	int								_CDBLodNum;

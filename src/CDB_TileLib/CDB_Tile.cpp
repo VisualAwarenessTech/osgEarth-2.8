@@ -49,7 +49,8 @@ OGR_File  Ogr_File_Instance;
 
 CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, int NLod) : m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
-				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false)
+				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
+				   m_Use_Spatial_Rect(false)
 {
 	m_GTModelSet.clear();
 
@@ -615,6 +616,42 @@ void CDB_Tile::Free_Resources(void)
 	Free_Buffers();
 }
 
+int CDB_Tile::LodNumFromExtent(CDB_Tile_Extent &Tile_Extent)
+{
+	int cdbLod = 0;
+
+	//Determine the CDB LOD
+	double keylonspace = Tile_Extent.East - Tile_Extent.West;
+	double keylatspace = Tile_Extent.North - Tile_Extent.South;
+
+	double tilesperdeg = 1.0 / keylatspace;
+	double tilesperdegX = 1.0 / keylonspace;
+
+	if (tilesperdeg < 0.99)
+	{
+		//This is a multi-tile cash tile
+		double lnum = 1.0 / tilesperdeg;
+		int itiles = (int)(round(lnum / 2.0));
+		cdbLod = -1;
+		while (itiles > 1)
+		{
+			itiles /= 2;
+			--cdbLod;
+		}
+	}
+	else
+	{
+		cdbLod = 0;
+		int itiles = (int)round(tilesperdeg);
+		while (itiles > 1)
+		{
+			itiles /= 2;
+			++cdbLod;
+		}
+	}
+	return cdbLod;
+}
+
 int CDB_Tile::GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
 								std::string& uref_str, std::string& rref_str)
 {
@@ -1154,6 +1191,14 @@ OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string
 			break;
 		}
 		valid = true;
+#if 0
+		if (m_Use_Spatial_Rect)
+		{
+			OGRPoint *poPoint = (OGRPoint *)f->GetGeometryRef();
+			if (!m_SpatialRectExtent.Contains(poPoint->getX(), poPoint->getY()))
+				valid = false;
+		}
+#endif
 		std::string cnam = f->GetFieldAsString("CNAM");
 		if (!cnam.empty())
 		{
@@ -1201,6 +1246,14 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 			break;
 		}
 		valid = true;
+#if 0
+		if (m_Use_Spatial_Rect)
+		{
+			OGRPoint *poPoint = (OGRPoint *)f->GetGeometryRef();
+			if (!m_SpatialRectExtent.Contains(poPoint->getX(), poPoint->getY()))
+				valid = false;
+		}
+#endif
 		std::string cnam = f->GetFieldAsString("CNAM");
 		if (!cnam.empty())
 		{
@@ -1236,6 +1289,12 @@ bool CDB_Tile::Init_GS_Model_Tile(unsigned int pos)
 	m_ModelSet[pos].PrimaryLayer = m_ModelSet[pos].PrimaryTileOgr->GetLayer(0);
 	if (!m_ModelSet[pos].PrimaryLayer)
 		return false;
+
+	if (m_Use_Spatial_Rect)
+	{
+		m_ModelSet[pos].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
+	}
+
 	m_ModelSet[pos].PrimaryLayer->ResetReading();
 	OGRLayer *poLayer = m_ModelSet[pos].ClassTileOgr->GetLayer(0);
 	bool have_class = Load_Class_Map(poLayer, m_ModelSet[pos].clsMap);
@@ -1333,6 +1392,12 @@ bool CDB_Tile::Init_GT_Model_Tile(int sel)
 	m_GTModelSet[sel].PrimaryLayer = m_GTModelSet[sel].	PrimaryTileOgr->GetLayer(0);
 	if (!m_GTModelSet[sel].PrimaryLayer)
 		return false;
+
+	if (m_Use_Spatial_Rect)
+	{
+		m_GTModelSet[sel].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
+	}
+
 	m_GTModelSet[sel].PrimaryLayer->ResetReading();
 	OGRLayer *poLayer = m_GTModelSet[sel].ClassTileOgr->GetLayer(0);
 	return Load_Class_Map(poLayer, m_GTModelSet[sel].clsMap);
@@ -1554,6 +1619,37 @@ bool CDB_Tile::Build_Cache_Tile(bool save_cache)
 	}
 	Tiles.clear();
 
+	return true;
+}
+
+CDB_Tile_Extent CDB_Tile::Actual_Extent_For_Tile(CDB_Tile_Extent &TileExtent)
+{
+	double MinLon = TileExtent.West;
+
+	double lonstep = Get_Lon_Step(TileExtent.South);
+	int CDB_LOD_Num = LodNumFromExtent(TileExtent);
+	lonstep /= Gbl_CDB_Tiles_Per_LOD[CDB_LOD_Num];
+
+	double incrs = floor(MinLon / lonstep);
+	double test = incrs * lonstep;
+	if (test != MinLon)
+	{
+		MinLon = test;
+	}
+
+	CDB_Tile_Extent thisTileExtent;
+	thisTileExtent.West = MinLon;
+	thisTileExtent.South = TileExtent.South;
+	thisTileExtent.East = thisTileExtent.West + lonstep;
+	thisTileExtent.North = TileExtent.North;
+
+	return thisTileExtent;
+}
+
+bool CDB_Tile::Set_SpatialFilter_Extent(CDB_Tile_Extent &SpatialExtent)
+{
+	m_SpatialRectExtent = SpatialExtent;
+	m_Use_Spatial_Rect = true;
 	return true;
 }
 
