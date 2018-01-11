@@ -38,6 +38,8 @@ CDB_GDAL_Drivers Gbl_TileDrivers;
 
 static int s_BaseMapLodNum = 0;
 static bool s_EnableBathymetry = true;
+static bool s_EnableLightMap = false;
+static bool s_EnableMaterials = false;
 static bool s_LOD0_GS_FullStack = false;
 static bool s_LOD0_GT_FullStack = false;
 
@@ -50,7 +52,7 @@ OGR_File  Ogr_File_Instance;
 CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, int NLod) : m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
 				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
-				   m_Use_Spatial_Rect(false)
+				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false)
 {
 	m_GTModelSet.clear();
 
@@ -63,12 +65,16 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 
 	std::stringstream	buf;
 	std::stringstream	subordinatebuf;
+	std::stringstream	subordinatebuf2;
 
 	m_CDB_LOD_Num = GetPathComponents(m_lat_str, m_lon_str, m_lod_str, m_uref_str, m_rref_str);
 
 	std::string filetype;
+	std::string sub2filetype;
 	std::string datasetstr;
 	std::string subordinatedatasetstr;
+	std::string subordinatedatasetstr2;
+	std::string subord2LayerName;
 
 	if (m_TileType == Elevation)
 	{
@@ -91,6 +97,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 	else if (m_TileType == Imagery)
 	{
 		m_LayerName = "004_Imagery";
+		subord2LayerName = "005_RMTexture";
 		if (m_CDB_LOD_Num < 0 && NLod == 0)
 		{
 			m_TileType = ImageryCache;
@@ -101,6 +108,9 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 			filetype = ".jp2";
 		}
 		datasetstr = "_D004" + m_DataSet;
+		subordinatedatasetstr = "_D004_S005_T001_";
+		subordinatedatasetstr2 = "_D005_S001_T001_";
+		sub2filetype = ".tif";
 	}
 	else if (m_TileType == GeoPackageMap)
 	{
@@ -141,13 +151,21 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
 				<< "_" << m_uref_str << "_" << m_rref_str << filetype;
 
-			if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
+			if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
 			{
 				subordinatebuf << cdbRootDir
 					<< cdbCacheDir
 					<< "\\" << m_LayerName
 					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
 					<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+			}
+			if (m_TileType == Imagery)
+			{
+				subordinatebuf2 << cdbRootDir
+					<< cdbCacheDir
+					<< "\\" << subord2LayerName
+					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
+					<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
 			}
 		}
 		else
@@ -161,7 +179,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				<< "\\" << m_uref_str
 				<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
 				<< "_" << m_uref_str << "_" << m_rref_str << filetype;
-			if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
+			if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
 			{
 				subordinatebuf << cdbRootDir
 					<< "\\Tiles"
@@ -172,6 +190,19 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 					<< "\\" << m_uref_str
 					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
 					<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+
+			}
+			if (m_TileType == Imagery)
+			{
+				subordinatebuf2 << cdbRootDir
+					<< "\\Tiles"
+					<< "\\" << m_lat_str
+					<< "\\" << m_lon_str
+					<< "\\" << subord2LayerName
+					<< "\\LC"
+					<< "\\" << m_uref_str
+					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
+					<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
 
 			}
 		}
@@ -188,7 +219,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 			<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
 			<< "_" << m_uref_str << "_" << m_rref_str << filetype;
 
-		if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
+		if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
 		{
 			subordinatebuf << cdbRootDir
 				<< "\\Tiles"
@@ -199,6 +230,18 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				<< "\\" << m_uref_str
 				<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
 				<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+		}
+		if (m_TileType == Imagery)
+		{
+			subordinatebuf2 << cdbRootDir
+				<< "\\Tiles"
+				<< "\\" << m_lat_str
+				<< "\\" << m_lon_str
+				<< "\\" << subord2LayerName
+				<< "\\" << m_lod_str
+				<< "\\" << m_uref_str
+				<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
+				<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
 		}
 	}
 	m_FileName = buf.str();
@@ -330,11 +373,14 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				m_GTModelSet.push_back(t);
 		}
 	}
-	if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
+	if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
 	{
 		m_SubordinateName = subordinatebuf.str();
 	}
-
+	if (m_TileType == Imagery)
+	{
+		m_SubordinateName2 = subordinatebuf2.str();
+	}
 
 	if (m_TileType == GeoTypicalModel)
 	{
@@ -363,6 +409,17 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				m_Subordinate_Exists = validate_tile_name(m_SubordinateName);
 			else
 				m_Subordinate_Exists = false;
+		}
+		if (m_TileType == Imagery)
+		{
+			if (s_EnableLightMap)
+				m_Subordinate_Exists = validate_tile_name(m_SubordinateName);
+			else
+				m_Subordinate_Exists = false;
+			if (s_EnableMaterials)
+				m_Subordinate2_Exists = validate_tile_name(m_SubordinateName2);
+			else
+				m_Subordinate2_Exists = false;
 		}
 	}
 
@@ -806,6 +863,16 @@ void CDB_Tile::Allocate_Buffers(void)
 			m_GDAL.greendata = m_GDAL.reddata + bandbuffersize;
 			m_GDAL.bluedata = m_GDAL.greendata + bandbuffersize;
 		}
+		if (m_Subordinate_Exists)
+		{
+			if (!m_GDAL.lightmapdata)
+				m_GDAL.lightmapdata = new unsigned char[bandbuffersize];
+		}
+		if (m_Subordinate2_Exists)
+		{
+			if (!m_GDAL.materialdata)
+				m_GDAL.materialdata = new unsigned char[bandbuffersize];
+		}
 	}
 	else if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
 	{
@@ -837,6 +904,16 @@ void CDB_Tile::Free_Buffers(void)
 	{
 		delete m_GDAL.subord_elevationdata;
 		m_GDAL.subord_elevationdata = NULL;
+	}
+	if (m_GDAL.lightmapdata)
+	{
+		delete m_GDAL.lightmapdata;
+		m_GDAL.lightmapdata = NULL;
+	}
+	if (m_GDAL.materialdata)
+	{
+		delete m_GDAL.materialdata;
+		m_GDAL.materialdata = NULL;
 	}
 	if (m_Tile_Status == Loaded)
 	{
@@ -878,10 +955,12 @@ bool CDB_Tile::Open_Tile(void)
 	if (m_TileType == Imagery)
 	{
 		m_GDAL.poDriver = Gbl_TileDrivers.cdb_JP2Driver;
+		m_GDAL.so2Driver = Gbl_TileDrivers.cdb_GTIFFDriver;
 	}
 	else if (m_TileType == ImageryCache)
 	{
 		m_GDAL.poDriver = Gbl_TileDrivers.cdb_GTIFFDriver;
+		m_GDAL.so2Driver = Gbl_TileDrivers.cdb_GTIFFDriver;
 	}
 	else if (m_TileType == Elevation)
 	{
@@ -912,11 +991,20 @@ bool CDB_Tile::Open_Tile(void)
 		GDALOpenInfo sOpenInfo(m_SubordinateName.c_str(), GA_ReadOnly);
 		m_GDAL.soDataset = (GDALDataset *)m_GDAL.poDriver->pfnOpen(&sOpenInfo);
 	}
+	if (m_Subordinate2_Exists)
+	{
+		GDALOpenInfo sOpenInfo(m_SubordinateName2.c_str(), GA_ReadOnly);
+		m_GDAL.so2Dataset = (GDALDataset *)m_GDAL.so2Driver->pfnOpen(&sOpenInfo);
+	}
 	if (!m_GDAL.poDataset)
 	{
 		return false;
 	}
 	if (m_Subordinate_Exists && !m_GDAL.soDataset)
+	{
+		return false;
+	}
+	if (m_Subordinate2_Exists && !m_GDAL.so2Dataset)
 	{
 		return false;
 	}
@@ -1431,6 +1519,30 @@ bool CDB_Tile::Read(void)
 			return false;
 		}
 
+		if (m_Subordinate_Exists)
+		{
+			GDALRasterBand * SubordLightMapBand = m_GDAL.soDataset->GetRasterBand(1);
+
+			gdal_err = SubordLightMapBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
+													m_GDAL.lightmapdata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 0, 0);
+			if (gdal_err == CE_Failure)
+			{
+				return false;
+			}
+		}
+
+		if (m_Subordinate2_Exists)
+		{
+			GDALRasterBand * MaterialBand = m_GDAL.so2Dataset->GetRasterBand(1);
+
+			gdal_err = MaterialBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
+											  m_GDAL.materialdata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 0, 0);
+			if (gdal_err == CE_Failure)
+			{
+				return false;
+			}
+		}
+
 	}
 	else if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
 	{
@@ -1524,6 +1636,11 @@ bool CDB_Tile::Tile_Exists(int sel)
 bool CDB_Tile::Subordinate_Exists(void)
 {
 	return m_Subordinate_Exists;
+}
+
+bool CDB_Tile::Subordinate2_Exsits(void)
+{
+	return m_Subordinate2_Exists;
 }
 
 void CDB_Tile::Set_Subordinate(bool value)
@@ -1839,6 +1956,22 @@ void CDB_Tile::Disable_Bathyemtry(bool value)
 		s_EnableBathymetry = false;
 	else
 		s_EnableBathymetry = true;
+}
+
+void CDB_Tile::Enable_LightMap(bool value)
+{
+	if (value)
+		s_EnableLightMap = false;
+	else
+		s_EnableLightMap = true;
+}
+
+void CDB_Tile::Enable_Materials(bool value)
+{
+	if (value)
+		s_EnableMaterials = false;
+	else
+		s_EnableMaterials = true;
 }
 
 void CDB_Tile::Set_LOD0_GS_Stack(bool value)

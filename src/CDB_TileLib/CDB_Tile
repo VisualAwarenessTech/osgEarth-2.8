@@ -129,19 +129,23 @@ struct CDB_GDAL_Access
 {
 	GDALDataset *		poDataset;
 	GDALDataset *		soDataset;
+	GDALDataset *		so2Dataset;
 	GDALRasterBand *	RedBand;
 	GDALRasterBand *	GreenBand;
 	GDALRasterBand *	BlueBand;
 	GDALDriver *		poDriver;
+	GDALDriver *		so2Driver;
 	double				adfGeoTransform[6];
 	unsigned char *		reddata;
 	unsigned char *		greendata;
 	unsigned char *		bluedata;
+	unsigned char *		lightmapdata;
+	unsigned char *		materialdata;
 	float *				elevationdata;
 	float *				subord_elevationdata;
 	CDB_GDAL_Access() : poDataset(NULL), RedBand(NULL), GreenBand(NULL), BlueBand(NULL), reddata(NULL),
 						greendata(NULL), bluedata(NULL), elevationdata(NULL), poDriver(NULL), subord_elevationdata(NULL),
-						soDataset(NULL)
+						soDataset(NULL), lightmapdata(NULL), materialdata(NULL), so2Dataset(NULL), so2Driver(NULL)
 	{
 	}
 };
@@ -271,6 +275,8 @@ public:
 
 	bool Subordinate_Exists(void);
 
+	bool Subordinate2_Exsits(void);
+
 	void Set_Subordinate(bool value);
 
 	double West(void);
@@ -334,6 +340,10 @@ public:
 
 	static void Disable_Bathyemtry(bool value);
 
+	static void Enable_LightMap(bool value);
+
+	static void Enable_Materials(bool value);
+		
 	static bool validate_tile_name(std::string &filename);
 
 	static void Set_LOD0_GS_Stack(bool value);
@@ -354,6 +364,7 @@ private:
 	std::string				m_LayerName;
 	std::string				m_DataSet;
 	std::string				m_SubordinateName;
+	std::string				m_SubordinateName2;
 	std::string				m_lat_str;
 	std::string				m_lon_str;
 	std::string				m_lod_str;
@@ -366,6 +377,7 @@ private:
 	int						m_CDB_LOD_Num;
 	CDB_GDAL_Access			m_GDAL;
 	bool					m_Subordinate_Exists;
+	bool					m_Subordinate2_Exists;
 	bool					m_Subordinate_Tile;
 	CDB_Model_Tile_SetV		m_ModelSet;
 	CDB_GT_Tile_SelectorV	m_GTModelSet;
