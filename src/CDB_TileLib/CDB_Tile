@@ -139,13 +139,16 @@ struct CDB_GDAL_Access
 	unsigned char *		reddata;
 	unsigned char *		greendata;
 	unsigned char *		bluedata;
-	unsigned char *		lightmapdata;
+	unsigned char *		lightmapdatar;
+	unsigned char *		lightmapdatag;
+	unsigned char *		lightmapdatab;
 	unsigned char *		materialdata;
 	float *				elevationdata;
 	float *				subord_elevationdata;
 	CDB_GDAL_Access() : poDataset(NULL), RedBand(NULL), GreenBand(NULL), BlueBand(NULL), reddata(NULL),
 						greendata(NULL), bluedata(NULL), elevationdata(NULL), poDriver(NULL), subord_elevationdata(NULL),
-						soDataset(NULL), lightmapdata(NULL), materialdata(NULL), so2Dataset(NULL), so2Driver(NULL)
+						soDataset(NULL), lightmapdatar(NULL), materialdata(NULL), so2Dataset(NULL), so2Driver(NULL),
+						lightmapdatag(NULL), lightmapdatab(NULL)
 	{
 	}
 };

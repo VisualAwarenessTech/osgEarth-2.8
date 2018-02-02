@@ -20,6 +20,8 @@
 //
 #include "CDB_Tile"
 #include <osgEarth/XmlUtils>
+#include <osgDB/FileUtils>
+#include <osgDB/FileNameUtils>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -865,8 +867,12 @@ void CDB_Tile::Allocate_Buffers(void)
 		}
 		if (m_Subordinate_Exists)
 		{
-			if (!m_GDAL.lightmapdata)
-				m_GDAL.lightmapdata = new unsigned char[bandbuffersize];
+			if (!m_GDAL.lightmapdatar)
+			{
+				m_GDAL.lightmapdatar = new unsigned char[bandbuffersize * 3];
+				m_GDAL.lightmapdatag = m_GDAL.lightmapdatar + bandbuffersize;
+				m_GDAL.lightmapdatab = m_GDAL.lightmapdatag + bandbuffersize;
+			}
 		}
 		if (m_Subordinate2_Exists)
 		{
@@ -905,10 +911,12 @@ void CDB_Tile::Free_Buffers(void)
 		delete m_GDAL.subord_elevationdata;
 		m_GDAL.subord_elevationdata = NULL;
 	}
-	if (m_GDAL.lightmapdata)
+	if (m_GDAL.lightmapdatar)
 	{
-		delete m_GDAL.lightmapdata;
-		m_GDAL.lightmapdata = NULL;
+		delete m_GDAL.lightmapdatar;
+		m_GDAL.lightmapdatar = NULL;
+		m_GDAL.lightmapdatag = NULL;
+		m_GDAL.lightmapdatab = NULL;
 	}
 	if (m_GDAL.materialdata)
 	{
@@ -1521,10 +1529,9 @@ bool CDB_Tile::Read(void)
 
 		if (m_Subordinate_Exists)
 		{
-			GDALRasterBand * SubordLightMapBand = m_GDAL.soDataset->GetRasterBand(1);
+			CPLErr gdal_err = m_GDAL.poDataset->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
+														 m_GDAL.lightmapdatar, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 3, NULL, 0, 0, 0);
 
-			gdal_err = SubordLightMapBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
-													m_GDAL.lightmapdata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 0, 0);
 			if (gdal_err == CE_Failure)
 			{
 				return false;
@@ -2591,25 +2598,76 @@ osg::Image* CDB_Tile::Image_From_Tile(void)
 	{
 		//allocate the osg image
 		osg::ref_ptr<osg::Image> image = new osg::Image;
+		std::string tilename = osgDB::getSimpleFileName(m_FileName);
+		image->setFileName(tilename);
 		GLenum pixelFormat = GL_RGBA;
-		image->allocateImage(m_Pixels.pixX, m_Pixels.pixY, 1, pixelFormat, GL_UNSIGNED_BYTE);
+		int Rnum = 1;
+		if (m_Subordinate_Exists)
+			++Rnum;
+		if (m_Subordinate2_Exists)
+			++Rnum;
+
+		image->allocateImage(m_Pixels.pixX, m_Pixels.pixY, Rnum, pixelFormat, GL_UNSIGNED_BYTE);
 		memset(image->data(), 0, image->getImageSizeInBytes());
 		int ibufpos = 0;
 		int dst_row = 0;
+		int curRnum = 0;
 		for (int iy = 0; iy < m_Pixels.pixY; ++iy)
 		{
 			int dst_col = 0;
 			for (int ix = 0; ix < m_Pixels.pixX; ++ix)
 			{
 				//Populate the osg:image
-				*(image->data(dst_col, dst_row) + 0) = m_GDAL.reddata[ibufpos];
-				*(image->data(dst_col, dst_row) + 1) = m_GDAL.greendata[ibufpos];
-				*(image->data(dst_col, dst_row) + 2) = m_GDAL.bluedata[ibufpos];
-				*(image->data(dst_col, dst_row) + 3) = 255;
+				*(image->data(dst_col, dst_row, curRnum) + 0) = m_GDAL.reddata[ibufpos];
+				*(image->data(dst_col, dst_row, curRnum) + 1) = m_GDAL.greendata[ibufpos];
+				*(image->data(dst_col, dst_row, curRnum) + 2) = m_GDAL.bluedata[ibufpos];
+				*(image->data(dst_col, dst_row, curRnum) + 3) = 255;
 				++ibufpos;
 				++dst_col;
 			}
 			++dst_row;
+		}
+		if (m_Subordinate_Exists)
+		{
+			ibufpos = 0;
+			dst_row = 0;
+			++curRnum;
+			for (int iy = 0; iy < m_Pixels.pixY; ++iy)
+			{
+				int dst_col = 0;
+				for (int ix = 0; ix < m_Pixels.pixX; ++ix)
+				{
+					//Populate the osg:image
+					*(image->data(dst_col, dst_row, curRnum) + 0) = m_GDAL.lightmapdatar[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 1) = m_GDAL.lightmapdatag[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 2) = m_GDAL.lightmapdatab[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 3) = 255;
+					++ibufpos;
+					++dst_col;
+				}
+				++dst_row;
+			}
+		}
+		if (m_Subordinate2_Exists)
+		{
+			ibufpos = 0;
+			dst_row = 0;
+			++curRnum;
+			for (int iy = 0; iy < m_Pixels.pixY; ++iy)
+			{
+				int dst_col = 0;
+				for (int ix = 0; ix < m_Pixels.pixX; ++ix)
+				{
+					//Populate the osg:image
+					*(image->data(dst_col, dst_row, curRnum) + 0) = m_GDAL.materialdata[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 1) = m_GDAL.materialdata[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 2) = m_GDAL.materialdata[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 3) = 255;
+					++ibufpos;
+					++dst_col;
+				}
+				++dst_row;
+			}
 		}
 		image->flipVertical();
 		return image.release();
@@ -2623,6 +2681,9 @@ osg::HeightField* CDB_Tile::HeightField_From_Tile(void)
 	if (m_Tile_Status == Loaded)
 	{
 		osg::ref_ptr<osg::HeightField> field = new osg::HeightField;
+		std::string tilename = osgDB::getSimpleFileName(m_FileName);
+		field->setName(tilename);
+
 		field->allocate(m_Pixels.pixX, m_Pixels.pixY);
 		//For now clear the data
 		for (unsigned int i = 0; i < field->getHeightList().size(); ++i)

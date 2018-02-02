@@ -49,7 +49,13 @@ namespace osgEarth { namespace Drivers
 		const optional<bool>& DisableBathemetry() const { return _Disable_Bathyemtry; }
 		optional<bool>& Verbose() { return _Verbose; }
 		const optional<bool>& Verbose() const { return _Verbose; }
-    public:
+		optional<bool>& LightMap() { return _Enable_Subord_Light; }
+		const optional<bool>& LightMap() const { return _Enable_Subord_Light; }
+		optional<bool>& Materials() { return _Enable_Subord_Material; }
+		const optional<bool>& Materials() const { return _Enable_Subord_Material; }
+		optional<bool>& MaterialMask() { return _Enable_Subord_MaterialMask; }
+		const optional<bool>& MaterialMask() const { return _Enable_Subord_MaterialMask; }
+	public:
         CDBOptions( const TileSourceOptions& opt = TileSourceOptions() )
            : TileSourceOptions( opt )
         {
@@ -71,6 +77,9 @@ namespace osgEarth { namespace Drivers
 			conf.updateIfSet("num_neg_lods", _NumNegLODs);
 			conf.updateIfSet("disablebathyemetry", _Disable_Bathyemtry);
 			conf.updateIfSet("verbose", _Verbose);
+			conf.updateIfSet("lightmap", _Enable_Subord_Light);
+			conf.updateIfSet("materials", _Enable_Subord_Material);
+			conf.updateIfSet("materialmask", _Enable_Subord_MaterialMask);
 			return conf;
         }
 
@@ -91,6 +100,9 @@ namespace osgEarth { namespace Drivers
 			conf.getIfSet("num_neg_lods", _NumNegLODs);
 			conf.getIfSet("disablebathyemetry", _Disable_Bathyemtry);
 			conf.getIfSet("verbose", _Verbose);
+			conf.getIfSet("lightmap", _Enable_Subord_Light);
+			conf.getIfSet("materials", _Enable_Subord_Material);
+			conf.getIfSet("materialmask", _Enable_Subord_MaterialMask);
 		}
 
         optional<std::string> _rootDir;
@@ -100,6 +112,9 @@ namespace osgEarth { namespace Drivers
 		optional<int> _NumNegLODs;
 		optional<bool> _Disable_Bathyemtry;
 		optional<bool> _Verbose;
+		optional<bool> _Enable_Subord_Light;
+		optional<bool> _Enable_Subord_Material;
+		optional<bool> _Enable_Subord_MaterialMask;
     };
 
 } } // namespace osgEarth::Drivers

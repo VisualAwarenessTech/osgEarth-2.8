@@ -98,7 +98,19 @@ Status CDBTileSource::initialize(const osgDB::Options* dbOptions)
 	   _UseCache = true;
    }
    
+   if (LightMap().isSet())
+   {
+	   bool enableLm = LightMap().value();
+	   if (enableLm)
+		   CDB_Tile::Enable_LightMap(true);
+   }
 
+   if (Materials().isSet())
+   {
+	   bool enableMat = Materials().value();
+	   if (enableMat)
+		   CDB_Tile::Enable_Materials(true);
+   }
    //verify tilesize
    if (tileSize().isSet())
 	   _tileSize = tileSize().value();
