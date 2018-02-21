@@ -42,6 +42,7 @@ static int s_BaseMapLodNum = 0;
 static bool s_EnableBathymetry = true;
 static bool s_EnableLightMap = false;
 static bool s_EnableMaterials = false;
+static bool s_EnableMaterialMask = false;
 static bool s_LOD0_GS_FullStack = false;
 static bool s_LOD0_GT_FullStack = false;
 
@@ -54,7 +55,7 @@ OGR_File  Ogr_File_Instance;
 CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, int NLod) : m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
 				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
-				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false)
+				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false)
 {
 	m_GTModelSet.clear();
 
@@ -878,6 +879,11 @@ void CDB_Tile::Allocate_Buffers(void)
 		{
 			if (!m_GDAL.materialdata)
 				m_GDAL.materialdata = new unsigned char[bandbuffersize];
+			if (s_EnableMaterialMask)
+			{
+				if(!m_GDAL.materialmaskdata)
+					m_GDAL.materialmaskdata = new unsigned char[bandbuffersize];
+			}
 		}
 	}
 	else if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
@@ -922,6 +928,11 @@ void CDB_Tile::Free_Buffers(void)
 	{
 		delete m_GDAL.materialdata;
 		m_GDAL.materialdata = NULL;
+	}
+	if (m_GDAL.materialmaskdata)
+	{
+		delete m_GDAL.materialmaskdata;
+		m_GDAL.materialmaskdata = NULL;
 	}
 	if (m_Tile_Status == Loaded)
 	{
@@ -1548,6 +1559,23 @@ bool CDB_Tile::Read(void)
 			{
 				return false;
 			}
+			if (s_EnableMaterialMask)
+			{
+				m_Have_MaterialMaskData = false;
+				int maskbandnum = m_GDAL.so2Dataset->GetRasterCount();
+				if (maskbandnum > 1)
+				{
+					GDALRasterBand * MaterialMaskBand = m_GDAL.so2Dataset->GetRasterBand(maskbandnum);
+					gdal_err = MaterialMaskBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
+													     m_GDAL.materialmaskdata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 0, 0);
+					if (gdal_err == CE_Failure)
+					{
+						return false;
+					}
+					m_Have_MaterialMaskData = true;
+				}
+
+			}
 		}
 
 	}
@@ -1968,17 +1996,25 @@ void CDB_Tile::Disable_Bathyemtry(bool value)
 void CDB_Tile::Enable_LightMap(bool value)
 {
 	if (value)
-		s_EnableLightMap = false;
-	else
 		s_EnableLightMap = true;
+	else
+		s_EnableLightMap = false;
 }
 
 void CDB_Tile::Enable_Materials(bool value)
 {
 	if (value)
-		s_EnableMaterials = false;
-	else
 		s_EnableMaterials = true;
+	else
+		s_EnableMaterials = false;
+}
+
+void CDB_Tile::Enable_MaterialsMask(bool value)
+{
+	if (value)
+		s_EnableMaterialMask = true;
+	else
+		s_EnableMaterialMask = false;
 }
 
 void CDB_Tile::Set_LOD0_GS_Stack(bool value)
@@ -2662,7 +2698,10 @@ osg::Image* CDB_Tile::Image_From_Tile(void)
 					*(image->data(dst_col, dst_row, curRnum) + 0) = m_GDAL.materialdata[ibufpos];
 					*(image->data(dst_col, dst_row, curRnum) + 1) = m_GDAL.materialdata[ibufpos];
 					*(image->data(dst_col, dst_row, curRnum) + 2) = m_GDAL.materialdata[ibufpos];
-					*(image->data(dst_col, dst_row, curRnum) + 3) = 255;
+					if(m_Have_MaterialMaskData)
+						*(image->data(dst_col, dst_row, curRnum) + 3) = m_GDAL.materialmaskdata[ibufpos];
+					else
+						*(image->data(dst_col, dst_row, curRnum) + 3) = 255;
 					++ibufpos;
 					++dst_col;
 				}

@@ -143,12 +143,13 @@ struct CDB_GDAL_Access
 	unsigned char *		lightmapdatag;
 	unsigned char *		lightmapdatab;
 	unsigned char *		materialdata;
+	unsigned char *		materialmaskdata;
 	float *				elevationdata;
 	float *				subord_elevationdata;
 	CDB_GDAL_Access() : poDataset(NULL), RedBand(NULL), GreenBand(NULL), BlueBand(NULL), reddata(NULL),
 						greendata(NULL), bluedata(NULL), elevationdata(NULL), poDriver(NULL), subord_elevationdata(NULL),
 						soDataset(NULL), lightmapdatar(NULL), materialdata(NULL), so2Dataset(NULL), so2Driver(NULL),
-						lightmapdatag(NULL), lightmapdatab(NULL)
+						lightmapdatag(NULL), lightmapdatab(NULL),materialmaskdata(NULL)
 	{
 	}
 };
@@ -347,6 +348,8 @@ public:
 
 	static void Enable_Materials(bool value);
 		
+	static void Enable_MaterialsMask(bool value);
+
 	static bool validate_tile_name(std::string &filename);
 
 	static void Set_LOD0_GS_Stack(bool value);
@@ -386,6 +389,7 @@ private:
 	CDB_GT_Tile_SelectorV	m_GTModelSet;
 	CDB_Tile_Extent			m_SpatialRectExtent;
 	bool					m_Use_Spatial_Rect;
+	bool					m_Have_MaterialMaskData;
 
 	int GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
 						  std::string& uref_str, std::string& rref_str);

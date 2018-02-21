@@ -111,6 +111,14 @@ Status CDBTileSource::initialize(const osgDB::Options* dbOptions)
 	   if (enableMat)
 		   CDB_Tile::Enable_Materials(true);
    }
+
+   if (MaterialMask().isSet())
+   {
+	   bool enableMask = MaterialMask().value();
+	   if (enableMask)
+		   CDB_Tile::Enable_MaterialsMask(true);
+   }
+
    //verify tilesize
    if (tileSize().isSet())
 	   _tileSize = tileSize().value();
