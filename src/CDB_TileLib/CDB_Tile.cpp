@@ -55,7 +55,7 @@ OGR_File  Ogr_File_Instance;
 CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, int NLod) : m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
 				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
-				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false)
+				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false), m_Have_MaterialData(false)
 {
 	m_GTModelSet.clear();
 
@@ -1559,6 +1559,8 @@ bool CDB_Tile::Read(void)
 			{
 				return false;
 			}
+			m_Have_MaterialData = true;
+
 			if (s_EnableMaterialMask)
 			{
 				m_Have_MaterialMaskData = false;
@@ -1666,6 +1668,16 @@ bool CDB_Tile::Tile_Exists(int sel)
 			return false;
 	}
 	return m_FileExists;
+}
+
+bool CDB_Tile::Has_Mask_Data(void)
+{
+	return m_Have_MaterialMaskData;
+}
+
+bool CDB_Tile::Has_Material_Data(void)
+{
+	return m_Have_MaterialData;
 }
 
 bool CDB_Tile::Subordinate_Exists(void)
@@ -2215,6 +2227,64 @@ coord2d CDB_Tile::LL2Pix(coord2d LLPoint)
 	return PixCoord;
 }
 
+bool CDB_Tile::Get_Lightmap_Pixel(coord2d ImPix, unsigned char &RedPix, unsigned char &GreenPix, unsigned char &BluePix)
+{
+	int tx = (int)ImPix.Xpos;
+	int ty = (int)ImPix.Ypos;
+
+	if ((tx < 0) || (tx > m_Pixels.pixX - 1) || (ty < 0) || (ty > m_Pixels.pixY - 1))
+	{
+		return false;
+	}
+
+	int bpos1 = (((int)ImPix.Ypos) * m_Pixels.pixX) + (int)ImPix.Xpos;
+	int bpos2 = bpos1 + 1;
+	int bpos3 = bpos1 + (int)m_Pixels.pixX;
+	int bpos4 = bpos3 + 1;
+
+	if (tx == m_Pixels.pixX - 1)
+	{
+		bpos2 = bpos1;
+		bpos4 = bpos3;
+	}
+
+	if (ty == m_Pixels.pixY - 1)
+	{
+		bpos3 = bpos1;
+		if (tx == m_Pixels.pixX - 1)
+			bpos4 = bpos1;
+		else
+			bpos4 = bpos2;
+	}
+
+	float rat2 = (float)(ImPix.Xpos - double(tx));
+	float rat1 = 1.0f - rat2;
+	float rat4 = (float)(ImPix.Ypos - double(ty));
+	float rat3 = 1.0f - rat4;
+
+	float p1p = ((float)m_GDAL.lightmapdatar[bpos1] * rat1) + ((float)m_GDAL.lightmapdatar[bpos2] * rat2);
+	float p2p = ((float)m_GDAL.lightmapdatar[bpos3] * rat1) + ((float)m_GDAL.lightmapdatar[bpos4] * rat2);
+	float red = (p1p * rat3) + (p2p * rat4);
+
+	p1p = ((float)m_GDAL.lightmapdatag[bpos1] * rat1) + ((float)m_GDAL.lightmapdatag[bpos2] * rat2);
+	p2p = ((float)m_GDAL.lightmapdatag[bpos3] * rat1) + ((float)m_GDAL.lightmapdatag[bpos4] * rat2);
+	float green = (p1p * rat3) + (p2p * rat4);
+
+	p1p = ((float)m_GDAL.lightmapdatab[bpos1] * rat1) + ((float)m_GDAL.lightmapdatab[bpos2] * rat2);
+	p2p = ((float)m_GDAL.lightmapdatab[bpos3] * rat1) + ((float)m_GDAL.lightmapdatab[bpos4] * rat2);
+	float blue = (p1p * rat3) + (p2p * rat4);
+
+	red = round(red) < 255.0f ? round(red) : 255.0f;
+	green = round(green) < 255.0f ? round(green) : 255.0f;
+	blue = round(blue) < 255.0f ? round(blue) : 255.0f;
+
+	RedPix = (unsigned char)red;
+	GreenPix = (unsigned char)green;
+	BluePix = (unsigned char)blue;
+	return true;
+
+}
+
 bool CDB_Tile::Get_Image_Pixel(coord2d ImPix, unsigned char &RedPix, unsigned char &GreenPix, unsigned char &BluePix)
 {
 	int tx = (int)ImPix.Xpos;
@@ -2271,6 +2341,39 @@ bool CDB_Tile::Get_Image_Pixel(coord2d ImPix, unsigned char &RedPix, unsigned ch
 	BluePix = (unsigned char)blue;
 	return true;
 
+}
+
+bool CDB_Tile::Get_Material_Pixel(coord2d ImPix, unsigned char &MatPix)
+{
+	int tx = (int)ImPix.Xpos;
+	int ty = (int)ImPix.Ypos;
+
+	if ((tx < 0) || (tx > m_Pixels.pixX - 1) || (ty < 0) || (ty > m_Pixels.pixY - 1))
+	{
+		return false;
+	}
+
+	int bpos1 = (((int)round(ImPix.Ypos)) * m_Pixels.pixX) + (int)round(ImPix.Xpos);
+
+	MatPix = m_GDAL.materialdata[bpos1];
+	return true;
+}
+
+bool CDB_Tile::Get_Mask_Pixel(coord2d ImPix, unsigned char &MaskPix)
+{
+	int tx = (int)ImPix.Xpos;
+	int ty = (int)ImPix.Ypos;
+
+	if ((tx < 0) || (tx > m_Pixels.pixX - 1) || (ty < 0) || (ty > m_Pixels.pixY - 1))
+	{
+		return false;
+	}
+
+	int bpos1 = (((int)round(ImPix.Ypos)) * m_Pixels.pixX) + (int)round(ImPix.Xpos);
+
+	MaskPix = m_GDAL.materialmaskdata[bpos1];
+
+	return true;
 }
 
 bool CDB_Tile::Get_Elevation_Pixel(coord2d ImPix, float &ElevationPix)
@@ -2387,10 +2490,20 @@ void CDB_Tile::Build_From_Tiles(CDB_TilePV *Tiles, bool from_scratch)
 		if (tile->Subordinate_Exists())
 		{
 			m_Subordinate_Tile = true;
+			m_Subordinate_Exists = true;
 			break;
 		}
 	}
 
+	for each (CDB_TileP tile in *Tiles)
+	{
+
+		if (tile->Subordinate2_Exsits())
+		{
+			m_Subordinate2_Exists = true;
+			break;
+		}
+	}
 	Allocate_Buffers();
 
 	if (!from_scratch && m_FileExists)
@@ -2443,12 +2556,38 @@ void CDB_Tile::Build_From_Tiles(CDB_TilePV *Tiles, bool from_scratch)
 						coord2d impix = tile->LL2Pix(clatlon);
 						if ((m_TileType == Imagery) || (m_TileType == ImageryCache))
 						{
-							unsigned char redpix, greenpix, bluepix;
+							unsigned char redpix, greenpix, bluepix, matpix, maskpix;
 							if (tile->Get_Image_Pixel(impix, redpix, greenpix, bluepix))
 							{
 								m_GDAL.reddata[buffloc] = redpix;
 								m_GDAL.greendata[buffloc] = greenpix;
 								m_GDAL.bluedata[buffloc] = bluepix;
+							}
+							if (m_Subordinate_Exists)
+							{
+								if (tile->Get_Lightmap_Pixel(impix, redpix, greenpix, bluepix))
+								{
+									m_GDAL.lightmapdatar[buffloc] = redpix;
+									m_GDAL.lightmapdatag[buffloc] = greenpix;
+									m_GDAL.lightmapdatab[buffloc] = bluepix;
+								}
+							}
+							if (m_Subordinate2_Exists)
+							{
+								if (tile->Has_Material_Data())
+								{
+									if (tile->Get_Material_Pixel(impix, matpix))
+									{
+										m_GDAL.materialdata[buffloc] = matpix;
+									}
+								}
+								if (tile->Has_Mask_Data())
+								{
+									if (tile->Get_Mask_Pixel(impix, maskpix))
+									{
+										m_GDAL.materialmaskdata[buffloc] = maskpix;
+									}
+								}
 							}
 						}
 						else if ((m_TileType == Elevation) || (m_TileType == ElevationCache))

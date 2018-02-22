@@ -277,6 +277,10 @@ public:
 
 	bool Tile_Exists(int sel = -1);
 
+	bool Has_Mask_Data(void);
+
+	bool Has_Material_Data(void);
+
 	bool Subordinate_Exists(void);
 
 	bool Subordinate2_Exsits(void);
@@ -297,6 +301,12 @@ public:
 
 	bool Get_Image_Pixel(coord2d ImPix, unsigned char &RedPix, unsigned char &GreenPix, unsigned char &BluePix);
 
+	bool Get_Lightmap_Pixel(coord2d ImPix, unsigned char &RedPix, unsigned char &GreenPix, unsigned char &BluePix);
+
+	bool Get_Material_Pixel(coord2d ImPix, unsigned char &MatPix);
+
+	bool Get_Mask_Pixel(coord2d ImPix, unsigned char &MaskPix);
+		
 	bool Get_Elevation_Pixel(coord2d ImPix, float &ElevationPix);
 
 	bool Get_Subordinate_Elevation_Pixel(coord2d ImPix, float &ElevationPix);
@@ -390,6 +400,7 @@ private:
 	CDB_Tile_Extent			m_SpatialRectExtent;
 	bool					m_Use_Spatial_Rect;
 	bool					m_Have_MaterialMaskData;
+	bool					m_Have_MaterialData;
 
 	int GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
 						  std::string& uref_str, std::string& rref_str);
