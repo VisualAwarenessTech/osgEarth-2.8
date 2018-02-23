@@ -61,6 +61,9 @@ private:
    std::string	_dataSet;
    int			_tileSize;
    bool			_Be_Verbose;
+   bool			_LightMap;
+   bool			_Materials;
+   bool			_MaterialMask;
 
 };
 

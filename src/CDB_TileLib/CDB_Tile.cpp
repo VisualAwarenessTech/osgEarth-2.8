@@ -40,9 +40,6 @@ CDB_GDAL_Drivers Gbl_TileDrivers;
 
 static int s_BaseMapLodNum = 0;
 static bool s_EnableBathymetry = true;
-static bool s_EnableLightMap = false;
-static bool s_EnableMaterials = false;
-static bool s_EnableMaterialMask = false;
 static bool s_LOD0_GS_FullStack = false;
 static bool s_LOD0_GT_FullStack = false;
 
@@ -52,10 +49,12 @@ const double Gbl_CDB_Tiles_Per_LOD[18] = {1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 
 
 OGR_File  Ogr_File_Instance;
 
-CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, int NLod) : m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
+CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, bool lightmap, bool material, bool material_mask, int NLod) : 
+	               m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
 				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
-				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false), m_Have_MaterialData(false)
+				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false), m_Have_MaterialData(false), m_EnableLightMap(lightmap),
+				   m_EnableMaterials(material), m_EnableMaterialMask(material_mask)
 {
 	m_GTModelSet.clear();
 
@@ -415,11 +414,11 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 		}
 		if (m_TileType == Imagery)
 		{
-			if (s_EnableLightMap)
+			if (m_EnableLightMap)
 				m_Subordinate_Exists = validate_tile_name(m_SubordinateName);
 			else
 				m_Subordinate_Exists = false;
-			if (s_EnableMaterials)
+			if (m_EnableMaterials)
 				m_Subordinate2_Exists = validate_tile_name(m_SubordinateName2);
 			else
 				m_Subordinate2_Exists = false;
@@ -860,13 +859,16 @@ void CDB_Tile::Allocate_Buffers(void)
 	int bandbuffersize = m_Pixels.pixX * m_Pixels.pixY;
 	if ((m_TileType == Imagery) || (m_TileType == ImageryCache))
 	{
-		if (!m_GDAL.reddata)
+		if (!m_Subordinate_Exists && !m_Subordinate2_Exists)
 		{
-			m_GDAL.reddata = new unsigned char[bandbuffersize * 3];
-			m_GDAL.greendata = m_GDAL.reddata + bandbuffersize;
-			m_GDAL.bluedata = m_GDAL.greendata + bandbuffersize;
+			if (!m_GDAL.reddata)
+			{
+				m_GDAL.reddata = new unsigned char[bandbuffersize * 3];
+				m_GDAL.greendata = m_GDAL.reddata + bandbuffersize;
+				m_GDAL.bluedata = m_GDAL.greendata + bandbuffersize;
+			}
 		}
-		if (m_Subordinate_Exists)
+		else if (m_Subordinate_Exists)
 		{
 			if (!m_GDAL.lightmapdatar)
 			{
@@ -875,11 +877,11 @@ void CDB_Tile::Allocate_Buffers(void)
 				m_GDAL.lightmapdatab = m_GDAL.lightmapdatag + bandbuffersize;
 			}
 		}
-		if (m_Subordinate2_Exists)
+		else if (m_Subordinate2_Exists)
 		{
 			if (!m_GDAL.materialdata)
 				m_GDAL.materialdata = new unsigned char[bandbuffersize];
-			if (s_EnableMaterialMask)
+			if (m_EnableMaterialMask)
 			{
 				if(!m_GDAL.materialmaskdata)
 					m_GDAL.materialmaskdata = new unsigned char[bandbuffersize];
@@ -1004,30 +1006,65 @@ bool CDB_Tile::Open_Tile(void)
 		m_GDAL.poDriver = Gbl_TileDrivers.cdb_GeoPackageDriver;
 		return Open_GP_Map_Tile();
 	}
-	m_GDAL.poDataset = (GDALDataset *)m_GDAL.poDriver->pfnOpen(&oOpenInfo);
-	if (m_Subordinate_Exists)
+	if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
 	{
-		GDALOpenInfo sOpenInfo(m_SubordinateName.c_str(), GA_ReadOnly);
-		m_GDAL.soDataset = (GDALDataset *)m_GDAL.poDriver->pfnOpen(&sOpenInfo);
+		m_GDAL.poDataset = (GDALDataset *)m_GDAL.poDriver->pfnOpen(&oOpenInfo);
+		if (m_Subordinate_Exists)
+		{
+			GDALOpenInfo sOpenInfo(m_SubordinateName.c_str(), GA_ReadOnly);
+			m_GDAL.soDataset = (GDALDataset *)m_GDAL.poDriver->pfnOpen(&sOpenInfo);
+		}
+		if (m_Subordinate2_Exists)
+		{
+			GDALOpenInfo sOpenInfo(m_SubordinateName2.c_str(), GA_ReadOnly);
+			m_GDAL.so2Dataset = (GDALDataset *)m_GDAL.so2Driver->pfnOpen(&sOpenInfo);
+		}
+		if (!m_GDAL.poDataset)
+		{
+			return false;
+		}
+		if (m_Subordinate_Exists && !m_GDAL.soDataset)
+		{
+			return false;
+		}
+		if (m_Subordinate2_Exists && !m_GDAL.so2Dataset)
+		{
+			return false;
+		}
+		m_GDAL.poDataset->GetGeoTransform(m_GDAL.adfGeoTransform);
 	}
-	if (m_Subordinate2_Exists)
+	else if ((m_TileType == Imagery) || (m_TileType == ImageryCache))
 	{
-		GDALOpenInfo sOpenInfo(m_SubordinateName2.c_str(), GA_ReadOnly);
-		m_GDAL.so2Dataset = (GDALDataset *)m_GDAL.so2Driver->pfnOpen(&sOpenInfo);
+		if (!m_Subordinate_Exists && !m_Subordinate2_Exists)
+		{
+			m_GDAL.poDataset = (GDALDataset *)m_GDAL.poDriver->pfnOpen(&oOpenInfo);
+			if (!m_GDAL.poDataset)
+			{
+				return false;
+			}
+			m_GDAL.poDataset->GetGeoTransform(m_GDAL.adfGeoTransform);
+		}
+		else if (m_Subordinate_Exists)
+		{
+			GDALOpenInfo sOpenInfo(m_SubordinateName.c_str(), GA_ReadOnly);
+			m_GDAL.soDataset = (GDALDataset *)m_GDAL.poDriver->pfnOpen(&sOpenInfo);
+			if ( !m_GDAL.soDataset)
+			{
+				return false;
+			}
+			m_GDAL.soDataset->GetGeoTransform(m_GDAL.adfGeoTransform);
+		}
+		else if (m_Subordinate2_Exists)
+		{
+			GDALOpenInfo sOpenInfo(m_SubordinateName2.c_str(), GA_ReadOnly);
+			m_GDAL.so2Dataset = (GDALDataset *)m_GDAL.so2Driver->pfnOpen(&sOpenInfo);
+			if (!m_GDAL.so2Dataset)
+			{
+				return false;
+			}
+			m_GDAL.so2Dataset->GetGeoTransform(m_GDAL.adfGeoTransform);
+		}
 	}
-	if (!m_GDAL.poDataset)
-	{
-		return false;
-	}
-	if (m_Subordinate_Exists && !m_GDAL.soDataset)
-	{
-		return false;
-	}
-	if (m_Subordinate2_Exists && !m_GDAL.so2Dataset)
-	{
-		return false;
-	}
-	m_GDAL.poDataset->GetGeoTransform(m_GDAL.adfGeoTransform);
 	m_Tile_Status = Opened;
 	return true;
 }
@@ -1522,7 +1559,7 @@ int CDB_Tile::Model_Sel_Count(void)
 
 bool CDB_Tile::Read(void)
 {
-	if (!m_GDAL.poDataset)
+	if (!m_GDAL.poDataset && !m_GDAL.soDataset && !m_GDAL.so2Dataset)
 		return false;
 
 	if (m_Tile_Status == Loaded)
@@ -1531,14 +1568,16 @@ bool CDB_Tile::Read(void)
 
 	if ((m_TileType == Imagery) || (m_TileType == ImageryCache))
 	{
-		CPLErr gdal_err = m_GDAL.poDataset->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
-													 m_GDAL.reddata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 3, NULL, 0, 0, 0);
-		if (gdal_err == CE_Failure)
+		if (!m_Subordinate_Exists && !m_Subordinate2_Exists)
 		{
-			return false;
+			CPLErr gdal_err = m_GDAL.poDataset->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
+				m_GDAL.reddata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 3, NULL, 0, 0, 0);
+			if (gdal_err == CE_Failure)
+			{
+				return false;
+			}
 		}
-
-		if (m_Subordinate_Exists)
+		else if (m_Subordinate_Exists)
 		{
 			CPLErr gdal_err = m_GDAL.poDataset->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
 														 m_GDAL.lightmapdatar, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 3, NULL, 0, 0, 0);
@@ -1548,12 +1587,11 @@ bool CDB_Tile::Read(void)
 				return false;
 			}
 		}
-
-		if (m_Subordinate2_Exists)
+		else if (m_Subordinate2_Exists)
 		{
 			GDALRasterBand * MaterialBand = m_GDAL.so2Dataset->GetRasterBand(1);
 
-			gdal_err = MaterialBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
+			CPLErr gdal_err = MaterialBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
 											  m_GDAL.materialdata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 0, 0);
 			if (gdal_err == CE_Failure)
 			{
@@ -1561,14 +1599,14 @@ bool CDB_Tile::Read(void)
 			}
 			m_Have_MaterialData = true;
 
-			if (s_EnableMaterialMask)
+			if (m_EnableMaterialMask)
 			{
 				m_Have_MaterialMaskData = false;
 				int maskbandnum = m_GDAL.so2Dataset->GetRasterCount();
 				if (maskbandnum > 1)
 				{
 					GDALRasterBand * MaterialMaskBand = m_GDAL.so2Dataset->GetRasterBand(maskbandnum);
-					gdal_err = MaterialMaskBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
+					CPLErr gdal_err = MaterialMaskBand->RasterIO(GF_Read, 0, 0, m_Pixels.pixX, m_Pixels.pixY,
 													     m_GDAL.materialmaskdata, m_Pixels.pixX, m_Pixels.pixY, GDT_Byte, 0, 0);
 					if (gdal_err == CE_Failure)
 					{
@@ -1616,11 +1654,37 @@ void CDB_Tile::Fill_Tile(void)
 	int buffsz = m_Pixels.pixX * m_Pixels.pixY;
 	if (m_TileType == Imagery)
 	{
-		for (int i = 0; i < buffsz; ++i)
+		if (!m_Subordinate_Exists && m_Subordinate2_Exists)
 		{
-			m_GDAL.reddata[i] = 127;
-			m_GDAL.greendata[i] = 127;
-			m_GDAL.bluedata[i] = 127;
+			for (int i = 0; i < buffsz; ++i)
+			{
+				m_GDAL.reddata[i] = 127;
+				m_GDAL.greendata[i] = 127;
+				m_GDAL.bluedata[i] = 127;
+			}
+		}
+		else if (m_Subordinate_Exists)
+		{
+			for (int i = 0; i < buffsz; ++i)
+			{
+				m_GDAL.lightmapdatar[i] = 0;
+				m_GDAL.lightmapdatag[i] = 0;
+				m_GDAL.lightmapdatab[i] = 0;
+			}
+		}
+		else if (m_Subordinate2_Exists)
+		{
+			for (int i = 0; i < buffsz; ++i)
+			{
+				m_GDAL.materialdata[i] = 0;
+			}
+			if (m_EnableMaterialMask)
+			{
+				for (int i = 0; i < buffsz; ++i)
+				{
+					m_GDAL.materialmaskdata[i] = 0;
+				}
+			}
 		}
 	}
 	else if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
@@ -1640,11 +1704,37 @@ void CDB_Tile::Fill_Tile(void)
 	}
 	else if (m_TileType == ImageryCache)
 	{
-		for (int i = 0; i < buffsz; ++i)
+		if (!m_Subordinate_Exists && !m_Subordinate2_Exists)
 		{
-			m_GDAL.reddata[i] = 0;
-			m_GDAL.greendata[i] = 0;
-			m_GDAL.bluedata[i] = 0;
+			for (int i = 0; i < buffsz; ++i)
+			{
+				m_GDAL.reddata[i] = 0;
+				m_GDAL.greendata[i] = 0;
+				m_GDAL.bluedata[i] = 0;
+			}
+		}
+		else if (m_Subordinate_Exists)
+		{
+			for (int i = 0; i < buffsz; ++i)
+			{
+				m_GDAL.lightmapdatar[i] = 0;
+				m_GDAL.lightmapdatag[i] = 0;
+				m_GDAL.lightmapdatab[i] = 0;
+			}
+		}
+		else if (m_Subordinate2_Exists)
+		{
+			for (int i = 0; i < buffsz; ++i)
+			{
+				m_GDAL.materialdata[i] = 0;
+			}
+			if (m_EnableMaterialMask)
+			{
+				for (int i = 0; i < buffsz; ++i)
+				{
+					m_GDAL.materialmaskdata[i] = 0;
+				}
+			}
 		}
 	}
 }
@@ -1740,7 +1830,7 @@ bool CDB_Tile::Build_Cache_Tile(bool save_cache)
 		thisTileExtent.East = thisTileExtent.West + lonstep;
 		thisTileExtent.North = thisTileExtent.South + 1.0;
 
-		CDB_TileP LodTile = new CDB_Tile(m_cdbRootDir, m_cdbCacheDir, subTileType, m_DataSet, &thisTileExtent, m_CDB_LOD_Num);
+		CDB_TileP LodTile = new CDB_Tile(m_cdbRootDir, m_cdbCacheDir, subTileType, m_DataSet, &thisTileExtent, m_EnableLightMap, m_EnableMaterials, m_EnableMaterialMask, m_CDB_LOD_Num);
 
 		if (LodTile->Tile_Exists())
 		{
@@ -1851,7 +1941,7 @@ bool CDB_Tile::Build_Earth_Tile(void)
 	OE_DEBUG "Build_Earth_Tile cdb extent " << thisTileExtent.North << " " << thisTileExtent.South << " " << thisTileExtent.East << " " << thisTileExtent.West << std::endl;
 
 	//Now get the actual cdb tile with the correct CDB extents
-	CDB_TileP LodTile = new CDB_Tile(m_cdbRootDir, m_cdbCacheDir, subTileType, m_DataSet, &thisTileExtent);
+	CDB_TileP LodTile = new CDB_Tile(m_cdbRootDir, m_cdbCacheDir, subTileType, m_DataSet, &thisTileExtent, m_EnableLightMap, m_EnableMaterials, m_EnableMaterialMask);
 
 	OE_DEBUG "Build_Earth_Tile cdb tile " << LodTile->FileName().c_str() << std::endl;
 
@@ -1904,7 +1994,7 @@ bool CDB_Tile::Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, s
 	CDB_Tile_Type Type = GeoPackageMap;
 	int BaseNumSave = s_BaseMapLodNum;
 	s_BaseMapLodNum = 3;
-	CDB_Tile * LOD0BM = new CDB_Tile(rootDir, CacheDir, Type, dataset, &L0_Extent);
+	CDB_Tile * LOD0BM = new CDB_Tile(rootDir, CacheDir, Type, dataset, &L0_Extent, false, false, false);
 	s_BaseMapLodNum = BaseNumSave;
 	bool ret = true;
 	if (LOD0BM->Tile_Exists())
@@ -1931,7 +2021,7 @@ bool CDB_Tile::Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, s
 				{
 					T.North = T.South + degpertileY;
 					T.East = T.West + degpertileX;
-					CDB_Tile * MapTile = new CDB_Tile(rootDir, CacheDir, Type, dataset, &T);
+					CDB_Tile * MapTile = new CDB_Tile(rootDir, CacheDir, Type, dataset, &T, false, false, false);
 					if (MapTile->Tile_Exists())
 					{
 						files.push_back(MapTile->FileName());
@@ -2005,29 +2095,6 @@ void CDB_Tile::Disable_Bathyemtry(bool value)
 		s_EnableBathymetry = true;
 }
 
-void CDB_Tile::Enable_LightMap(bool value)
-{
-	if (value)
-		s_EnableLightMap = true;
-	else
-		s_EnableLightMap = false;
-}
-
-void CDB_Tile::Enable_Materials(bool value)
-{
-	if (value)
-		s_EnableMaterials = true;
-	else
-		s_EnableMaterials = false;
-}
-
-void CDB_Tile::Enable_MaterialsMask(bool value)
-{
-	if (value)
-		s_EnableMaterialMask = true;
-	else
-		s_EnableMaterialMask = false;
-}
 
 void CDB_Tile::Set_LOD0_GS_Stack(bool value)
 {
@@ -2501,6 +2568,7 @@ void CDB_Tile::Build_From_Tiles(CDB_TilePV *Tiles, bool from_scratch)
 		if (tile->Subordinate2_Exsits())
 		{
 			m_Subordinate2_Exists = true;
+			m_Have_MaterialData = true;
 			break;
 		}
 	}
@@ -2547,6 +2615,9 @@ void CDB_Tile::Build_From_Tiles(CDB_TilePV *Tiles, bool from_scratch)
 				coord2d clatlon;
 				clatlon.Ypos = srowlat;
 				bool proces_subordinate = m_Subordinate_Tile && tile->Subordinate_Exists();
+				if (m_Subordinate2_Exists)
+					if (tile->Has_Mask_Data())
+						m_Have_MaterialMaskData = true;
 				for (int iy = sy; iy <= ey; ++iy)
 				{
 					buffloc = (iy * m_Pixels.pixX) + sx;
@@ -2557,13 +2628,16 @@ void CDB_Tile::Build_From_Tiles(CDB_TilePV *Tiles, bool from_scratch)
 						if ((m_TileType == Imagery) || (m_TileType == ImageryCache))
 						{
 							unsigned char redpix, greenpix, bluepix, matpix, maskpix;
-							if (tile->Get_Image_Pixel(impix, redpix, greenpix, bluepix))
+							if (!m_Subordinate_Exists && !m_Subordinate2_Exists)
 							{
-								m_GDAL.reddata[buffloc] = redpix;
-								m_GDAL.greendata[buffloc] = greenpix;
-								m_GDAL.bluedata[buffloc] = bluepix;
+								if (tile->Get_Image_Pixel(impix, redpix, greenpix, bluepix))
+								{
+									m_GDAL.reddata[buffloc] = redpix;
+									m_GDAL.greendata[buffloc] = greenpix;
+									m_GDAL.bluedata[buffloc] = bluepix;
+								}
 							}
-							if (m_Subordinate_Exists)
+							else if (m_Subordinate_Exists)
 							{
 								if (tile->Get_Lightmap_Pixel(impix, redpix, greenpix, bluepix))
 								{
@@ -2572,7 +2646,7 @@ void CDB_Tile::Build_From_Tiles(CDB_TilePV *Tiles, bool from_scratch)
 									m_GDAL.lightmapdatab[buffloc] = bluepix;
 								}
 							}
-							if (m_Subordinate2_Exists)
+							else if (m_Subordinate2_Exists)
 							{
 								if (tile->Has_Material_Data())
 								{
@@ -2777,36 +2851,35 @@ osg::Image* CDB_Tile::Image_From_Tile(void)
 		image->setFileName(tilename);
 		GLenum pixelFormat = GL_RGBA;
 		int Rnum = 1;
-		if (m_Subordinate_Exists)
-			++Rnum;
-		if (m_Subordinate2_Exists)
-			++Rnum;
-
-		image->allocateImage(m_Pixels.pixX, m_Pixels.pixY, Rnum, pixelFormat, GL_UNSIGNED_BYTE);
-		memset(image->data(), 0, image->getImageSizeInBytes());
+		int curRnum = 0;
 		int ibufpos = 0;
 		int dst_row = 0;
-		int curRnum = 0;
-		for (int iy = 0; iy < m_Pixels.pixY; ++iy)
-		{
-			int dst_col = 0;
-			for (int ix = 0; ix < m_Pixels.pixX; ++ix)
-			{
-				//Populate the osg:image
-				*(image->data(dst_col, dst_row, curRnum) + 0) = m_GDAL.reddata[ibufpos];
-				*(image->data(dst_col, dst_row, curRnum) + 1) = m_GDAL.greendata[ibufpos];
-				*(image->data(dst_col, dst_row, curRnum) + 2) = m_GDAL.bluedata[ibufpos];
-				*(image->data(dst_col, dst_row, curRnum) + 3) = 255;
-				++ibufpos;
-				++dst_col;
-			}
-			++dst_row;
-		}
-		if (m_Subordinate_Exists)
+		image->allocateImage(m_Pixels.pixX, m_Pixels.pixY, Rnum, pixelFormat, GL_UNSIGNED_BYTE);
+		memset(image->data(), 0, image->getImageSizeInBytes());
+		if (!m_Subordinate_Exists && !m_Subordinate2_Exists)
 		{
 			ibufpos = 0;
 			dst_row = 0;
-			++curRnum;
+			for (int iy = 0; iy < m_Pixels.pixY; ++iy)
+			{
+				int dst_col = 0;
+				for (int ix = 0; ix < m_Pixels.pixX; ++ix)
+				{
+					//Populate the osg:image
+					*(image->data(dst_col, dst_row, curRnum) + 0) = m_GDAL.reddata[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 1) = m_GDAL.greendata[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 2) = m_GDAL.bluedata[ibufpos];
+					*(image->data(dst_col, dst_row, curRnum) + 3) = 255;
+					++ibufpos;
+					++dst_col;
+				}
+				++dst_row;
+			}
+		}
+		else if (m_Subordinate_Exists)
+		{
+			ibufpos = 0;
+			dst_row = 0;
 			for (int iy = 0; iy < m_Pixels.pixY; ++iy)
 			{
 				int dst_col = 0;
@@ -2823,11 +2896,10 @@ osg::Image* CDB_Tile::Image_From_Tile(void)
 				++dst_row;
 			}
 		}
-		if (m_Subordinate2_Exists)
+		else if (m_Subordinate2_Exists)
 		{
 			ibufpos = 0;
 			dst_row = 0;
-			++curRnum;
 			for (int iy = 0; iy < m_Pixels.pixY; ++iy)
 			{
 				int dst_col = 0;

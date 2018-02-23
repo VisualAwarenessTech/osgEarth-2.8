@@ -263,7 +263,7 @@ typedef vector<CDB_TileP> CDB_TilePV;
 class CDBTILELIBRARYAPI CDB_Tile
 {
 public:
-	CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, int NLod=0);
+	CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, bool lightmap, bool material, bool material_mask, int NLod=0);
 
 	virtual ~CDB_Tile();
 
@@ -346,6 +346,10 @@ public:
 
 	GDALDataset * Map_Tile_Dataset(void);
 
+	void Enable_Materials(bool value, bool value2);
+
+	void Enable_LightMap(bool value);
+
 	static bool Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, std::vector<std::string> &files);
 
 	static double Get_Lon_Step(double Latitude);
@@ -354,11 +358,6 @@ public:
 
 	static void Disable_Bathyemtry(bool value);
 
-	static void Enable_LightMap(bool value);
-
-	static void Enable_Materials(bool value);
-		
-	static void Enable_MaterialsMask(bool value);
 
 	static bool validate_tile_name(std::string &filename);
 
@@ -401,6 +400,9 @@ private:
 	bool					m_Use_Spatial_Rect;
 	bool					m_Have_MaterialMaskData;
 	bool					m_Have_MaterialData;
+	bool					m_EnableLightMap;
+	bool					m_EnableMaterials;
+	bool					m_EnableMaterialMask;
 
 	int GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
 						  std::string& uref_str, std::string& rref_str);

@@ -41,7 +41,9 @@ using namespace osgEarth;
 
 
 CDBTileSource::CDBTileSource( const osgEarth::TileSourceOptions& options ) : TileSource(options), CDBOptions(options), _UseCache(false), _rootDir(""), _cacheDir(""), 
-																			_tileSize(1024), _dataSet("_S001_T001_"), _Be_Verbose(false)
+																			_tileSize(1024), _dataSet("_S001_T001_"), _Be_Verbose(false), _LightMap(false), _Materials(false),
+																			_MaterialMask(false)
+
 {
 
 }   
@@ -100,24 +102,18 @@ Status CDBTileSource::initialize(const osgDB::Options* dbOptions)
    
    if (LightMap().isSet())
    {
-	   bool enableLm = LightMap().value();
-	   if (enableLm)
-		   CDB_Tile::Enable_LightMap(true);
-   }
+	   _LightMap = LightMap().value();
+  }
 
    if (Materials().isSet())
    {
-	   bool enableMat = Materials().value();
-	   if (enableMat)
-		   CDB_Tile::Enable_Materials(true);
+	   _Materials = Materials().value();
    }
 
    if (MaterialMask().isSet())
    {
-	   bool enableMask = MaterialMask().value();
-	   if (enableMask)
-		   CDB_Tile::Enable_MaterialsMask(true);
-   }
+	   _MaterialMask = MaterialMask().value();
+  }
 
    //verify tilesize
    if (tileSize().isSet())
@@ -269,7 +265,7 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 	const GeoExtent key_extent = key.getExtent();
 	CDB_Tile_Type tiletype = Imagery;
 	CDB_Tile_Extent tileExtent(key_extent.north(), key_extent.south(), key_extent.east(), key_extent.west());
-	CDB_Tile *mainTile = new CDB_Tile(_rootDir, _cacheDir, tiletype, _dataSet, &tileExtent);
+	CDB_Tile *mainTile = new CDB_Tile(_rootDir, _cacheDir, tiletype, _dataSet, &tileExtent, _LightMap, _Materials, _MaterialMask);
 	std::string base = mainTile->FileName();
 	int cdbLod = mainTile->CDB_LOD_Num();
 
@@ -345,7 +341,7 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 	const GeoExtent key_extent = key.getExtent();
 	CDB_Tile_Type tiletype = Elevation;
 	CDB_Tile_Extent tileExtent(key_extent.north(), key_extent.south(), key_extent.east(), key_extent.west());
-	CDB_Tile *mainTile = new CDB_Tile(_rootDir, _cacheDir, tiletype, _dataSet, &tileExtent);
+	CDB_Tile *mainTile = new CDB_Tile(_rootDir, _cacheDir, tiletype, _dataSet, &tileExtent, _LightMap, _Materials, _MaterialMask);
 	std::string base = mainTile->FileName();
 	int cdbLod = mainTile->CDB_LOD_Num();
 

@@ -256,12 +256,12 @@ public:
 		bool subtile = false;
 		if (CDB_Tile::Get_Lon_Step(tileExtent.South) == 1.0)
 		{
-			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent);
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent, false, false, false);
 		}
 		else
 		{
 			CDB_Tile_Extent  CDBTile_Tile_Extent = CDB_Tile::Actual_Extent_For_Tile(tileExtent);
-			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &CDBTile_Tile_Extent);
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &CDBTile_Tile_Extent, false, false, false);
 			mainTile->Set_SpatialFilter_Extent(tileExtent);
 			subtile = true;
 			if (_Be_Verbose)
