@@ -558,6 +558,13 @@ private:
 				f->set("modeltype", mtypevalue);
 				f->set("tilename", buffer);
 				f->set("selection", sel);
+
+				CDB_Model_Runtime_Class FeatureClass = mainTile->Current_Feature_Class_Data();
+				f->set("bsr", FeatureClass.bsr);
+				f->set("bbw", FeatureClass.bbw);
+				f->set("bbl", FeatureClass.bbl);
+				f->set("bbh", FeatureClass.bbh);
+
 			}
 			++_cur_Feature_Cnt;
 			if (!_CDB_inflated)

@@ -407,9 +407,11 @@ SubstituteModelFilter::process(const FeatureList&           features,
 				context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, localoptions, ar);
 			else
             	context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, context.getDBOptions());	
-
-			model->accept(v);
-
+			if (model)
+			{
+				model->getOrCreateStateSet()->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+				model->accept(v);
+			}
             // if icon decluttering is off, install an AutoTransform.
             if ( iconSymbol )
             {

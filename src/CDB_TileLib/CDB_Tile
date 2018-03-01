@@ -340,6 +340,8 @@ public:
 
 	int Model_Sel_Count(void);
 
+	CDB_Model_Runtime_Class Current_Feature_Class_Data(void);
+
 	osgDB::Archive::FileNameList * Model_Archive_List(unsigned int pos = 0);
 
 	OGRLayer * Map_Tile_Layer(std::string LayerName);
@@ -349,6 +351,10 @@ public:
 	void Enable_Materials(bool value, bool value2);
 
 	void Enable_LightMap(bool value);
+
+	std::string Subordinate_Name(void);
+
+	std::string Subordinate2_Name(void);
 
 	static bool Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, std::vector<std::string> &files);
 
@@ -368,6 +374,7 @@ public:
 	static CDB_Tile_Extent Actual_Extent_For_Tile(CDB_Tile_Extent &TileExtent);
 
 	static int LodNumFromExtent(CDB_Tile_Extent &Tile_Extent);
+
 
 private:
 	std::string				m_cdbRootDir;
@@ -403,7 +410,7 @@ private:
 	bool					m_EnableLightMap;
 	bool					m_EnableMaterials;
 	bool					m_EnableMaterialMask;
-
+	CDB_Model_Runtime_Class m_CurFeatureClass;
 	int GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
 						  std::string& uref_str, std::string& rref_str);
 

@@ -1351,16 +1351,16 @@ OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string
 				valid = false;
 			else
 			{
-				CDB_Model_Runtime_Class myExtents = m_ModelSet[pos].clsMap[cnam];
-				ModelKeyName = Model_KeyName(myExtents.FACC_value, myExtents.FSC_value, myExtents.Model_Base_Name);
+				m_CurFeatureClass = m_ModelSet[pos].clsMap[cnam];
+				ModelKeyName = Model_KeyName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 				if (inflated)
 				{
-					FullModelName = Model_FullFileName(myExtents.FACC_value, myExtents.FSC_value, myExtents.Model_Base_Name);
+					FullModelName = Model_FullFileName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 					Model_in_Archive = validate_tile_name(FullModelName);
 				}
 				else
 				{
-					FullModelName = Model_FileName(myExtents.FACC_value, myExtents.FSC_value, myExtents.Model_Base_Name);
+					FullModelName = Model_FileName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 					ArchiveFileName = archive_validate_modelname(m_ModelSet[pos].archiveFileList, FullModelName);
 					if (ArchiveFileName.empty())
 						Model_in_Archive = false;
@@ -1406,8 +1406,8 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 				valid = false;
 			else
 			{
-				CDB_Model_Runtime_Class myExtents = m_GTModelSet[sel].clsMap[cnam];
-				ModelKeyName = Model_KeyName(myExtents.FACC_value, myExtents.FSC_value, myExtents.Model_Base_Name);
+				m_CurFeatureClass = m_GTModelSet[sel].clsMap[cnam];
+				ModelKeyName = Model_KeyName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 				ModelFullName = GeoTypical_FullFileName(ModelKeyName);
 				Model_in_Archive = validate_tile_name(ModelFullName);
 			}
@@ -1416,6 +1416,11 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 			valid = false;
 	}
 	return f;
+}
+
+CDB_Model_Runtime_Class CDB_Tile::Current_Feature_Class_Data(void)
+{
+	return m_CurFeatureClass;
 }
 
 std::string CDB_Tile::Model_KeyName(std::string &FACC_value, std::string &FSC_Value, std::string &BaseFileName)
@@ -1501,12 +1506,36 @@ bool CDB_Tile::Load_Class_Map(OGRLayer * poLayer, CDB_Model_RuntimeMap &clsMap)
 		return false;
 	}
 
+	int bsr_index = Find_Field_Index(poFDefn, "BSR", OFTReal);
+	if (bsr_index < 0)
+	{
+		return false;
+	}
+
+	int bbw_index = Find_Field_Index(poFDefn, "BBW", OFTReal);
+	if (bbw_index < 0)
+	{
+		return false;
+	}
+
+	int bbl_index = Find_Field_Index(poFDefn, "BBL", OFTReal);
+	if (bbl_index < 0)
+	{
+		return false;
+	}
+
+	int bbh_index = Find_Field_Index(poFDefn, "BBH", OFTReal);
+	if (bbh_index < 0)
+	{
+		return false;
+	}
+
 	poLayer->ResetReading();
 	OGRFeature* dbf_feature;
 	while ((dbf_feature = poLayer->GetNextFeature()) != NULL)
 	{
 		CDB_Model_Runtime_Class nextEntry;
-		std::string Key = nextEntry.set_class(dbf_feature, cnam_attr_index, name_attr_index, facc_index, fsc_index);
+		std::string Key = nextEntry.set_class(dbf_feature, cnam_attr_index, name_attr_index, facc_index, fsc_index, bsr_index, bbw_index, bbl_index, bbh_index);
 		clsMap.insert(std::pair<std::string, CDB_Model_Runtime_Class>(Key, nextEntry));
 		OGRFeature::DestroyFeature(dbf_feature);
 	}
@@ -2839,6 +2868,16 @@ bool CDB_Tile::Write(void)
 		}
 	}
 	return true;
+}
+
+std::string CDB_Tile::Subordinate_Name(void)
+{
+	return m_SubordinateName;
+}
+
+std::string CDB_Tile::Subordinate2_Name(void)
+{
+	return m_SubordinateName2;
 }
 
 osg::Image* CDB_Tile::Image_From_Tile(void)

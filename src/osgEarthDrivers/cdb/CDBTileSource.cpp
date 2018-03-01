@@ -277,7 +277,14 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 			if (mainTile->Tile_Exists())
 			{
 				if (_Be_Verbose)
-					printf("Imagery: Loading %s\n", base.c_str());
+				{
+					if(!_Materials && !_LightMap)
+						printf("Imagery: Loading %s\n", base.c_str());
+					else if (_Materials)
+						printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+					else if (_LightMap)
+						printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+				}
 				mainTile->Load_Tile();
 				ret_Image = mainTile->Image_From_Tile();
 			}
@@ -293,7 +300,14 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 			if (mainTile->Build_Earth_Tile())
 			{
 				if (_Be_Verbose)
-					printf("Imagery: Building %s\n", base.c_str());
+				{
+					if (!_Materials && !_LightMap)
+						printf("Imagery: Loading %s\n", base.c_str());
+					else if (_Materials)
+						printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+					else if (_LightMap)
+						printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+				}
 				OE_DEBUG "Imagery Built Earth Tile " << key.str() << "=" << base << std::endl;
 				ret_Image = mainTile->Image_From_Tile();
 			}
@@ -304,7 +318,14 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 		if (mainTile->Tile_Exists())
 		{
 			if (_Be_Verbose)
-				printf("Imagery: Loading %s\n", base.c_str());
+			{
+				if (!_Materials && !_LightMap)
+					printf("Imagery: Loading %s\n", base.c_str());
+				else if (_Materials)
+					printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+				else if (_LightMap)
+					printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+			}
 			mainTile->Load_Tile();
 			ret_Image = mainTile->Image_From_Tile();
 		}
@@ -313,7 +334,14 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 			if (mainTile->Build_Cache_Tile(_UseCache))
 			{
 				if (_Be_Verbose)
-					printf("Imagery: Built Cache tile %s\n", base.c_str());
+				{
+					if (!_Materials && !_LightMap)
+						printf("Imagery: Loading %s\n", base.c_str());
+					else if (_Materials)
+						printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+					else if (_LightMap)
+						printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+				}
 				ret_Image = mainTile->Image_From_Tile();
 			}
 		}

@@ -354,12 +354,15 @@ struct CDB_Model_Runtime_Class
 	std::string		Model_Base_Name;
 	std::string		FACC_value;
 	std::string		FSC_value;
-
-	CDB_Model_Runtime_Class() : Model_Base_Name(""), FACC_value(""), FSC_value("")
+	double			bsr;
+	double			bbw;
+	double			bbl;
+	double			bbh;
+	CDB_Model_Runtime_Class() : Model_Base_Name(""), FACC_value(""), FSC_value(""),bsr(0.0), bbw(0.0), bbh(0.0), bbl(0.0)
 	{
 	}
 
-	std::string set_class(OGRFeature * f, int key_index, int Model_Base_Index, int FACC_Index, int FSC_Index)
+	std::string set_class(OGRFeature * f, int key_index, int Model_Base_Index, int FACC_Index, int FSC_Index, int bsr_Index, int bbw_Index, int bbl_Index, int bbh_Index)
 	{
 		std::string cnam = f->GetFieldAsString(key_index);
 		Model_Base_Name = f->GetFieldAsString(Model_Base_Index);
@@ -369,6 +372,10 @@ struct CDB_Model_Runtime_Class
 		format_stream << std::setfill('0')
 			<< std::setw(3) << abs(subcode);
 		FSC_value = format_stream.str();
+		bsr = f->GetFieldAsDouble(bsr_Index);
+		bbw = f->GetFieldAsDouble(bbw_Index);
+		bbl = f->GetFieldAsDouble(bbl_Index);
+		bbh = f->GetFieldAsDouble(bbh_Index);
 		return cnam;
 	}
 
