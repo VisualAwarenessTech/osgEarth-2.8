@@ -238,9 +238,10 @@ struct CDB_GT_Model_Tile_Selector
 	OGRLayer *		PrimaryLayer;
 	bool			PrimaryExists;
 	bool			ClassExists;
+	int				RealSel;
 	CDB_Model_RuntimeMap clsMap;
 	CDB_GT_Model_Tile_Selector() : TilePrimaryShapeName(""), TileSecondaryShapeName(""), PrimaryExists(false),
-		ClassExists(false), PrimaryLayerName(""), PrimaryTileOgr(NULL), ClassTileOgr(NULL),PrimaryLayer(NULL)
+		ClassExists(false), PrimaryLayerName(""), PrimaryTileOgr(NULL), ClassTileOgr(NULL),PrimaryLayer(NULL),RealSel(0)
 	{
 		clsMap.clear();
 	}
@@ -268,6 +269,8 @@ public:
 	virtual ~CDB_Tile();
 
 	std::string FileName(int sel = -1);
+
+	int Realsel(int sel);
 
 	int CDB_LOD_Num(void);
 

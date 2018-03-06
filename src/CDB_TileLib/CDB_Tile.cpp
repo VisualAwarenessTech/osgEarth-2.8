@@ -371,6 +371,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 			t.ClassLayerName = clslaybuf.str();
 			t.PrimaryExists = validate_tile_name(t.TilePrimaryShapeName);
 			t.ClassExists = validate_tile_name(t.TileSecondaryShapeName);
+			t.RealSel = i - 1;
 			if (t.PrimaryExists && t.ClassExists)
 				m_GTModelSet.push_back(t);
 		}
@@ -640,6 +641,7 @@ bool CDB_Tile::Build_GT_Stack(void)
 			t.ClassLayerName = clslaybuf.str();
 			t.PrimaryExists = validate_tile_name(t.TilePrimaryShapeName);
 			t.ClassExists = validate_tile_name(t.TileSecondaryShapeName);
+			t.RealSel = i - 1;
 			if (t.PrimaryExists && t.ClassExists)
 			{
 				m_GTModelSet.insert(m_GTModelSet.begin(), t);
@@ -662,6 +664,18 @@ std::string CDB_Tile::FileName(int sel)
 	}
 	else
 		return m_ModelSet[sel].ModelWorkingName;
+}
+
+int CDB_Tile::Realsel(int sel)
+{
+	if (sel < 0)
+		return sel;
+	else if (m_TileType == GeoTypicalModel)
+	{
+		return m_GTModelSet[sel].RealSel;
+	}
+	else
+		return sel;
 }
 
 int CDB_Tile::CDB_LOD_Num(void)

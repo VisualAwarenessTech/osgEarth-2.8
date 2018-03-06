@@ -466,7 +466,9 @@ private:
 		// find the right driver for the given mime type
 		bool have_archive = false;
 		bool have_texture_zipfile = false;
-
+#ifdef _DEBUG
+		int fubar = 0;
+#endif
 		std::string TileNameStr;
 		if (_CDB_Edit_Support)
 		{
@@ -520,6 +522,7 @@ private:
 			if (!Model_in_Archive)
 				valid_model = false;
 
+			double ZoffsetPos = 0.0;
 			if (_M_Contains_ABS_Z)
 			{
 				OGRGeometry *geo = feat_handle->GetGeometryRef();
@@ -527,7 +530,9 @@ private:
 				{
 					OGRPoint * poPoint = (OGRPoint *)geo;
 					double Mpos = poPoint->getM();
-					poPoint->setZ(Mpos);
+					ZoffsetPos = poPoint->getZ(); //Used as altitude offset
+					poPoint->setZ(Mpos+ ZoffsetPos);
+						
 				}
 			}
 
@@ -540,7 +545,13 @@ private:
 			++_s_CDB_FeatureID;
 
 			f->set("osge_basename", ModelKeyName);
-
+#ifdef _DEBUG
+			int dbgpos = ModelKeyName.find("Ambulance");
+			if (dbgpos != std::string::npos)
+			{
+				++fubar;
+			}
+#endif
 			if (_CDB_Edit_Support)
 			{
 				std::stringstream format_stream;
@@ -557,13 +568,17 @@ private:
 					mtypevalue = "geospecific";
 				f->set("modeltype", mtypevalue);
 				f->set("tilename", buffer);
-				f->set("selection", sel);
+				if (!_CDB_geoTypical)
+					f->set("selection", sel);
+				else
+					f->set("selection", mainTile->Realsel(sel));
 
 				CDB_Model_Runtime_Class FeatureClass = mainTile->Current_Feature_Class_Data();
 				f->set("bsr", FeatureClass.bsr);
 				f->set("bbw", FeatureClass.bbw);
 				f->set("bbl", FeatureClass.bbl);
 				f->set("bbh", FeatureClass.bbh);
+				f->set("zoffset", ZoffsetPos);
 
 			}
 			++_cur_Feature_Cnt;
