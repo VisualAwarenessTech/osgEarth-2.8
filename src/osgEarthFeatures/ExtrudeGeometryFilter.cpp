@@ -541,6 +541,10 @@ ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
     { 
         tex = new osg::Vec3Array( numWallVerts );
         walls->setTexCoordArray( 0, tex );
+		if (wallSkin->materialURI().isSet())
+		{
+			walls->setTexCoordArray(1, tex);
+		}
     }
 
     osg::Vec4Array* colors = 0L;
@@ -709,6 +713,10 @@ ExtrudeGeometryFilter::buildRoofGeometry(const Structure&     structure,
     {
         tex = new osg::Vec3Array();
         roof->setTexCoordArray(0, tex);
+		if (roofSkin->materialURI().isSet())
+		{
+			roof->setTexCoordArray(1, tex);
+		}
     }
 
     osg::Vec4Array* anchors = 0L;    
@@ -1004,8 +1012,8 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
                 height = *_extrusionSymbol->height();
             }
 
-            osg::ref_ptr<osg::StateSet> wallStateSet;
-            osg::ref_ptr<osg::StateSet> roofStateSet;
+			osg::ref_ptr<osg::StateSet> wallStateSet;
+			osg::ref_ptr<osg::StateSet> roofStateSet;
 
             // calculate the wall texturing:
             SkinResource* wallSkin = 0L;
@@ -1080,6 +1088,10 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
                 {
                     // Get a stateset for the individual wall stateset
                     context.resourceCache()->getOrCreateStateSet(wallSkin, wallStateSet, context.getDBOptions());
+					if (wallSkin->materialURI().isSet())
+					{
+						context.resourceCache()->getOrCreateMatStateSet(wallSkin, wallStateSet, context.getDBOptions());
+					}
                 }
             }
 
@@ -1098,6 +1110,10 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
                 {
                     // Get a stateset for the individual roof skin
                     context.resourceCache()->getOrCreateStateSet(roofSkin, roofStateSet, context.getDBOptions());
+					if (roofSkin->materialURI().isSet())
+					{
+						context.resourceCache()->getOrCreateMatStateSet(roofSkin, roofStateSet, context.getDBOptions());
+					}
                 }
             }
 
@@ -1132,12 +1148,12 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
             if ( walls.valid() && walls->getVertexArray() && walls->getVertexArray()->getNumElements() > 0 )
             {
                 addDrawable( walls.get(), wallStateSet.get(), name, input, index );
-            }
+			}
 
             if ( rooflines.valid() && rooflines->getVertexArray() && rooflines->getVertexArray()->getNumElements() > 0 )
             {
                 addDrawable( rooflines.get(), roofStateSet.get(), name, input, index );
-            }
+			}
 
             if ( baselines.valid() && baselines->getVertexArray() && baselines->getVertexArray()->getNumElements() > 0 )
             {
