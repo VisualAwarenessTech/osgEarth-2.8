@@ -545,6 +545,14 @@ SubstituteModelFilter::process(const FeatureList&           features,
         }
     }
 
+
+	if (ar)
+	{
+		ar.release();
+		ar = NULL;
+	}
+
+
 	if (Do_Editing_Support)
 	{
 		osg::Group * Orphaned = new osg::Group();
