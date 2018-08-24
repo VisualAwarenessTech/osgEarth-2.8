@@ -497,22 +497,39 @@ public:
 	bool SetName_and_Driver(std::string Name, std::string Driver);
 	bool Exists(void);
 	GDALDataset * Open_Output(void);
+	GDALDataset * Open_Input(std::string FileName = "");
 	OGRLayer *	  Get_Or_Create_Layer(std::string LayerName, osgEarth::Features::Feature * f);
 	bool		  Add_Feature_to_Layer(OGRLayer *oLayer, osgEarth::Features::Feature * f);
 	bool		  Close_File(void);
+	bool		  Set_Inst_Layer(std::string LayerName);
+	bool		  Set_Class_Layer(std::string LayerName);
+	OGRSpatialReference * Inst_Spatial_Reference();
+	bool		  Get_Inst_Envelope(OGREnvelope &env);
+	bool		  Load_Class(void);
+	void		  Set_GeoTyp_Process(bool value);
+	OGRFeature *  Next_Valid_Feature(std::string &ModelKeyName, std::string &FullModelName);
+
 	static OGR_File *	  GetInstance(void);
 private:
 	std::string				m_FileName;
 	std::string				m_Driver;
 	GDALDataset *			m_PODataset;
+	OGRLayer *				m_InstLayer;
+	OGRLayer *				m_ClassLayer;
 	OGRSpatialReference *	m_oSRS;
 	bool					m_FileExists;
 	bool					m_OutputIsShape;
+	bool					m_InputIsShape;
+	bool					m_GeoTyp_Proc;
 	GIntBig					m_FID;
+
+	CDB_Model_RuntimeMap	m_GS_ClassMap;
+
 	GDALDataset *			Open_Output_File(std::string FileName, bool FileExists);
 	void					Set_oSRS(void);
 	OGRLayer *				Get_Or_Create_Layer(GDALDataset *poDS, std::string LayerName, osgEarth::Features::Feature * f);
 	bool					Set_Layer_Fields(osgEarth::Features::Feature * f, OGRLayer * poLayer);
 	bool					Check_Layer_Fields(osgEarth::Features::Feature * f, OGRLayer * poLayer);
+	int						Find_Field_Index(OGRFeatureDefn *poFDefn, std::string fieldname, OGRFieldType Type);
 
 };

@@ -343,14 +343,14 @@ public:
 			subtile = true;
 			if (_BE_Verbose)
 			{
-				printf("Sourcetile: North %lf South %lf East %lf West %lf \n", CDBTile_Tile_Extent.North, CDBTile_Tile_Extent.South,
-					CDBTile_Tile_Extent.East, CDBTile_Tile_Extent.West);
+				OSG_WARN << "Sourcetile: North " << CDBTile_Tile_Extent.North << " South " << CDBTile_Tile_Extent.South << " East " <<
+							CDBTile_Tile_Extent.East << " West " << CDBTile_Tile_Extent.West << std::endl;
 			}
 		}
 		_CDBLodNum = mainTile->CDB_LOD_Num();
 		if (_BE_Verbose)
 		{
-			printf("CDB Feature Cursor called with CDB LOD %d Tile\n", _CDBLodNum);
+			OSG_WARN << "CDB Feature Cursor called with CDB LOD " << _CDBLodNum << " Tile" << std::endl;
 		}
 		int Files2check = mainTile->Model_Sel_Count();
 		std::string base;
@@ -368,7 +368,7 @@ public:
 				Files2check = 0;
 				if (_BE_Verbose)
 				{
-					printf("Tile %s is blacklisted\n", base.c_str());
+					OSG_WARN << "Tile " << base << " is blacklisted" << std::endl;
 				}
 			}
 		}
@@ -385,17 +385,17 @@ public:
 				{
 					if (_CDB_geoTypical)
 					{
-						printf("Feature tile loding GeoTypical Tile %s\n", base.c_str());
+						OSG_WARN << "Feature tile loding GeoTypical Tile " << base << std::endl;
 						if (subtile)
-							printf("Subtile: North %lf South %lf East %lf West %lf \n", tileExtent.North, tileExtent.South,
-								tileExtent.East, tileExtent.West);
+							OSG_WARN << "Subtile: North " << tileExtent.North << " South " << tileExtent.South << " East " <<
+										tileExtent.East << " West " << tileExtent.West << std::endl;
 					}
 					else
 					{
-						printf("Feature tile loding GeoSpecific Tile %s\n", base.c_str());
+						OSG_WARN << "Feature tile loding GeoSpecific Tile " << base << std::endl;
 						if (subtile)
-							printf("Subtile: North %lf South %lf East %lf West %lf \n", tileExtent.North, tileExtent.South,
-								tileExtent.East, tileExtent.West);
+							OSG_WARN << "Subtile: North " << tileExtent.North << " South " << tileExtent.South << " East " <<
+										tileExtent.East << " West " << tileExtent.West << std::endl;
 					}
 				}
 				bool fileOk = getFeatures(mainTile, base, features, FilesChecked);
@@ -403,7 +403,7 @@ public:
 				{
 					if (_BE_Verbose)
 					{
-						printf("File %s has %d Features\n", base.c_str(), (int)features.size());
+						OSG_WARN << "File " << base << " has " << features.size() << " Features" << std::endl;
 					}
 					OE_INFO << LC << "Features " << features.size() << base << std::endl;
 					have_a_file = true;

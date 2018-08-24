@@ -278,12 +278,12 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 			{
 				if (_Be_Verbose)
 				{
-					if(!_Materials && !_LightMap)
-						printf("Imagery: Loading %s\n", base.c_str());
+					if (!_Materials && !_LightMap)
+						OSG_WARN << "Imagery: Loading " << base << std::endl;
 					else if (_Materials)
-						printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+						OSG_WARN << "Imagery: Loading " << mainTile->Subordinate2_Name() << std::endl;
 					else if (_LightMap)
-						printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+						OSG_WARN << "Imagery: Loading " << mainTile->Subordinate_Name() << std::endl;
 				}
 				mainTile->Load_Tile();
 				ret_Image = mainTile->Image_From_Tile();
@@ -291,7 +291,7 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 			else
 			{
 				if (_Be_Verbose)
-					printf("Imagery: Blacklisting %s\n", base.c_str());
+					OSG_WARN << "Imagery: Blacklisting " << base << std::endl;
 				Registry::instance()->blacklist(base);
 			}
 		}
@@ -302,11 +302,11 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 				if (_Be_Verbose)
 				{
 					if (!_Materials && !_LightMap)
-						printf("Imagery: Loading %s\n", base.c_str());
+						OSG_WARN << "Imagery: Loading " << base << std::endl;
 					else if (_Materials)
-						printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+						OSG_WARN << "Imagery: Loading " << mainTile->Subordinate2_Name() << std::endl;
 					else if (_LightMap)
-						printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+						OSG_WARN << "Imagery: Loading " << mainTile->Subordinate_Name() << std::endl;
 				}
 				OE_DEBUG "Imagery Built Earth Tile " << key.str() << "=" << base << std::endl;
 				ret_Image = mainTile->Image_From_Tile();
@@ -320,11 +320,11 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 			if (_Be_Verbose)
 			{
 				if (!_Materials && !_LightMap)
-					printf("Imagery: Loading %s\n", base.c_str());
+					OSG_WARN << "Imagery: Loading " << base << std::endl;
 				else if (_Materials)
-					printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+					OSG_WARN << "Imagery: Loading " << mainTile->Subordinate2_Name() << std::endl;
 				else if (_LightMap)
-					printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+					OSG_WARN << "Imagery: Loading " << mainTile->Subordinate_Name() << std::endl;
 			}
 			mainTile->Load_Tile();
 			ret_Image = mainTile->Image_From_Tile();
@@ -336,11 +336,11 @@ osg::Image* CDBTileSource::createImage(const osgEarth::TileKey& key,
 				if (_Be_Verbose)
 				{
 					if (!_Materials && !_LightMap)
-						printf("Imagery: Loading %s\n", base.c_str());
+						OSG_WARN << "Imagery: Loading " << base << std::endl;
 					else if (_Materials)
-						printf("Imagery: Loading %s\n", mainTile->Subordinate2_Name().c_str());
+						OSG_WARN << "Imagery: Loading " << mainTile->Subordinate2_Name() << std::endl;
 					else if (_LightMap)
-						printf("Imagery: Loading %s\n", mainTile->Subordinate_Name().c_str());
+						OSG_WARN << "Imagery: Loading " << mainTile->Subordinate_Name() << std::endl;
 				}
 				ret_Image = mainTile->Image_From_Tile();
 			}
@@ -380,14 +380,14 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 			if (mainTile->Tile_Exists())
 			{
 				if (_Be_Verbose)
-					printf("Elevation: Loading %s\n", base.c_str());
+					OSG_WARN << "Elevation: Loading " << base << std::endl;
 				mainTile->Load_Tile();
 				ret_Field = mainTile->HeightField_From_Tile();
 			}
 			else
 			{
 				if (_Be_Verbose)
-					printf("Elevation: Blacklisting %s\n", base.c_str());
+					OSG_WARN << "Elevation: Blacklisting " << base << std::endl;
 				Registry::instance()->blacklist(base);
 			}
 		}
@@ -405,7 +405,7 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 		if (mainTile->Tile_Exists())
 		{
 			if (_Be_Verbose)
-				printf("Elevation: Loading %s\n", base.c_str());
+				OSG_WARN << "Elevation: Loading " << base << std::endl;
 			mainTile->Load_Tile();
 			ret_Field = mainTile->HeightField_From_Tile();
 		}
@@ -414,7 +414,7 @@ osg::HeightField* CDBTileSource::createHeightField(const osgEarth::TileKey& key,
 			if (mainTile->Build_Cache_Tile(_UseCache))
 			{
 				if (_Be_Verbose)
-					printf("Elevation: Built Cache tile %s\n", base.c_str());
+					OSG_WARN << "Elevation: Built Cache tile " << base << std::endl;
 				ret_Field = mainTile->HeightField_From_Tile();
 			}
 		}

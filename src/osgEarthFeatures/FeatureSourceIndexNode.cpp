@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
+
 #include <osgEarthFeatures/FeatureSourceIndexNode>
 #include <osgEarth/Registry>
 #include <algorithm>
@@ -48,6 +49,7 @@ namespace
         typename T::key_type operator*() { return T::const_iterator::operator*().first; }
     };
 }
+
 
 //-----------------------------------------------------------------------------
 
@@ -86,25 +88,35 @@ osg::Group(rhs, copy)
     _fids  = rhs._fids;
 }
 
+
 FeatureSourceIndexNode::FeatureSourceIndexNode(FeatureSourceIndex* index) :
 _index( index )
 {
     //nop
 }
 
+
 FeatureSourceIndexNode::~FeatureSourceIndexNode()
 {
     if ( _index.valid() )
     {
         // must copy and clear the original list first to dereference the RefIDPair instances.
-        std::set<FeatureID> fidsToRemove;
-        fidsToRemove.insert( KeyIter<FIDMap>(_fids.begin()), KeyIter<FIDMap>(_fids.end()) );
+
+		std::set<FeatureID> fidsToRemove;
+
+		for each (std::pair<FeatureID, osg::ref_ptr<RefIDPair>> fid in _fids)
+		{
+			fidsToRemove.insert(fid.first);
+		}
         _fids.clear();
+
 
         OE_DEBUG << LC << "Removing " << fidsToRemove.size() << " fids\n";
         _index->removeFIDs( fidsToRemove.begin(), fidsToRemove.end() );
+
     }
 }
+
 
 ObjectID
 FeatureSourceIndexNode::tagDrawable(osg::Drawable* drawable, Feature* feature)

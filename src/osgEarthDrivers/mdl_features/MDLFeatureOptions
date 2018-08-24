@@ -1,0 +1,102 @@
+/* -*-c++-*- */
+/* osgEarth - Dynamic map generation toolkit for OpenSceneGraph
+ * Copyright 2008-2013 Pelican Mapping
+ * http://osgearth.org
+ *
+ * osgEarth is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+// 2014-2015 GAJ Geospatial Enterprises, Orlando FL
+// Created FeatureSourceCDB for Incorporation of Common Database (CDB) support within osgEarth
+// 2016-2017 Visual Awareness Technologies and Consulting Inc. St Petersburg FL
+
+#ifndef OSGEARTH_DRIVER_CDB_FEATURE_SOURCE_OPTIONS
+#define OSGEARTH_DRIVER_CDB_FEATURE_SOURCE_OPTIONS 1
+
+#include <osgEarth/Common>
+#include <osgEarth/URI>
+#include <osgEarthFeatures/FeatureSource>
+
+namespace osgEarth { namespace Drivers
+{
+    using namespace osgEarth;
+    using namespace osgEarth::Features;
+
+    /**
+     * Options for the CDB feature driver.
+     */
+    class MDLFeatureOptions : public FeatureSourceOptions // NO EXPORT; header only
+    {
+    public:
+		optional<std::string>& url() { return _url; }
+		const optional<std::string>& url() const { return _url; }
+		optional<std::string>& instlayer() { return _instlayer; }
+		const optional<std::string>& instlayer() const { return _instlayer; }
+		optional<std::string>& clslayer() { return _classlayer; }
+		const optional<std::string>& clslayer() const { return _classlayer; }
+		optional<bool>& Edit_Support() { return _Edit_Support; }
+		const optional<bool>& Edit_Support() const { return _Edit_Support; }
+		optional<bool>& geoTypical() { return _geoTypical; }
+		const optional<bool>& geoTypical() const { return _geoTypical; }
+		optional<bool>& Verbose() { return _Verbose; }
+		const optional<bool>& Verbose() const { return _Verbose; }
+	public:
+        MDLFeatureOptions( const ConfigOptions& opt =ConfigOptions() ) :
+          FeatureSourceOptions( opt )
+          {
+            setDriver( "mdl" );            
+            fromConfig( _conf );
+          }
+
+          virtual ~MDLFeatureOptions() { }
+
+    public:
+        Config getConfig() const {
+            Config conf = FeatureSourceOptions::getConfig();
+			conf.updateIfSet("url", _url);
+			conf.updateIfSet("instlayer", _instlayer);
+			conf.updateIfSet("classlayer", _classlayer);
+			conf.updateIfSet("geotypical", _geoTypical);
+			conf.updateIfSet("edit_support", _Edit_Support);
+			conf.updateIfSet("verbose", _Verbose);
+			return conf;
+        }
+
+    protected:
+        void mergeConfig( const Config& conf ) {
+            FeatureSourceOptions::mergeConfig( conf );
+            fromConfig( conf );
+        }
+
+    private:
+        void fromConfig( const Config& conf ) {
+			conf.getIfSet("url", _url);
+			conf.getIfSet("instlayer", _instlayer);
+			conf.getIfSet("classlayer", _classlayer);
+			conf.getIfSet("edit_support", _Edit_Support);
+			conf.getIfSet("geotypical", _geoTypical);
+			conf.getIfSet("verbose", _Verbose);
+		}
+
+		optional<std::string> _url;
+		optional<std::string> _instlayer;
+		optional<std::string> _classlayer;
+		optional<bool> _Verbose;
+		optional<bool>_Edit_Support;
+		optional<bool>_geoTypical;
+	};
+
+} } // namespace osgEarth::Drivers
+
+#endif // OSGEARTH_DRIVER_MDL_FEATURE_SOURCE_OPTIONS
+

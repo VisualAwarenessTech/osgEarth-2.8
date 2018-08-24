@@ -3115,6 +3115,8 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 			Fcode = "240_Tower-NC";
 		else if (Fcode == "080")
 			Fcode = "080_Comm_Tower";
+		else if (Fcode == "020")
+			Fcode = "020_Built-Up_Area";
 	}
 	else if (Facc1 == "E_Vegetation")
 	{
@@ -3244,18 +3246,27 @@ osgDB::Archive::FileNameList * CDB_Tile::Model_Archive_List(unsigned int pos)
 	return &m_ModelSet[pos].archiveFileList;
 }
 
-OGR_File::OGR_File() : m_FileName(""), m_Driver(""), m_oSRS(NULL), m_OutputIsShape(false), m_PODataset(NULL), m_FID(0), m_FileExists(false)
+OGR_File::OGR_File() : m_FileName(""), m_Driver(""), m_oSRS(NULL), m_OutputIsShape(false), m_PODataset(NULL), m_FID(0), m_FileExists(false), m_InstLayer(NULL),
+					   m_ClassLayer(NULL), m_GeoTyp_Proc(false), m_InputIsShape(false)
 {
+	m_GS_ClassMap.clear();
 }
 
-OGR_File::OGR_File(std::string FileName, std::string Driver) :m_FileName(FileName), m_Driver(Driver), m_oSRS(NULL), m_OutputIsShape(false), m_PODataset(NULL), m_FID(0)
+OGR_File::OGR_File(std::string FileName, std::string Driver) :m_FileName(FileName), m_Driver(Driver), m_oSRS(NULL), m_OutputIsShape(false), m_PODataset(NULL), m_FID(0),
+															  m_InstLayer(NULL), m_ClassLayer(NULL), m_GeoTyp_Proc(false), m_InputIsShape(false)
 {
 	m_FileExists = CDB_Tile::validate_tile_name(m_FileName);
+	m_GS_ClassMap.clear();
 }
 
 OGR_File::~OGR_File()
 {
-
+	if (m_PODataset)
+	{
+		GDALClose(m_PODataset);
+		m_PODataset = NULL;
+	}
+	m_GS_ClassMap.clear();
 }
 
 bool OGR_File::SetName_and_Driver(std::string Name, std::string Driver)
@@ -3265,9 +3276,117 @@ bool OGR_File::SetName_and_Driver(std::string Name, std::string Driver)
 	m_FileExists = CDB_Tile::validate_tile_name(m_FileName);
 	return m_FileExists;
 }
+
 OGR_File * OGR_File::GetInstance(void)
 {
 	return &Ogr_File_Instance;
+}
+
+bool OGR_File::Set_Inst_Layer(std::string LayerName)
+{
+	if (!m_PODataset)
+		return false;
+	m_InstLayer = m_PODataset->GetLayerByName(LayerName.c_str());
+
+	if (m_InstLayer)
+		return true;
+	else
+		return false;
+}
+
+bool OGR_File::Set_Class_Layer(std::string LayerName)
+{
+	if (!m_PODataset)
+		return false;
+	m_ClassLayer = m_PODataset->GetLayerByName(LayerName.c_str());
+
+	if (m_ClassLayer)
+		return true;
+	else
+		return false;
+}
+
+OGRSpatialReference * OGR_File::Inst_Spatial_Reference()
+{
+	return m_InstLayer->GetSpatialRef();
+}
+
+bool OGR_File::Get_Inst_Envelope(OGREnvelope &env)
+{
+	OGRErr status = m_InstLayer->GetExtent(&env);
+	if (status == OGRERR_NONE)
+		return true;
+	else
+		return false;
+
+}
+
+bool OGR_File::Load_Class(void)
+{
+	OGRFeatureDefn * poFDefn = m_ClassLayer->GetLayerDefn();
+	int name_attr_index = Find_Field_Index(poFDefn, "MODL", OFTString);
+	if (name_attr_index < 0)
+	{
+		return false;
+	}
+
+	int cnam_attr_index = Find_Field_Index(poFDefn, "CNAM", OFTString);
+	if (cnam_attr_index < 0)
+	{
+		return false;
+	}
+
+	int facc_index = Find_Field_Index(poFDefn, "FACC", OFTString);
+	if (facc_index < 0)
+	{
+		return false;
+	}
+
+	int fsc_index = Find_Field_Index(poFDefn, "FSC", OFTInteger);
+	if (fsc_index < 0)
+	{
+		return false;
+	}
+
+	int bsr_index = Find_Field_Index(poFDefn, "BSR", OFTReal);
+	if (bsr_index < 0)
+	{
+		return false;
+	}
+
+	int bbw_index = Find_Field_Index(poFDefn, "BBW", OFTReal);
+	if (bbw_index < 0)
+	{
+		return false;
+	}
+
+	int bbl_index = Find_Field_Index(poFDefn, "BBL", OFTReal);
+	if (bbl_index < 0)
+	{
+		return false;
+	}
+
+	int bbh_index = Find_Field_Index(poFDefn, "BBH", OFTReal);
+	if (bbh_index < 0)
+	{
+		return false;
+	}
+
+	m_ClassLayer->ResetReading();
+	OGRFeature* dbf_feature;
+	while ((dbf_feature = m_ClassLayer->GetNextFeature()) != NULL)
+	{
+		CDB_Model_Runtime_Class nextEntry;
+		std::string Key = nextEntry.set_class(dbf_feature, cnam_attr_index, name_attr_index, facc_index, fsc_index, bsr_index, bbw_index, bbl_index, bbh_index);
+		m_GS_ClassMap.insert(std::pair<std::string, CDB_Model_Runtime_Class>(Key, nextEntry));
+		OGRFeature::DestroyFeature(dbf_feature);
+	}
+	return true;
+}
+
+void OGR_File::Set_GeoTyp_Process(bool value)
+{
+	m_GeoTyp_Proc = value;
 }
 
 bool OGR_File::Exists(void)
@@ -3339,6 +3458,51 @@ GDALDataset * OGR_File::Open_Output_File(std::string FileName, bool FileExists)
 #endif
 
 	return poDS;
+}
+
+GDALDataset * OGR_File::Open_Input(std::string FileName)
+{
+#if 0
+	while (!m_OpenLock->Lock())
+	{
+		Sleep(1000);
+	}
+#endif
+
+	if (!FileName.empty())
+		m_FileName = FileName;
+	if (m_Driver == "ESRI Shapefile")
+		m_InputIsShape = true;
+
+	GDALDriver * poDriver = GetGDALDriverManager()->GetDriverByName(m_Driver.c_str());
+
+	if (poDriver != NULL)
+	{
+		GDALOpenInfo poOpenInfo(m_FileName.c_str(), GDAL_OF_VECTOR);
+		m_PODataset = poDriver->pfnOpen(&poOpenInfo);
+		if (m_PODataset == NULL)
+		{
+			std::string Message = "Unable to open output file " + m_FileName;
+			printf("%s\n", Message.c_str());
+			return NULL;
+		}
+
+	}
+	else
+	{
+		std::string Message = "Unable to obtain driver for " + m_Driver;
+		printf("%s\n", Message.c_str());
+#if 0
+		m_OpenLock->Unlock();
+#endif
+		return NULL;
+	}
+
+#if 0
+	m_OpenLock->Unlock();
+#endif
+
+	return m_PODataset;
 }
 
 void OGR_File::Set_oSRS(void)
@@ -3630,4 +3794,62 @@ bool OGR_File::Close_File(void)
 		retval = true;
 	}
 	return retval;
+}
+
+int OGR_File::Find_Field_Index(OGRFeatureDefn *poFDefn, std::string fieldname, OGRFieldType Type)
+{
+	int dbfieldcnt = poFDefn->GetFieldCount();
+	for (int dbffieldIdx = 0; dbffieldIdx < dbfieldcnt; ++dbffieldIdx)
+	{
+		OGRFieldDefn *po_FieldDefn = poFDefn->GetFieldDefn(dbffieldIdx);
+		std::string thisname = po_FieldDefn->GetNameRef();
+		if (thisname.compare(fieldname) == 0)
+		{
+			if (po_FieldDefn->GetType() == Type)
+				return dbffieldIdx;
+		}
+	}
+	return -1;
+}
+
+OGRFeature * OGR_File::Next_Valid_Feature(std::string &ModelKeyName, std::string &FullModelName )
+{
+	bool valid = false;
+	bool done = false;
+	OGRFeature *f = NULL;
+
+	while (!valid && !done)
+	{
+		f = m_InstLayer->GetNextFeature();
+		if (!f)
+		{
+			done = true;
+			break;
+		}
+		valid = true;
+
+		std::string cnam = f->GetFieldAsString("CNAM");
+		if (!cnam.empty())
+		{
+			CDB_Model_RuntimeMap::iterator mi = m_GS_ClassMap.find(cnam);
+			if (mi == m_GS_ClassMap.end())
+				valid = false;
+			else
+			{
+				CDB_Model_Runtime_Class CurFeatureClass = m_GS_ClassMap[cnam];
+				if (!m_GeoTyp_Proc)
+				{
+					ModelKeyName = cnam;
+					FullModelName = CurFeatureClass.Model_Base_Name;
+				}
+				else
+				{
+					valid = false;
+				}
+			}
+		}
+		else
+			valid = false;
+	}
+	return f;
 }
