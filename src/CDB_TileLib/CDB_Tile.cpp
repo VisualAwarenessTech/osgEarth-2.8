@@ -42,6 +42,7 @@ static int s_BaseMapLodNum = 0;
 static bool s_EnableBathymetry = true;
 static bool s_LOD0_GS_FullStack = false;
 static bool s_LOD0_GT_FullStack = false;
+static bool s_CDB_Tile_Be_Verbose = false;
 
 const int Gbl_CDB_Tile_Sizes[11] = {1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
 //Caution this only goes down to CDB Level 17
@@ -1424,6 +1425,13 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 				ModelKeyName = Model_KeyName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 				ModelFullName = GeoTypical_FullFileName(ModelKeyName);
 				Model_in_Archive = validate_tile_name(ModelFullName);
+				if (!Model_in_Archive)
+				{
+					if (s_CDB_Tile_Be_Verbose)
+					{
+						OSG_WARN << "File " << ModelFullName << " reference from " << m_FileName << " not found" << std::endl;
+					}
+				}
 			}
 		}
 		else
@@ -2153,6 +2161,14 @@ void CDB_Tile::Set_LOD0_GT_Stack(bool value)
 		s_LOD0_GT_FullStack = true;
 	else
 		s_LOD0_GT_FullStack = false;
+}
+
+void CDB_Tile::Set_Verbose(bool value)
+{
+	if (value)
+		s_CDB_Tile_Be_Verbose = true;
+	else
+		s_CDB_Tile_Be_Verbose = false;
 }
 
 bool CDB_Tile::Initialize_Tile_Drivers(std::string &ErrorMsg)

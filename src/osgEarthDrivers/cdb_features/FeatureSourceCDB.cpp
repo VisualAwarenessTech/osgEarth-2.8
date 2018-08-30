@@ -296,6 +296,11 @@ public:
 				CDB_Tile::Set_LOD0_GS_Stack(true);
 		}
 
+		if (_BE_Verbose)
+		{
+			CDB_Tile::Set_Verbose(true);
+		}
+
 		if (Feature_Profile)
 		{
 			setFeatureProfile(Feature_Profile);

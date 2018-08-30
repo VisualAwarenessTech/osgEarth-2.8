@@ -374,6 +374,8 @@ public:
 
 	static void Set_LOD0_GT_Stack(bool value);
 
+	static void Set_Verbose(bool value);
+
 	static CDB_Tile_Extent Actual_Extent_For_Tile(CDB_Tile_Extent &TileExtent);
 
 	static int LodNumFromExtent(CDB_Tile_Extent &Tile_Extent);
