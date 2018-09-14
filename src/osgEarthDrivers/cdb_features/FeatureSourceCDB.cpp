@@ -500,10 +500,10 @@ private:
 		{
 			if (!_CDB_geoTypical)
 			{
-				have_archive = mainTile->Model_Geometry_Name(ModelZipFile);
+				have_archive = mainTile->Model_Geometry_Name(ModelZipFile, sel);
 				if (!have_archive)
 					return false;
-				have_texture_zipfile = mainTile->Model_Texture_Archive(TextureZipFile);
+				have_texture_zipfile = mainTile->Model_Texture_Archive(TextureZipFile, sel);
 			}
 		}
 		if (!_CDB_geoTypical)

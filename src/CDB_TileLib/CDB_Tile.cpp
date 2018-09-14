@@ -1329,7 +1329,7 @@ OGRFeature * CDB_Tile::Next_Valid_Feature(int sel, bool inflated, std::string &M
 										  bool &Model_in_Archive)
 {
 	if (m_TileType == GeoSpecificModel)
-		return Next_Valid_Geospecific_Feature(inflated, ModelKeyName, FullModelName, ArchiveFileName, Model_in_Archive);
+		return Next_Valid_Geospecific_Feature(inflated, ModelKeyName, FullModelName, ArchiveFileName, Model_in_Archive, sel);
 	else
 		return Next_Valid_GeoTypical_Feature(sel, ModelKeyName, FullModelName, Model_in_Archive);
 }
