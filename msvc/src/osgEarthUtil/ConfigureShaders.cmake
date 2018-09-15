@@ -1,10 +1,10 @@
 # configureshaders.cmake.in
 
-set(source_dir      "D:/Development/Op3d_Active/osgearth-2.8/src/osgEarthUtil")
-set(bin_dir         "D:/Development/Op3d_Active/osgearth-2.8/msvc/src/osgEarthUtil")
+set(source_dir      "../../../src/osgEarthUtil")
+set(bin_dir         "./")
 set(glsl_files      "ContourMap.vert.glsl;ContourMap.frag.glsl;Fog.vert.glsl;Fog.frag.glsl;Graticule.vert.glsl;Graticule.frag.glsl;LogDepthBuffer.vert.glsl;LogDepthBuffer.VertOnly.vert.glsl;LogDepthBuffer.frag.glsl;Shadowing.vert.glsl;Shadowing.frag.glsl")
 set(template_file   "Shaders.cpp.in")
-set(output_cpp_file "D:/Development/Op3d_Active/osgearth-2.8/msvc/src/osgEarthUtil/AutoGenShaders.cpp")
+set(output_cpp_file "./AutoGenShaders.cpp")
 
 # modify the contents for inlining; replace input with output (var: file)
 # i.e., the file name (in the form ) gets replaced with the

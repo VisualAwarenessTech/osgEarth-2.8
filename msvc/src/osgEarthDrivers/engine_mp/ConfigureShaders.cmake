@@ -1,10 +1,10 @@
 # configureshaders.cmake.in
 
-set(source_dir      "D:/Development/Op3d_Active/osgearth-2.8/src/osgEarthDrivers/engine_mp")
-set(bin_dir         "D:/Development/Op3d_Active/osgearth-2.8/msvc/src/osgEarthDrivers/engine_mp")
+set(source_dir      "../../../../src/osgEarthDrivers/engine_mp")
+set(bin_dir         "./")
 set(glsl_files      "MPEngine.vert.model.glsl;MPEngine.vert.view.glsl;MPEngine.frag.glsl;MPEngine.NormalMap.vert.glsl;MPEngine.NormalMap.frag.glsl")
 set(template_file   "MPShaders.cpp.in")
-set(output_cpp_file "D:/Development/Op3d_Active/osgearth-2.8/msvc/src/osgEarthDrivers/engine_mp/AutoGenShaders.cpp")
+set(output_cpp_file "./AutoGenShaders.cpp")
 
 # modify the contents for inlining; replace input with output (var: file)
 # i.e., the file name (in the form ) gets replaced with the
