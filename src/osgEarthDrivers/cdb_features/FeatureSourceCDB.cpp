@@ -114,11 +114,13 @@ public:
 	  _GS_LOD0_FullStack(false),
 	  _cur_Feature_Cnt(0),
 	  _rootString(""),
+	  _FileName(""),
 	  _cacheDir(""),
 	  _dataSet("_S001_T001_"),
 	  _CDBLodNum(0),
 	  _BE_Verbose(false),
-	  _M_Contains_ABS_Z(false)
+	  _M_Contains_ABS_Z(false),
+	  _UsingFileInput(false)
 #ifdef _SAVE_OGR_OUTPUT
 	,_OGR_Output(NULL),
 	_OGR_OutputName("C:\\Temp\\GeoSpecificModelCapture.gpkg"),
@@ -206,6 +208,27 @@ public:
 			if (z_in_m)
 				_M_Contains_ABS_Z = true;
 		}
+		// Make sure the root directory is set
+		bool CDB_Limits = true;
+		if (!_options.rootDir().isSet())
+		{
+			OE_WARN << "CDB root directory not set!" << std::endl;
+		}
+		else
+		{
+			_rootString = _options.rootDir().value();
+		}
+
+		if (_options.fileName().isSet())
+		{
+			_FileName = _options.fileName().value();
+			_UsingFileInput = true;
+			if (!CDB_Global::getInstance()->Open_Vector_File(_FileName))
+			{
+				OE_WARN << "Failed to open " << _FileName << std::endl;
+			}
+			CDB_Limits = false;
+		}
 
 		if (_options.Limits().isSet())
 		{
@@ -219,21 +242,34 @@ public:
 			if (count == 4)
 			{
 				//CDB tiles always filter to geocell boundaries
-				min_lon = round(min_lon);
-				min_lat = round(min_lat);
-				max_lat = round(max_lat);
-				max_lon = round(max_lon);
-				if ((max_lon > min_lon) && (max_lat > min_lat))
+				unsigned tiles_x;
+				unsigned tiles_y;
+				if (CDB_Limits)
 				{
-					unsigned tiles_x = (unsigned)(max_lon - min_lon);
-					unsigned tiles_y = (unsigned)(max_lat - min_lat);
-					osg::ref_ptr<const SpatialReference> src_srs;
-					src_srs = SpatialReference::create("EPSG:4326");
-					CDBFeatureProfile = osgEarth::Profile::create(src_srs, min_lon, min_lat, max_lon, max_lat, tiles_x, tiles_y);
-
-					//			   Below works but same as no limits
-					//			   setProfile(osgEarth::Profile::create(src_srs, -180.0, -90.0, 180.0, 90.0, min_lon, min_lat, max_lon, max_lat, 90U, 45U));
+					min_lon = round(min_lon);
+					min_lat = round(min_lat);
+					max_lat = round(max_lat);
+					max_lon = round(max_lon);
+					if ((max_lon > min_lon) && (max_lat > min_lat))
+					{
+						tiles_x = (unsigned)(max_lon - min_lon);
+						tiles_y = (unsigned)(max_lat - min_lat);
+						//			   Below works but same as no limits
+						//			   setProfile(osgEarth::Profile::create(src_srs, -180.0, -90.0, 180.0, 90.0, min_lon, min_lat, max_lon, max_lat, 90U, 45U));
+					}
 				}
+				else
+				{
+					min_lon = floor(min_lon);
+					min_lat = floor(min_lat);
+					max_lat = ceil(max_lat);
+					max_lon = ceil(max_lon);
+					tiles_x = 1;
+					tiles_y = 1;
+				}
+				osg::ref_ptr<const SpatialReference> src_srs;
+				src_srs = SpatialReference::create("EPSG:4326");
+				CDBFeatureProfile = osgEarth::Profile::create(src_srs, min_lon, min_lat, max_lon, max_lat, tiles_x, tiles_y);
 			}
 			if (!CDBFeatureProfile)
 				OE_WARN << "Invalid Limits received by CDB Driver: Not using Limits" << std::endl;
@@ -338,12 +374,12 @@ public:
 		bool subtile = false;
 		if (CDB_Tile::Get_Lon_Step(tileExtent.South) == 1.0)
 		{
-			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent, false, false, false);
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &tileExtent, false, false, false, 0, _UsingFileInput);
 		}
 		else
 		{
 			CDB_Tile_Extent  CDBTile_Tile_Extent = CDB_Tile::Actual_Extent_For_Tile(tileExtent);
-			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &CDBTile_Tile_Extent, false, false, false);
+			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &CDBTile_Tile_Extent, false, false, false, 0, _UsingFileInput);
 			mainTile->Set_SpatialFilter_Extent(tileExtent);
 			subtile = true;
 			if (_BE_Verbose)
@@ -357,6 +393,9 @@ public:
 		{
 			OSG_WARN << "CDB Feature Cursor called with CDB LOD " << _CDBLodNum << " Tile" << std::endl;
 		}
+		if (_UsingFileInput)
+			mainTile->Set_DataFromGlobal(true);
+
 		int Files2check = mainTile->Model_Sel_Count();
 		std::string base;
 		int FilesChecked = 0;
@@ -367,6 +406,7 @@ public:
 		if (Files2check > 0)
 		{
 			base = mainTile->FileName(FilesChecked);
+				
 			// check the blacklist:
 			if (Registry::instance()->isBlacklisted(base))
 			{
@@ -975,10 +1015,12 @@ private:
 	bool							_GT_LOD0_FullStack;
 	bool							_BE_Verbose;
 	bool							_M_Contains_ABS_Z;
+	bool							_UsingFileInput;
     osg::ref_ptr<CacheBin>          _cacheBin;
     osg::ref_ptr<osgDB::Options>    _dbOptions;
 	int								_CDBLodNum;
 	std::string						_rootString;
+	std::string						_FileName;
 	std::string						_cacheDir;
 	std::string						_dataSet;
 	int								_cur_Feature_Cnt;

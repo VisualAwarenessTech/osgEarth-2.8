@@ -40,6 +40,8 @@ namespace osgEarth { namespace Drivers
     public:
 		optional<std::string>& rootDir() { return _rootDir; }
 		const optional<std::string>& rootDir() const { return _rootDir; }
+		optional<std::string>& fileName() { return _FileName; }
+		const optional<std::string>& fileName() const { return _FileName; }
 		optional<std::string>& Limits() { return _Limits; }
 		const optional<std::string>& Limits() const { return _Limits; }
 		optional<int>& minLod() { return _minLod; }
@@ -78,6 +80,7 @@ namespace osgEarth { namespace Drivers
         Config getConfig() const {
             Config conf = FeatureSourceOptions::getConfig();
 			conf.updateIfSet("root_dir", _rootDir);
+			conf.updateIfSet("filename", _FileName);
 			conf.updateIfSet("limits", _Limits);
 			conf.updateIfSet("minlod", _minLod);
 			conf.updateIfSet("maxlod", _maxLod);
@@ -102,6 +105,7 @@ namespace osgEarth { namespace Drivers
     private:
         void fromConfig( const Config& conf ) {
 			conf.getIfSet("root_dir", _rootDir);
+			conf.getIfSet("filename", _FileName);
 			conf.getIfSet("limits", _Limits);
 			conf.getIfSet("minlod", _minLod);
 			conf.getIfSet("maxlod", _maxLod);
@@ -118,6 +122,7 @@ namespace osgEarth { namespace Drivers
 
 		optional<std::string> _rootDir;
 		optional<std::string> _Limits;
+		optional<std::string> _FileName;
 		optional<int> _minLod;
 		optional<int> _maxLod;
 		optional<bool>_inflated;

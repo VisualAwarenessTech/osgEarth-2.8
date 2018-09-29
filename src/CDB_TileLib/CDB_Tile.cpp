@@ -38,11 +38,6 @@
 
 CDB_GDAL_Drivers Gbl_TileDrivers;
 
-static int s_BaseMapLodNum = 0;
-static bool s_EnableBathymetry = true;
-static bool s_LOD0_GS_FullStack = false;
-static bool s_LOD0_GT_FullStack = false;
-static bool s_CDB_Tile_Be_Verbose = false;
 
 const int Gbl_CDB_Tile_Sizes[11] = {1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
 //Caution this only goes down to CDB Level 17
@@ -50,15 +45,114 @@ const double Gbl_CDB_Tiles_Per_LOD[18] = {1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 
 
 OGR_File  Ogr_File_Instance;
 
-CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, bool lightmap, bool material, bool material_mask, int NLod) : 
+CDB_Global CDB_Global_Instance;
+
+CDB_Global::CDB_Global() : m_ogrDataset(NULL)
+{
+	int s_BaseMapLodNum = 0;
+	bool s_EnableBathymetry = true;
+	bool s_LOD0_GS_FullStack = false;
+	bool s_LOD0_GT_FullStack = false;
+	bool s_CDB_Tile_Be_Verbose = false;
+}
+
+CDB_Global::~CDB_Global()
+{
+	if (m_ogrDataset)
+	{
+		GDALClose(m_ogrDataset);
+		m_ogrDataset = NULL;
+	}
+}
+
+bool CDB_Global::Open_Vector_File(std::string FileName)
+{
+	bool FileExists = CDB_Tile::validate_tile_name(FileName);
+	if (FileExists && (FileName.find(".gpkg") != std::string::npos))
+	{
+		//		GDALOpenInfo oOpenInfoP(m_FileName.c_str(), GA_ReadOnly | GDAL_OF_VECTOR);
+		//		m_GDAL.poDataset = m_GDAL.poDriver->pfnOpen(&oOpenInfoP);
+		char * drivers[2];
+		drivers[0] = "GPKG";
+		drivers[1] = NULL;
+		m_ogrDataset = (GDALDataset *)GDALOpenEx(FileName.c_str(), GDAL_OF_VECTOR | GA_ReadOnly | GDAL_OF_SHARED, drivers, NULL, NULL);
+		if (!m_ogrDataset)
+			return false;
+	}
+	else
+		return false;
+	return true;
+}
+
+GDALDataset * CDB_Global::Get_Dataset(void)
+{
+	return m_ogrDataset;
+}
+
+void CDB_Global::Set_BaseMapLodNum(int num)
+{
+	s_BaseMapLodNum = num;
+}
+
+int CDB_Global::BaseMapLodNum(void)
+{
+	return s_BaseMapLodNum;
+}
+
+void CDB_Global::Set_EnableBathymetry(bool value)
+{
+	s_EnableBathymetry = value;
+}
+
+bool CDB_Global::EnableBathymetry(void)
+{
+	return s_EnableBathymetry;
+}
+
+void CDB_Global::Set_LOD0_GS_FullStack(bool value)
+{
+	s_LOD0_GS_FullStack = value;
+}
+
+bool CDB_Global::LOD0_GS_FullStack(void)
+{
+	return s_LOD0_GS_FullStack;
+}
+
+void CDB_Global::Set_LOD0_GT_FullStack(bool value)
+{
+	s_LOD0_GT_FullStack = value;
+}
+
+bool CDB_Global::LOD0_GT_FullStack(void)
+{
+	return s_LOD0_GT_FullStack;
+}
+
+void CDB_Global::Set_CDB_Tile_Be_Verbose(bool value)
+{
+	s_CDB_Tile_Be_Verbose = value;
+}
+
+bool CDB_Global::CDB_Tile_Be_Verbose(void)
+{
+	return s_CDB_Tile_Be_Verbose;
+}
+
+CDB_Global * CDB_Global::getInstance(void)
+{
+	return &CDB_Global_Instance;
+}
+
+CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, bool lightmap, bool material, bool material_mask, int NLod, bool DataFromGlobal) :
 	               m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
 				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
 				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false), m_Have_MaterialData(false), m_EnableLightMap(lightmap),
-				   m_EnableMaterials(material), m_EnableMaterialMask(material_mask)
+				   m_EnableMaterials(material), m_EnableMaterialMask(material_mask), m_DataFromGlobal(DataFromGlobal), m_GlobalDataset(NULL)
 {
 	m_GTModelSet.clear();
-
+	CDB_Global * gbls = CDB_Global::getInstance();
 	if (NLod > 0)
 	{
 		m_Pixels.pixX = Gbl_CDB_Tile_Sizes[NLod];
@@ -78,6 +172,9 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 	std::string subordinatedatasetstr;
 	std::string subordinatedatasetstr2;
 	std::string subord2LayerName;
+
+	if (m_DataFromGlobal)
+		m_GlobalDataset = gbls->Get_Dataset();
 
 	if (m_TileType == Elevation)
 	{
@@ -118,7 +215,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 	else if (m_TileType == GeoPackageMap)
 	{
 		m_LayerName = "901_VectorBase";
-		if (m_CDB_LOD_Num < s_BaseMapLodNum)
+		if (m_CDB_LOD_Num < gbls->BaseMapLodNum())
 			filetype = ".xml";
 		else
 			filetype = ".gpkg";
@@ -409,7 +506,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 		m_FileExists = validate_tile_name(m_FileName);
 		if ((m_TileType == Elevation) || (m_TileType == ElevationCache))
 		{
-			if (s_EnableBathymetry)
+			if (gbls->EnableBathymetry())
 				m_Subordinate_Exists = validate_tile_name(m_SubordinateName);
 			else
 				m_Subordinate_Exists = false;
@@ -446,12 +543,12 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 	{
 		if (m_TileType == GeoSpecificModel)
 		{
-			if(s_LOD0_GS_FullStack)
+			if(gbls->LOD0_GS_FullStack())
 				Build_GS_Stack();
 		}
 		else if (m_TileType == GeoTypicalModel)
 		{
-			if(s_LOD0_GT_FullStack)
+			if(gbls->LOD0_GT_FullStack())
 				Build_GT_Stack();
 		}
 	}
@@ -468,6 +565,18 @@ CDB_Tile::~CDB_Tile()
 	Close_Dataset();
 
 	Free_Buffers();
+}
+
+void CDB_Tile::Set_DataFromGlobal(bool value)
+{
+	m_DataFromGlobal = value;
+	if (m_DataFromGlobal)
+		m_GlobalDataset = CDB_Global::getInstance()->Get_Dataset();
+}
+
+bool CDB_Tile::DataFromGlobal(void)
+{
+	return m_DataFromGlobal;
 }
 
 bool CDB_Tile::Build_GS_Stack(void)
@@ -1427,7 +1536,7 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 				Model_in_Archive = validate_tile_name(ModelFullName);
 				if (!Model_in_Archive)
 				{
-					if (s_CDB_Tile_Be_Verbose)
+					if (CDB_Global::getInstance()->CDB_Tile_Be_Verbose())
 					{
 						OSG_WARN << "File " << ModelFullName << " reference from " << m_FileName << " not found" << std::endl;
 					}
@@ -2043,10 +2152,11 @@ bool CDB_Tile::Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, s
 	std::string CacheDir = "";
 
 	CDB_Tile_Type Type = GeoPackageMap;
-	int BaseNumSave = s_BaseMapLodNum;
-	s_BaseMapLodNum = 3;
+	CDB_Global * gbls = CDB_Global::getInstance();
+	int BaseNumSave = gbls->BaseMapLodNum();
+	gbls->Set_BaseMapLodNum(3);
 	CDB_Tile * LOD0BM = new CDB_Tile(rootDir, CacheDir, Type, dataset, &L0_Extent, false, false, false);
-	s_BaseMapLodNum = BaseNumSave;
+	gbls->Set_BaseMapLodNum(BaseNumSave);
 	bool ret = true;
 	if (LOD0BM->Tile_Exists())
 	{
@@ -2060,7 +2170,7 @@ bool CDB_Tile::Get_BaseMap_Files(std::string rootDir, CDB_Tile_Extent &Extent, s
 			{
 				std::string LODstr = LODE->getText();
 				int baseLod = atoi(LODstr.c_str());
-				s_BaseMapLodNum = baseLod;
+				CDB_Global::getInstance()->Set_BaseMapLodNum(baseLod);
 				//Adjust extent to be on baseMap lod tile boundary
 				double degpertileY = 1.0 / Gbl_CDB_Tiles_Per_LOD[baseLod];
 				double degpertileX = Get_Lon_Step(Extent.South) / Gbl_CDB_Tiles_Per_LOD[baseLod];
@@ -2140,35 +2250,39 @@ double CDB_Tile::Get_Lon_Step(double Latitude)
 
 void CDB_Tile::Disable_Bathyemtry(bool value)
 {
+	CDB_Global * gbls = CDB_Global::getInstance();
 	if (value)
-		s_EnableBathymetry = false;
+		gbls->Set_EnableBathymetry(false);
 	else
-		s_EnableBathymetry = true;
+		gbls->Set_EnableBathymetry(true);
 }
 
 
 void CDB_Tile::Set_LOD0_GS_Stack(bool value)
 {
+	CDB_Global * gbls = CDB_Global::getInstance();
 	if (value)
-		s_LOD0_GS_FullStack = true;
+		gbls->Set_LOD0_GS_FullStack(true);
 	else
-		s_LOD0_GS_FullStack = false;
+		gbls->Set_LOD0_GS_FullStack(false);
 }
 
 void CDB_Tile::Set_LOD0_GT_Stack(bool value)
 {
+	CDB_Global * gbls = CDB_Global::getInstance();
 	if (value)
-		s_LOD0_GT_FullStack = true;
+		gbls->Set_LOD0_GT_FullStack(true);
 	else
-		s_LOD0_GT_FullStack = false;
+		gbls->Set_LOD0_GT_FullStack(false);
 }
 
 void CDB_Tile::Set_Verbose(bool value)
 {
+	CDB_Global * gbls = CDB_Global::getInstance();
 	if (value)
-		s_CDB_Tile_Be_Verbose = true;
+		gbls->Set_CDB_Tile_Be_Verbose(true);
 	else
-		s_CDB_Tile_Be_Verbose = false;
+		gbls->Set_CDB_Tile_Be_Verbose(false);
 }
 
 bool CDB_Tile::Initialize_Tile_Drivers(std::string &ErrorMsg)
