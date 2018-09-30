@@ -1149,9 +1149,11 @@ void CDB_Tile::Close_Dataset(void)
 
 bool CDB_Tile::Open_Tile(void)
 {
-	if (m_GDAL.poDataset)
-		return true;
-
+	if (!m_DataFromGlobal)
+	{
+		if (m_GDAL.poDataset)
+			return true;
+	}
 	GDALOpenInfo oOpenInfo(m_FileName.c_str(), GA_ReadOnly);
 	if (m_TileType == Imagery)
 	{
@@ -1173,12 +1175,18 @@ bool CDB_Tile::Open_Tile(void)
 	}
 	else if (m_TileType == GeoTypicalModel)
 	{
-		m_GDAL.poDriver = Gbl_TileDrivers.cdb_ShapefileDriver;
+		if(m_DataFromGlobal)
+			m_GDAL.poDriver = m_GlobalDataset->GetDriver();
+		else
+			m_GDAL.poDriver = Gbl_TileDrivers.cdb_ShapefileDriver;
 		return Open_GT_Model_Tile();
 	}
 	else if (m_TileType == GeoSpecificModel)
 	{
-		m_GDAL.poDriver = Gbl_TileDrivers.cdb_ShapefileDriver;
+		if (m_DataFromGlobal)
+			m_GDAL.poDriver = m_GlobalDataset->GetDriver();
+		else
+			m_GDAL.poDriver = Gbl_TileDrivers.cdb_ShapefileDriver;
 		return Open_GS_Model_Tile();
 	}
 	else if (m_TileType == GeoPackageMap)
@@ -1254,50 +1262,60 @@ bool CDB_Tile::Open_GS_Model_Tile(void)
 	bool Have_a_Valid_set = false;
 	for(unsigned int i = 0; i < m_ModelSet.size(); ++i)
 	{
-		if (m_ModelSet[i].ModelWorkingNameExists && m_ModelSet[i].ModelDbfNameExists && m_ModelSet[i].ModelGeometryNameExists)
+		bool valid_set = true;
+		if(!m_DataFromGlobal)
 		{
-			bool valid_set = true;
-			GDALOpenInfo oOpenInfoP(m_ModelSet[i].ModelWorkingName.c_str(), GA_ReadOnly);
-			m_ModelSet[i].PrimaryTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoP);
-			if (!m_ModelSet[i].PrimaryTileOgr)
+			if (m_ModelSet[i].ModelWorkingNameExists && m_ModelSet[i].ModelDbfNameExists && m_ModelSet[i].ModelGeometryNameExists)
 			{
-				valid_set = false;
-				continue;
-			}
+				GDALOpenInfo oOpenInfoP(m_ModelSet[i].ModelWorkingName.c_str(), GA_ReadOnly);
+				m_ModelSet[i].PrimaryTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoP);
+				if (!m_ModelSet[i].PrimaryTileOgr)
+				{
+					valid_set = false;
+					continue;
+				}
 
-			GDALOpenInfo oOpenInfoC(m_ModelSet[i].ModelDbfName.c_str(), GA_ReadOnly);
-			m_ModelSet[i].ClassTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoC);
-			if (!m_ModelSet[i].ClassTileOgr)
-			{
-				//Check for junk files clogging up the works
-				std::string shx = Set_FileType(m_ModelSet[i].ModelDbfName, ".shx");
-				if (validate_tile_name(shx))
-				{
-					if (::DeleteFile(shx.c_str()) == 0)
-					{
-						return false;
-					}
-				}
-				std::string shp = Set_FileType(m_ModelSet[i].ModelDbfName, ".shp");
-				if (validate_tile_name(shp))
-				{
-					if (::DeleteFile(shp.c_str()) == 0)
-					{
-						return false;
-					}
-				}
+				GDALOpenInfo oOpenInfoC(m_ModelSet[i].ModelDbfName.c_str(), GA_ReadOnly);
 				m_ModelSet[i].ClassTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoC);
 				if (!m_ModelSet[i].ClassTileOgr)
 				{
-					valid_set = false;
-					if (m_ModelSet[i].PrimaryTileOgr)
+					//Check for junk files clogging up the works
+					std::string shx = Set_FileType(m_ModelSet[i].ModelDbfName, ".shx");
+					if (validate_tile_name(shx))
 					{
-						GDALClose(m_ModelSet[i].PrimaryTileOgr);
-						m_ModelSet[i].PrimaryTileOgr = NULL;
+						if (::DeleteFile(shx.c_str()) == 0)
+						{
+							return false;
+						}
 					}
-					continue;
+					std::string shp = Set_FileType(m_ModelSet[i].ModelDbfName, ".shp");
+					if (validate_tile_name(shp))
+					{
+						if (::DeleteFile(shp.c_str()) == 0)
+						{
+							return false;
+						}
+					}
+					m_ModelSet[i].ClassTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoC);
+					if (!m_ModelSet[i].ClassTileOgr)
+					{
+						valid_set = false;
+						if (m_ModelSet[i].PrimaryTileOgr)
+						{
+							GDALClose(m_ModelSet[i].PrimaryTileOgr);
+							m_ModelSet[i].PrimaryTileOgr = NULL;
+						}
+						continue;
+					}
 				}
 			}
+			if (valid_set)
+				Have_a_Valid_set = true;
+		}
+		else
+		{
+			if (m_ModelSet[i].ModelWorkingNameExists && m_ModelSet[i].ModelDbfNameExists && m_ModelSet[i].ModelGeometryNameExists)
+				valid_set = true;
 			if (valid_set)
 				Have_a_Valid_set = true;
 		}
@@ -1312,39 +1330,49 @@ bool CDB_Tile::Open_GT_Model_Tile(void)
 	bool have_an_opening = false;
 	for (size_t i = 0; i < m_GTModelSet.size(); ++i)
 	{
-		if (m_GTModelSet[i].PrimaryExists && m_GTModelSet[i].ClassExists)
+		if (!m_DataFromGlobal)
 		{
-			GDALOpenInfo oOpenInfoP(m_GTModelSet[i].TilePrimaryShapeName.c_str(), GA_ReadOnly);
-			m_GTModelSet[i].PrimaryTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoP);
-			if (!m_GTModelSet[i].PrimaryTileOgr)
-				continue;
-			GDALOpenInfo oOpenInfoC(m_GTModelSet[i].TileSecondaryShapeName.c_str(), GA_ReadOnly);
-			m_GTModelSet[i].ClassTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoC);
-			if (!m_GTModelSet[i].ClassTileOgr)
+			if (m_GTModelSet[i].PrimaryExists && m_GTModelSet[i].ClassExists)
 			{
-				//Check for junk files clogging up the works
-				std::string shx = Set_FileType(m_GTModelSet[i].TileSecondaryShapeName, ".shx");
-				if (validate_tile_name(shx))
-				{
-					if (::DeleteFile(shx.c_str()) == 0)
-					{
-						continue;
-					}
-				}
-				std::string shp = Set_FileType(m_GTModelSet[i].TileSecondaryShapeName, ".shp");
-				if (validate_tile_name(shp))
-				{
-					if (::DeleteFile(shp.c_str()) == 0)
-					{
-						continue;
-					}
-				}
+				GDALOpenInfo oOpenInfoP(m_GTModelSet[i].TilePrimaryShapeName.c_str(), GA_ReadOnly);
+				m_GTModelSet[i].PrimaryTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoP);
+				if (!m_GTModelSet[i].PrimaryTileOgr)
+					continue;
+				GDALOpenInfo oOpenInfoC(m_GTModelSet[i].TileSecondaryShapeName.c_str(), GA_ReadOnly);
 				m_GTModelSet[i].ClassTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoC);
 				if (!m_GTModelSet[i].ClassTileOgr)
-					continue;
+				{
+					//Check for junk files clogging up the works
+					std::string shx = Set_FileType(m_GTModelSet[i].TileSecondaryShapeName, ".shx");
+					if (validate_tile_name(shx))
+					{
+						if (::DeleteFile(shx.c_str()) == 0)
+						{
+							continue;
+						}
+					}
+					std::string shp = Set_FileType(m_GTModelSet[i].TileSecondaryShapeName, ".shp");
+					if (validate_tile_name(shp))
+					{
+						if (::DeleteFile(shp.c_str()) == 0)
+						{
+							continue;
+						}
+					}
+					m_GTModelSet[i].ClassTileOgr = m_GDAL.poDriver->pfnOpen(&oOpenInfoC);
+					if (!m_GTModelSet[i].ClassTileOgr)
+						continue;
+				}
+				if (m_GTModelSet[i].PrimaryTileOgr && m_GTModelSet[i].ClassTileOgr)
+					have_an_opening = true;
 			}
-			if (m_GTModelSet[i].PrimaryTileOgr && m_GTModelSet[i].ClassTileOgr)
+		}
+		else
+		{
+			if (m_GTModelSet[i].PrimaryExists && m_GTModelSet[i].ClassExists)
+			{
 				have_an_opening = true;
+			}
 		}
 	}
 	if(have_an_opening)
@@ -1620,9 +1648,16 @@ std::string CDB_Tile::Model_KeyName(std::string &FACC_value, std::string &FSC_Va
 
 bool CDB_Tile::Init_GS_Model_Tile(unsigned int pos)
 {
-	if (!m_ModelSet[pos].ClassTileOgr)
-		return false;
-	m_ModelSet[pos].PrimaryLayer = m_ModelSet[pos].PrimaryTileOgr->GetLayer(0);
+	if (!m_DataFromGlobal)
+	{
+		if (!m_ModelSet[pos].ClassTileOgr)
+			return false;
+		m_ModelSet[pos].PrimaryLayer = m_ModelSet[pos].PrimaryTileOgr->GetLayer(0);
+	}
+	else
+	{
+		m_ModelSet[pos].PrimaryLayer = m_GlobalDataset->GetLayerByName(m_FileName.c_str());
+	}
 	if (!m_ModelSet[pos].PrimaryLayer)
 		return false;
 
@@ -1632,7 +1667,12 @@ bool CDB_Tile::Init_GS_Model_Tile(unsigned int pos)
 	}
 
 	m_ModelSet[pos].PrimaryLayer->ResetReading();
-	OGRLayer *poLayer = m_ModelSet[pos].ClassTileOgr->GetLayer(0);
+	OGRLayer *poLayer = NULL;
+	if (!m_DataFromGlobal)
+		poLayer = m_ModelSet[pos].ClassTileOgr->GetLayer(0);
+	else
+		poLayer = m_GlobalDataset->GetLayerByName(m_ModelSet[pos].ModelDbfName.c_str());
+
 	bool have_class = Load_Class_Map(poLayer, m_ModelSet[pos].clsMap);
 	bool have_archive = Load_Archive(m_ModelSet[pos].ModelGeometryName, m_ModelSet[pos].archiveFileList);
 	return (have_class && have_archive);
@@ -1747,9 +1787,16 @@ int CDB_Tile::Find_Field_Index(OGRFeatureDefn *poFDefn, std::string fieldname, O
 
 bool CDB_Tile::Init_GT_Model_Tile(int sel)
 {
-	if (!m_GTModelSet[sel].ClassTileOgr)
-		return false;
-	m_GTModelSet[sel].PrimaryLayer = m_GTModelSet[sel].	PrimaryTileOgr->GetLayer(0);
+	if (!m_DataFromGlobal)
+	{
+		if (!m_GTModelSet[sel].ClassTileOgr)
+			return false;
+		m_GTModelSet[sel].PrimaryLayer = m_GTModelSet[sel].PrimaryTileOgr->GetLayer(0);
+	}
+	else
+	{
+		m_GTModelSet[sel].PrimaryLayer = m_GlobalDataset->GetLayerByName(m_GTModelSet[sel].TilePrimaryShapeName.c_str());
+	}
 	if (!m_GTModelSet[sel].PrimaryLayer)
 		return false;
 
@@ -1759,7 +1806,15 @@ bool CDB_Tile::Init_GT_Model_Tile(int sel)
 	}
 
 	m_GTModelSet[sel].PrimaryLayer->ResetReading();
-	OGRLayer *poLayer = m_GTModelSet[sel].ClassTileOgr->GetLayer(0);
+	OGRLayer *poLayer = NULL;
+	if (!m_DataFromGlobal)
+	{
+		poLayer = m_GTModelSet[sel].ClassTileOgr->GetLayer(0);
+	}
+	else
+	{
+		poLayer = m_GlobalDataset->GetLayerByName(m_GTModelSet[sel].TileSecondaryShapeName.c_str());
+	}
 	return Load_Class_Map(poLayer, m_GTModelSet[sel].clsMap);
 }
 
