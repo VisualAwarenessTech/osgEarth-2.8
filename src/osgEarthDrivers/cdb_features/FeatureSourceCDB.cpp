@@ -301,15 +301,6 @@ public:
 		Feature_Profile->setMaxLevel(maxLod);
 		Feature_Profile->setProfile(CDBFeatureProfile);
 
-		// Make sure the root directory is set
-		if (!_options.rootDir().isSet())
-		{
-			OE_WARN << "CDB root directory not set!" << std::endl;
-		}
-		else
-		{
-			_rootString = _options.rootDir().value();
-		}
 
 		bool errorset = false;
 		std::string Errormsg = "";
@@ -394,7 +385,7 @@ public:
 			OSG_WARN << "CDB Feature Cursor called with CDB LOD " << _CDBLodNum << " Tile" << std::endl;
 		}
 		if (_UsingFileInput)
-			mainTile->Set_DataFromGlobal(true);
+			mainTile->Set_SpatialFilter_Extent(tileExtent);
 
 		int Files2check = mainTile->Model_Sel_Count();
 		std::string base;

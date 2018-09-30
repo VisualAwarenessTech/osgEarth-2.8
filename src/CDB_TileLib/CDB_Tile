@@ -279,6 +279,7 @@ public:
 	bool CDB_Tile_Be_Verbose(void);
 	bool Open_Vector_File(std::string FileName);
 	GDALDataset * Get_Dataset(void);
+	bool CDB_Global::Has_Layer(std::string LayerName);
 
 	static CDB_Global * getInstance(void);
 

@@ -84,6 +84,20 @@ bool CDB_Global::Open_Vector_File(std::string FileName)
 	return true;
 }
 
+bool CDB_Global::Has_Layer(std::string LayerName)
+{
+	if (!m_ogrDataset)
+		return false;
+	else
+	{
+		OGRLayer * poLayer = m_ogrDataset->GetLayerByName(LayerName.c_str());
+		if (poLayer)
+			return true;
+		else
+			return false;
+	}
+}
+
 GDALDataset * CDB_Global::Get_Dataset(void)
 {
 	return m_ogrDataset;
@@ -242,30 +256,71 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 
 	//Set tile size for lower levels of detail
 
-	if (m_CDB_LOD_Num < 0)
+	if (!m_DataFromGlobal)
 	{
-		if (NLod == 0)
+		if (m_CDB_LOD_Num < 0)
 		{
-			buf << cdbCacheDir
-				<< "\\" << m_LayerName
-				<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
-				<< "_" << m_uref_str << "_" << m_rref_str << filetype;
-
-			if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
+			if (NLod == 0)
 			{
-				subordinatebuf << cdbRootDir
-					<< cdbCacheDir
+				buf << cdbCacheDir
 					<< "\\" << m_LayerName
-					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
+					<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
 					<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+
+				if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
+				{
+					subordinatebuf << cdbRootDir
+						<< cdbCacheDir
+						<< "\\" << m_LayerName
+						<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
+						<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+				}
+				if (m_TileType == Imagery)
+				{
+					subordinatebuf2 << cdbRootDir
+						<< cdbCacheDir
+						<< "\\" << subord2LayerName
+						<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
+						<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
+				}
 			}
-			if (m_TileType == Imagery)
+			else
 			{
-				subordinatebuf2 << cdbRootDir
-					<< cdbCacheDir
-					<< "\\" << subord2LayerName
-					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
-					<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
+				buf << cdbRootDir
+					<< "\\Tiles"
+					<< "\\" << m_lat_str
+					<< "\\" << m_lon_str
+					<< "\\" << m_LayerName
+					<< "\\LC"
+					<< "\\" << m_uref_str
+					<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
+					<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+				if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
+				{
+					subordinatebuf << cdbRootDir
+						<< "\\Tiles"
+						<< "\\" << m_lat_str
+						<< "\\" << m_lon_str
+						<< "\\" << m_LayerName
+						<< "\\LC"
+						<< "\\" << m_uref_str
+						<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
+						<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+
+				}
+				if (m_TileType == Imagery)
+				{
+					subordinatebuf2 << cdbRootDir
+						<< "\\Tiles"
+						<< "\\" << m_lat_str
+						<< "\\" << m_lon_str
+						<< "\\" << subord2LayerName
+						<< "\\LC"
+						<< "\\" << m_uref_str
+						<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
+						<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
+
+				}
 			}
 		}
 		else
@@ -275,10 +330,11 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				<< "\\" << m_lat_str
 				<< "\\" << m_lon_str
 				<< "\\" << m_LayerName
-				<< "\\LC"
+				<< "\\" << m_lod_str
 				<< "\\" << m_uref_str
 				<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
 				<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+
 			if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
 			{
 				subordinatebuf << cdbRootDir
@@ -286,11 +342,10 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 					<< "\\" << m_lat_str
 					<< "\\" << m_lon_str
 					<< "\\" << m_LayerName
-					<< "\\LC"
+					<< "\\" << m_lod_str
 					<< "\\" << m_uref_str
 					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
 					<< "_" << m_uref_str << "_" << m_rref_str << filetype;
-
 			}
 			if (m_TileType == Imagery)
 			{
@@ -299,50 +354,16 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 					<< "\\" << m_lat_str
 					<< "\\" << m_lon_str
 					<< "\\" << subord2LayerName
-					<< "\\LC"
+					<< "\\" << m_lod_str
 					<< "\\" << m_uref_str
 					<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
 					<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
-
 			}
 		}
 	}
 	else
 	{
-		buf << cdbRootDir
-			<< "\\Tiles"
-			<< "\\" << m_lat_str
-			<< "\\" << m_lon_str
-			<< "\\" << m_LayerName
-			<< "\\" << m_lod_str
-			<< "\\" << m_uref_str
-			<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
-			<< "_" << m_uref_str << "_" << m_rref_str << filetype;
-
-		if ((m_TileType == Elevation) || (m_TileType == ElevationCache) || (m_TileType == Imagery))
-		{
-			subordinatebuf << cdbRootDir
-				<< "\\Tiles"
-				<< "\\" << m_lat_str
-				<< "\\" << m_lon_str
-				<< "\\" << m_LayerName
-				<< "\\" << m_lod_str
-				<< "\\" << m_uref_str
-				<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr << m_lod_str
-				<< "_" << m_uref_str << "_" << m_rref_str << filetype;
-		}
-		if (m_TileType == Imagery)
-		{
-			subordinatebuf2 << cdbRootDir
-				<< "\\Tiles"
-				<< "\\" << m_lat_str
-				<< "\\" << m_lon_str
-				<< "\\" << subord2LayerName
-				<< "\\" << m_lod_str
-				<< "\\" << m_uref_str
-				<< "\\" << m_lat_str << m_lon_str << subordinatedatasetstr2 << m_lod_str
-				<< "_" << m_uref_str << "_" << m_rref_str << sub2filetype;
-		}
+		buf << m_LayerName << datasetstr.substr(5) << "Pnt_" << m_lod_str; //Global Layer Name
 	}
 	m_FileName = buf.str();
 
@@ -351,17 +372,22 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 		std::string dataset2str = "_D100_S001_T002_";
 		std::string filetype2str = ".dbf";
 		std::stringstream dbfbuf;
-
-		dbfbuf << cdbRootDir
-			<< "\\Tiles"
-			<< "\\" << m_lat_str
-			<< "\\" << m_lon_str
-			<< "\\" << m_LayerName
-			<< "\\" << m_lod_str
-			<< "\\" << m_uref_str
-			<< "\\" << m_lat_str << m_lon_str << dataset2str << m_lod_str
-			<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
-
+		if (!m_DataFromGlobal)
+		{
+			dbfbuf << cdbRootDir
+				<< "\\Tiles"
+				<< "\\" << m_lat_str
+				<< "\\" << m_lon_str
+				<< "\\" << m_LayerName
+				<< "\\" << m_lod_str
+				<< "\\" << m_uref_str
+				<< "\\" << m_lat_str << m_lon_str << dataset2str << m_lod_str
+				<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
+		}
+		else
+		{
+			dbfbuf << m_LayerName << dataset2str.substr(5) << "Cls_" << m_lod_str;
+		}
 		CDB_Model_Tile_Set ModelSet;
 
 		ModelSet.ModelDbfName = dbfbuf.str();
@@ -424,20 +450,27 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 
 			std::stringstream dsbuf;
 			dsbuf << "_D101_S" << std::setfill('0')
-				<< std::setw(3) << abs(i) << "_T" << std::setfill('0')
-				<< std::setw(3) << abs(Tnum) << "_";
+				  << std::setw(3) << abs(i) << "_T" << std::setfill('0')
+				  << std::setw(3) << abs(Tnum) << "_";
 			datasetstr = dsbuf.str();
 
 			std::stringstream f1buf;
-			f1buf << cdbRootDir
-				<< "\\Tiles"
-				<< "\\" << m_lat_str
-				<< "\\" << m_lon_str
-				<< "\\" << m_LayerName
-				<< "\\" << m_lod_str
-				<< "\\" << m_uref_str
-				<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
-				<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+			if (!m_DataFromGlobal)
+			{
+				f1buf << cdbRootDir
+					<< "\\Tiles"
+					<< "\\" << m_lat_str
+					<< "\\" << m_lon_str
+					<< "\\" << m_LayerName
+					<< "\\" << m_lod_str
+					<< "\\" << m_uref_str
+					<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
+					<< "_" << m_uref_str << "_" << m_rref_str << filetype;
+			}
+			else
+			{
+				f1buf << m_LayerName << datasetstr.substr(5) << "Pnt_" << m_lod_str;
+			}
 			t.TilePrimaryShapeName = f1buf.str();
 
 			std::stringstream laybuf;
@@ -452,23 +485,38 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 			datasetstr = ds2buf.str();
 
 			std::stringstream f2buf;
-			f2buf << cdbRootDir
-				<< "\\Tiles"
-				<< "\\" << m_lat_str
-				<< "\\" << m_lon_str
-				<< "\\" << m_LayerName
-				<< "\\" << m_lod_str
-				<< "\\" << m_uref_str
-				<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
-				<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
+			if (!m_DataFromGlobal)
+			{
+				f2buf << cdbRootDir
+					<< "\\Tiles"
+					<< "\\" << m_lat_str
+					<< "\\" << m_lon_str
+					<< "\\" << m_LayerName
+					<< "\\" << m_lod_str
+					<< "\\" << m_uref_str
+					<< "\\" << m_lat_str << m_lon_str << datasetstr << m_lod_str
+					<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
+			}
+			else
+			{
+				f2buf << m_LayerName << datasetstr.substr(5) << "Cls_" << m_lod_str;
+			}
 			t.TileSecondaryShapeName = f2buf.str();
 
 			std::stringstream clslaybuf;
 			clslaybuf << "101_GTFeature_S" << std::setfill('0') << std::setw(3) << abs(i) << "_T"
 				<< std::setfill('0') << std::setw(3) << abs(Tnum + 1) << "_Cls";
 			t.ClassLayerName = clslaybuf.str();
-			t.PrimaryExists = validate_tile_name(t.TilePrimaryShapeName);
-			t.ClassExists = validate_tile_name(t.TileSecondaryShapeName);
+			if (!m_DataFromGlobal)
+			{
+				t.PrimaryExists = validate_tile_name(t.TilePrimaryShapeName);
+				t.ClassExists = validate_tile_name(t.TileSecondaryShapeName);
+			}
+			else
+			{
+				t.PrimaryExists = gbls->Has_Layer(t.TilePrimaryShapeName);
+				t.ClassExists = gbls->Has_Layer(t.TileSecondaryShapeName);
+			}
 			t.RealSel = i - 1;
 			if (t.PrimaryExists && t.ClassExists)
 				m_GTModelSet.push_back(t);
@@ -494,8 +542,16 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 	}
 	else if (m_TileType == GeoSpecificModel)
 	{
-		m_FileExists = validate_tile_name(m_FileName);
-		m_ModelSet[0].ModelDbfNameExists = validate_tile_name(m_ModelSet[0].ModelDbfName);
+		if (!m_DataFromGlobal)
+		{
+			m_FileExists = validate_tile_name(m_FileName);
+			m_ModelSet[0].ModelDbfNameExists = validate_tile_name(m_ModelSet[0].ModelDbfName);
+		}
+		else
+		{
+			m_FileExists = gbls->Has_Layer(m_FileName);
+			m_ModelSet[0].ModelDbfNameExists = gbls->Has_Layer(m_ModelSet[0].ModelDbfName);
+		}
 		m_ModelSet[0].ModelGeometryNameExists = validate_tile_name(m_ModelSet[0].ModelGeometryName);
 		m_ModelSet[0].ModelTextureNameExists = validate_tile_name(m_ModelSet[0].ModelTextureName);
 		m_ModelSet[0].ModelWorkingName = m_FileName;
