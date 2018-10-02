@@ -3354,6 +3354,8 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 			Fcode = "010_Power_Plant";
 		else if (Fcode == "240")
 			Fcode = "240_Tower-NC";
+		else if (Fcode == "241")
+			Fcode = "241_Tower_General";
 		else if (Fcode == "080")
 			Fcode = "080_Comm_Tower";
 		else if (Fcode == "020")

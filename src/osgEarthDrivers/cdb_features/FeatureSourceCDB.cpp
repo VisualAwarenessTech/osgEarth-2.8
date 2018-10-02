@@ -423,15 +423,29 @@ public:
 					{
 						OSG_WARN << "Feature tile loding GeoTypical Tile " << base << std::endl;
 						if (subtile)
+						{
 							OSG_WARN << "Subtile: North " << tileExtent.North << " South " << tileExtent.South << " East " <<
 										tileExtent.East << " West " << tileExtent.West << std::endl;
+						}
+						else if (_UsingFileInput)
+						{
+							OSG_WARN << "ThisTile: North " << tileExtent.North << " South " << tileExtent.South << " East " <<
+										tileExtent.East << " West " << tileExtent.West << std::endl;
+						}
 					}
 					else
 					{
 						OSG_WARN << "Feature tile loding GeoSpecific Tile " << base << std::endl;
 						if (subtile)
+						{
 							OSG_WARN << "Subtile: North " << tileExtent.North << " South " << tileExtent.South << " East " <<
-										tileExtent.East << " West " << tileExtent.West << std::endl;
+										 tileExtent.East << " West " << tileExtent.West << std::endl;
+						}
+						else if (_UsingFileInput)
+						{
+							OSG_WARN << "ThisTile: North " << tileExtent.North << " South " << tileExtent.South << " East " <<
+								tileExtent.East << " West " << tileExtent.West << std::endl;
+						}
 					}
 				}
 				bool fileOk = getFeatures(mainTile, base, features, FilesChecked);
