@@ -260,39 +260,6 @@ typedef CDB_Tile * CDB_TileP;
 typedef vector<CDB_TileP> CDB_TilePV;
 
 #include <osgEarthFeatures/Feature>
-class CDBTILELIBRARYAPI CDB_Global
-{
-public:
-
-	CDB_Global();
-	~CDB_Global();
-
-	void Set_BaseMapLodNum(int num);
-	int BaseMapLodNum(void);
-	void Set_EnableBathymetry(bool value);
-	bool EnableBathymetry(void);
-	void Set_LOD0_GS_FullStack(bool value);
-	bool LOD0_GS_FullStack(void);
-	void Set_LOD0_GT_FullStack(bool value);
-	bool LOD0_GT_FullStack(void);
-	void Set_CDB_Tile_Be_Verbose(bool value);
-	bool CDB_Tile_Be_Verbose(void);
-	bool Open_Vector_File(std::string FileName);
-	GDALDataset * Get_Dataset(void);
-	bool CDB_Global::Has_Layer(std::string LayerName);
-
-	static CDB_Global * getInstance(void);
-
-private:
-
-	int s_BaseMapLodNum;
-	bool s_EnableBathymetry;
-	bool s_LOD0_GS_FullStack;
-	bool s_LOD0_GT_FullStack;
-	bool s_CDB_Tile_Be_Verbose;
-
-	GDALDataset *	m_ogrDataset;
-};
 
 class CDBTILELIBRARYAPI CDB_Tile
 {

@@ -22,7 +22,7 @@
 
 #include "CDBFeatureOptions"
 #include <CDB_TileLib/CDB_Tile>
-
+#include <cdbGlobals\cdbGlobals>
 #include <osgEarth/Version>
 #include <osgEarth/Registry>
 #include <osgEarth/XmlUtils>
