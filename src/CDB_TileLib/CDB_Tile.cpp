@@ -285,31 +285,44 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 		filetype2str = ".zip";
 		std::string layerName2 = "300_GSModelGeometry";
 		std::stringstream geombuf;
-		geombuf << cdbRootDir
-			<< "\\Tiles"
-			<< "\\" << m_lat_str
-			<< "\\" << m_lon_str
-			<< "\\" << layerName2
-			<< "\\" << m_lod_str
-			<< "\\" << m_uref_str
-			<< "\\" << m_lat_str << m_lon_str << dataset2str << m_lod_str
-			<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
-
+		if (!m_DataFromGlobal)
+		{
+			geombuf << cdbRootDir
+				<< "\\Tiles"
+				<< "\\" << m_lat_str
+				<< "\\" << m_lon_str
+				<< "\\" << layerName2
+				<< "\\" << m_lod_str
+				<< "\\" << m_uref_str
+				<< "\\" << m_lat_str << m_lon_str << dataset2str << m_lod_str
+				<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
+		}
+		else
+		{
+			geombuf << layerName2 << dataset2str.substr(5) << "Mda_" << m_lod_str;
+		}
 		ModelSet.ModelGeometryName = geombuf.str();
 
 		dataset2str = "_D301_S001_T001_";
 		filetype2str = ".zip";
 		layerName2 = "301_GSModelTexture";
 		std::stringstream txbuf;
-		txbuf << cdbRootDir
-			<< "\\Tiles"
-			<< "\\" << m_lat_str
-			<< "\\" << m_lon_str
-			<< "\\" << layerName2
-			<< "\\" << m_lod_str
-			<< "\\" << m_uref_str
-			<< "\\" << m_lat_str << m_lon_str << dataset2str << m_lod_str
-			<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
+		if (!m_DataFromGlobal)
+		{
+			txbuf << cdbRootDir
+				<< "\\Tiles"
+				<< "\\" << m_lat_str
+				<< "\\" << m_lon_str
+				<< "\\" << layerName2
+				<< "\\" << m_lod_str
+				<< "\\" << m_uref_str
+				<< "\\" << m_lat_str << m_lon_str << dataset2str << m_lod_str
+				<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
+		}
+		else
+		{
+			txbuf << layerName2 << dataset2str.substr(5) << "Mda_" << m_lod_str;
+		}
 
 		ModelSet.ModelTextureName = txbuf.str();
 
@@ -435,14 +448,21 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 		{
 			m_FileExists = validate_tile_name(m_FileName);
 			m_ModelSet[0].ModelDbfNameExists = validate_tile_name(m_ModelSet[0].ModelDbfName);
+			m_ModelSet[0].ModelGeometryNameExists = validate_tile_name(m_ModelSet[0].ModelGeometryName);
+			m_ModelSet[0].ModelTextureNameExists = validate_tile_name(m_ModelSet[0].ModelTextureName);
 		}
 		else
 		{
 			m_FileExists = gbls->Has_Layer(m_FileName);
 			m_ModelSet[0].ModelDbfNameExists = gbls->Has_Layer(m_ModelSet[0].ModelDbfName);
+			std::string temp = "gpkg:" + m_ModelSet[0].ModelGeometryName + ":" + m_uref_str + ":" + m_rref_str + ".zip";
+			m_ModelSet[0].ModelGeometryName = temp;
+			m_ModelSet[0].ModelGeometryNameExists = gbls->Load_Media(m_ModelSet[0].ModelGeometryName);
+
+			temp = "gpkg:" + m_ModelSet[0].ModelTextureName + ":" + m_uref_str + ":" + m_rref_str + ".zip";
+			m_ModelSet[0].ModelTextureName = temp;
+			m_ModelSet[0].ModelTextureNameExists = gbls->Load_Media(m_ModelSet[0].ModelTextureName);
 		}
-		m_ModelSet[0].ModelGeometryNameExists = validate_tile_name(m_ModelSet[0].ModelGeometryName);
-		m_ModelSet[0].ModelTextureNameExists = validate_tile_name(m_ModelSet[0].ModelTextureName);
 		m_ModelSet[0].ModelWorkingName = m_FileName;
 		m_ModelSet[0].ModelWorkingNameExists = m_FileExists;
 	}
