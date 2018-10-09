@@ -45,3 +45,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user
+msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user
+msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user

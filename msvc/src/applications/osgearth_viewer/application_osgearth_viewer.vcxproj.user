@@ -5,7 +5,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='vs2017_Debug|x64'">
-    <LocalDebuggerCommandArguments>--verbose --window 50 50 900 900 --sky --coords --dd  "G:EarthFiles\GeoInt3dPreview.earth"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--verbose --window 50 50 900 900 --sky --coords --dd  "F:\EarthFiles\GeoInt3dPreview.earth"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerDebuggerType>Auto</LocalDebuggerDebuggerType>
   </PropertyGroup>
@@ -14,7 +14,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='vs2017_Release|x64'">
-    <LocalDebuggerCommandArguments>--verbose --window 50 50 900 900 --sky --coords --dd  "C:\Users\GLENA\AppData\Local\Temp\CDB_Builder\GeoInt3dPreview.earth"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--verbose --window 50 50 900 900 --sky --coords --dd  "G:\EarthFiles\GeoInt3dPreview.earth"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
