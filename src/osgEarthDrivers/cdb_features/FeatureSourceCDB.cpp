@@ -353,6 +353,10 @@ public:
 			OE_WARN << "CDB root directory not set!" << std::endl;
 			return result;
 		}
+		if (_UsingFileInput)
+		{
+			CDB_Global::getInstance()->Check_Done();
+		}
 		const osgEarth::TileKey key = query.tileKey().get();
 		const GeoExtent key_extent = key.getExtent();
 		CDB_Tile_Type tiletype;
