@@ -120,7 +120,9 @@ public:
 	  _CDBLodNum(0),
 	  _BE_Verbose(false),
 	  _M_Contains_ABS_Z(false),
-	  _UsingFileInput(false)
+	  _UsingFileInput(false),
+	  _GTGeomemtryTableName(""),
+	  _GTTextureTableName("")
 #ifdef _SAVE_OGR_OUTPUT
 	,_OGR_Output(NULL),
 	_OGR_OutputName("C:\\Temp\\GeoSpecificModelCapture.gpkg"),
@@ -191,7 +193,6 @@ public:
 			{
 				if (!_CDB_inflated)
 				{
-					OE_WARN << "GeoTypical option was set without CDB_Inflated: Forcing Inflated" << std::endl;
 					_CDB_inflated = true;
 				}
 			}
@@ -223,9 +224,24 @@ public:
 		{
 			_FileName = _options.fileName().value();
 			_UsingFileInput = true;
-			if (!CDB_Global::getInstance()->Open_Vector_File(_FileName))
+			CDB_Global * gbls = CDB_Global::getInstance();
+			if (!gbls->Open_Vector_File(_FileName))
 			{
 				OE_WARN << "Failed to open " << _FileName << std::endl;
+			}
+			else if (_CDB_geoTypical)
+			{
+				_GTGeomemtryTableName = "gpkg:GTModelGeometry_Mda";
+				_GTTextureTableName = "gpkg:GTModelTexture_Mda";
+				if (!gbls->Load_Media(_GTGeomemtryTableName))
+				{
+					OE_WARN << "GTGeometry not found in GeoPackage!" << std::endl;
+				}
+				if (!gbls->Load_Media(_GTTextureTableName))
+				{
+					OE_WARN << "GTTexture not found in GeoPackage!" << std::endl;
+				}
+				_CDB_inflated = false;
 			}
 			CDB_Limits = false;
 		}
@@ -554,9 +570,18 @@ private:
 					return false;
 				have_texture_zipfile = mainTile->Model_Texture_Archive(TextureZipFile, sel);
 			}
+			else if(_UsingFileInput)
+			{
+				have_archive = !_GTGeomemtryTableName.empty();
+				if (!have_archive)
+					return false;
+				have_texture_zipfile = !_GTTextureTableName.empty();
+			}
 		}
 		if (!_CDB_geoTypical)
 			ModelZipDir = mainTile->Model_ZipDir();
+		else if (_UsingFileInput)
+			ModelZipDir = _GTGeomemtryTableName;
 
 		bool done = false;
 		while (!done)
@@ -1032,6 +1057,8 @@ private:
 	std::string						_FileName;
 	std::string						_cacheDir;
 	std::string						_dataSet;
+	std::string						_GTGeomemtryTableName;
+	std::string						_GTTextureTableName;
 	int								_cur_Feature_Cnt;
 #ifdef _SAVE_OGR_OUTPUT
 	OGR_File *						_OGR_Output;

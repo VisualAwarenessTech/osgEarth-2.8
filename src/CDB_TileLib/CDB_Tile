@@ -422,6 +422,9 @@ private:
 	bool					m_DataFromGlobal;
 	CDB_Model_Runtime_Class m_CurFeatureClass;
 	GDALDataset *			m_GlobalDataset;
+
+	osgDB::Archive::FileNameList m_GTGeomerty_archiveFileList;
+
 	int GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
 						  std::string& uref_str, std::string& rref_str);
 

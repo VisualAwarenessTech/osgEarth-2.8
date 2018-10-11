@@ -1526,7 +1526,12 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 				m_CurFeatureClass = m_GTModelSet[sel].clsMap[cnam];
 				ModelKeyName = Model_KeyName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 				ModelFullName = GeoTypical_FullFileName(ModelKeyName);
-				Model_in_Archive = validate_tile_name(ModelFullName);
+				if(!m_DataFromGlobal)
+					Model_in_Archive = validate_tile_name(ModelFullName);
+				else
+				{
+					archive_validate_modelname(m_GTGeomerty_archiveFileList, ModelFullName);
+				}
 				if (!Model_in_Archive)
 				{
 					if (CDB_Global::getInstance()->CDB_Tile_Be_Verbose())
@@ -1724,7 +1729,17 @@ bool CDB_Tile::Init_GT_Model_Tile(int sel)
 	{
 		poLayer = m_GlobalDataset->GetLayerByName(m_GTModelSet[sel].TileSecondaryShapeName.c_str());
 	}
-	return Load_Class_Map(poLayer, m_GTModelSet[sel].clsMap);
+
+	bool have_class = Load_Class_Map(poLayer, m_GTModelSet[sel].clsMap);
+	bool have_archive;
+	if (m_DataFromGlobal)
+	{
+		std::string tablename = "gpkg:GTModelGeometry_Mda";
+		have_archive = Load_Archive(tablename, m_GTGeomerty_archiveFileList);
+	}
+	else
+		have_archive = true;
+	return have_class & have_archive;
 }
 
 int CDB_Tile::Model_Sel_Count(void)
@@ -3277,13 +3292,23 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 	}
 
 	std::stringstream modbuf;
-	modbuf << m_cdbRootDir
-		<< "\\GTModel\\500_GTModelGeometry"
-		<< "\\" << Facc1
-		<< "\\" << Facc2
-		<< "\\" << Fcode
-		<< "\\D500_S001_T001_" << BaseFileName;
-
+	if (!m_DataFromGlobal)
+	{
+		modbuf << m_cdbRootDir
+			<< "\\GTModel\\500_GTModelGeometry"
+			<< "\\" << Facc1
+			<< "\\" << Facc2
+			<< "\\" << Fcode
+			<< "\\D500_S001_T001_" << BaseFileName;
+	}
+	else
+	{
+		modbuf << m_cdbRootDir
+			<< Facc1
+			<< "\\" << Facc2
+			<< "\\" << Fcode
+			<< "\\D500_S001_T001_" << BaseFileName;
+	}
 	return modbuf.str();
 }
 
