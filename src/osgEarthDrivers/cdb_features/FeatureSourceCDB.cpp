@@ -231,8 +231,8 @@ public:
 			}
 			else if (_CDB_geoTypical)
 			{
-				_GTGeomemtryTableName = "gpkg:GTModelGeometry_Mda";
-				_GTTextureTableName = "gpkg:GTModelTexture_Mda";
+				_GTGeomemtryTableName = "gpkg:GTModelGeometry_Mda.zip";
+				_GTTextureTableName = "gpkg:GTModelTexture_Mda.zip";
 				if (!gbls->Load_Media(_GTGeomemtryTableName))
 				{
 					OE_WARN << "GTGeometry not found in GeoPackage!" << std::endl;
@@ -581,8 +581,11 @@ private:
 		if (!_CDB_geoTypical)
 			ModelZipDir = mainTile->Model_ZipDir();
 		else if (_UsingFileInput)
+		{
 			ModelZipDir = _GTGeomemtryTableName;
-
+			ModelZipFile = _GTGeomemtryTableName;
+			TextureZipFile = _GTTextureTableName;
+		}
 		bool done = false;
 		while (!done)
 		{
@@ -846,7 +849,7 @@ private:
 			}
 			OGR_F_Destroy(feat_handle);
 		}
-		if (have_archive)
+		if (have_archive && !_CDB_geoTypical)
 		{
 			//Verify all models in the archive have been referenced
 			//If not store them in unreferenced

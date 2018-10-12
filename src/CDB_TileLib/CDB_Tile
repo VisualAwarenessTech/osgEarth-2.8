@@ -489,9 +489,9 @@ private:
 	std::string Model_FileName(std::string &FACC_value, std::string &FSC_value, std::string &BaseFileName);
 
 	OGRFeature * Next_Valid_Geospecific_Feature(bool inflated, std::string &ModelKeyName, std::string &FullModelName, std::string &ArchiveFileName,
-												bool &Model_in_Archive, unsigned int pos = 0);
+												bool  &Model_in_Archive, unsigned int pos = 0);
 
-	OGRFeature * Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, bool &Model_in_Archive);
+	OGRFeature * Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, std::string &ArchiveFileName, bool &Model_in_Archive);
 
 	std::string Model_TextureDir(void);
 

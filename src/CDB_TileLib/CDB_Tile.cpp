@@ -1433,7 +1433,7 @@ OGRFeature * CDB_Tile::Next_Valid_Feature(int sel, bool inflated, std::string &M
 	if (m_TileType == GeoSpecificModel)
 		return Next_Valid_Geospecific_Feature(inflated, ModelKeyName, FullModelName, ArchiveFileName, Model_in_Archive, sel);
 	else
-		return Next_Valid_GeoTypical_Feature(sel, ModelKeyName, FullModelName, Model_in_Archive);
+		return Next_Valid_GeoTypical_Feature(sel, ModelKeyName, FullModelName, ArchiveFileName, Model_in_Archive);
 }
 
 OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string &ModelKeyName, std::string &FullModelName, std::string &ArchiveFileName,
@@ -1492,7 +1492,7 @@ OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string
 	return f;
 }
 
-OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, bool &Model_in_Archive)
+OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, std::string &ArchiveFileName, bool &Model_in_Archive)
 {
 	bool valid = false;
 	bool done = false;
@@ -1530,7 +1530,8 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 					Model_in_Archive = validate_tile_name(ModelFullName);
 				else
 				{
-					archive_validate_modelname(m_GTGeomerty_archiveFileList, ModelFullName);
+					ArchiveFileName = archive_validate_modelname(m_GTGeomerty_archiveFileList, ModelFullName);
+					Model_in_Archive = !ArchiveFileName.empty();
 				}
 				if (!Model_in_Archive)
 				{
@@ -1734,7 +1735,7 @@ bool CDB_Tile::Init_GT_Model_Tile(int sel)
 	bool have_archive;
 	if (m_DataFromGlobal)
 	{
-		std::string tablename = "gpkg:GTModelGeometry_Mda";
+		std::string tablename = "gpkg:GTModelGeometry_Mda.zip";
 		have_archive = Load_Archive(tablename, m_GTGeomerty_archiveFileList);
 	}
 	else
@@ -3303,11 +3304,10 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 	}
 	else
 	{
-		modbuf << m_cdbRootDir
-			<< Facc1
-			<< "\\" << Facc2
-			<< "\\" << Fcode
-			<< "\\D500_S001_T001_" << BaseFileName;
+		modbuf << Facc1
+			<< "/" << Facc2
+			<< "/" << Fcode
+			<< "/D500_S001_T001_" << BaseFileName;
 	}
 	return modbuf.str();
 }
