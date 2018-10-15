@@ -211,14 +211,6 @@ public:
 		}
 		// Make sure the root directory is set
 		bool CDB_Limits = true;
-		if (!_options.rootDir().isSet())
-		{
-			OE_WARN << "CDB root directory not set!" << std::endl;
-		}
-		else
-		{
-			_rootString = _options.rootDir().value();
-		}
 
 		if (_options.fileName().isSet())
 		{
@@ -244,6 +236,16 @@ public:
 				_CDB_inflated = false;
 			}
 			CDB_Limits = false;
+		}
+
+		if (!_options.rootDir().isSet())
+		{
+			if(!_UsingFileInput)
+				OE_WARN << "CDB root directory not set!" << std::endl;
+		}
+		else
+		{
+			_rootString = _options.rootDir().value();
 		}
 
 		if (_options.Limits().isSet())
@@ -366,8 +368,11 @@ public:
 		// Make sure the root directory is set
 		if (!_options.rootDir().isSet())
 		{
-			OE_WARN << "CDB root directory not set!" << std::endl;
-			return result;
+			if (!_UsingFileInput)
+			{
+				OE_WARN << "CDB root directory not set!" << std::endl;
+				return result;
+			}
 		}
 		if (_UsingFileInput)
 		{
