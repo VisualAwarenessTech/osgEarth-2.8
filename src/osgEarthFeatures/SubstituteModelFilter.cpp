@@ -238,6 +238,7 @@ SubstituteModelFilter::process(const FeatureList&           features,
 		}
 
 		bool feature_defined_model = input->hasAttr("osge_modelname");
+		bool skip_multitexdisable = input->hasAttr("osge_nomultidisable");
 		bool replace = false;
 
 #ifdef _DEBUG
@@ -410,7 +411,8 @@ SubstituteModelFilter::process(const FeatureList&           features,
 			if (model)
 			{
 				model->getOrCreateStateSet()->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
-				model->accept(v);
+				if(!skip_multitexdisable)
+					model->accept(v);
 			}
             // if icon decluttering is off, install an AutoTransform.
             if ( iconSymbol )

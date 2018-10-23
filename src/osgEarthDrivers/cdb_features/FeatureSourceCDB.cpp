@@ -122,7 +122,8 @@ public:
 	  _M_Contains_ABS_Z(false),
 	  _UsingFileInput(false),
 	  _GTGeomemtryTableName(""),
-	  _GTTextureTableName("")
+	  _GTTextureTableName(""),
+	  _Materials(false)
 #ifdef _SAVE_OGR_OUTPUT
 	,_OGR_Output(NULL),
 	_OGR_OutputName("C:\\Temp\\GeoSpecificModelCapture.gpkg"),
@@ -307,6 +308,11 @@ public:
 		}
 		else
 			maxLod = minLod;
+
+		if (_options.Materials().isSet())
+		{
+			_Materials = _options.Materials().value();
+		}
 
 		// Always a WGS84 unprojected lat/lon profile.
 		if (!CDBFeatureProfile)
@@ -718,6 +724,8 @@ private:
 					if (!_CDB_geoTypical)
 						f->set("osge_modeltexture", ModelTextureDir);
 				}
+				if (_Materials)
+					f->set("osge_nomultidisable", "true");
 #ifdef _DEBUG
 				OE_DEBUG << LC << "Model File " << FullModelName << " Set to Load" << std::endl;
 #endif
@@ -1068,6 +1076,7 @@ private:
 	std::string						_GTGeomemtryTableName;
 	std::string						_GTTextureTableName;
 	int								_cur_Feature_Cnt;
+	bool							_Materials;
 #ifdef _SAVE_OGR_OUTPUT
 	OGR_File *						_OGR_Output;
 	std::string						_OGR_OutputName;

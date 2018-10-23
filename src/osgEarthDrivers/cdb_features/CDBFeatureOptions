@@ -66,6 +66,8 @@ namespace osgEarth { namespace Drivers
 		const optional<bool>& Verbose() const { return _Verbose; }
 		optional<bool>& ABS_Z_in_M() { return _ABS_Z_in_M; }
 		const optional<bool>& ABS_Z_in_M() const { return _ABS_Z_in_M; }
+		optional<bool>& Materials() { return _Enable_Subord_Material; }
+		const optional<bool>& Materials() const { return _Enable_Subord_Material; }
 	public:
         CDBFeatureOptions( const ConfigOptions& opt =ConfigOptions() ) :
           FeatureSourceOptions( opt )
@@ -93,6 +95,7 @@ namespace osgEarth { namespace Drivers
 			conf.updateIfSet("gs_lod0_full_stack", _GS_LOD0_FullStack);
 			conf.updateIfSet("verbose", _Verbose);
 			conf.updateIfSet("abszinm", _ABS_Z_in_M);
+			conf.updateIfSet("materials", _Enable_Subord_Material);
 			return conf;
         }
 
@@ -117,6 +120,7 @@ namespace osgEarth { namespace Drivers
 			conf.getIfSet("gt_lod0_full_stack", _GT_LOD0_FullStack);
 			conf.getIfSet("gs_lod0_full_stack", _GS_LOD0_FullStack);
 			conf.getIfSet("verbose", _Verbose);
+			conf.getIfSet("materials", _Enable_Subord_Material);
 			conf.getIfSet("abszinm", _ABS_Z_in_M);
 		}
 
@@ -134,6 +138,7 @@ namespace osgEarth { namespace Drivers
 		optional<bool>_GS_LOD0_FullStack;
 		optional<bool> _Verbose;
 		optional<bool> _ABS_Z_in_M;
+		optional<bool> _Enable_Subord_Material;
 	};
 
 } } // namespace osgEarth::Drivers
