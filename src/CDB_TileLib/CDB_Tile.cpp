@@ -3256,7 +3256,9 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 		Facc1 = "Z_General";
 
 	//Second Level Directory
-	if (Facc2 == "L")
+	if (Facc2 == "D")
+		Facc2 = "D_Power_Gen";
+	else if (Facc2 == "L")
 		Facc2 = "L_Misc_Feature";
 	else if (Facc2 == "T")
 		Facc2 = "T_Comm";
