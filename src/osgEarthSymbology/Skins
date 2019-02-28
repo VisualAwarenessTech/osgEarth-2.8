@@ -105,7 +105,11 @@ namespace osgEarth { namespace Symbology
         optional<bool>& isTiled() { return _isTiled; }
         const optional<bool>& isTiled() const { return _isTiled; }
 
-        /** Image offset within a source atlas (S dimension [0..1]) */
+		/** Whether this image is suitable for use as a vertically repeating texture */
+		optional<int>& SurfaceMaterialCode() { return _SurfaceMaterialCode; }
+		const optional<int>& SurfaceMaterialCode() const { return _SurfaceMaterialCode; }
+		
+		/** Image offset within a source atlas (S dimension [0..1]) */
         optional<float>& imageBiasS() { return _imageBiasS; }
         const optional<float>& imageBiasS() const { return _imageBiasS; }
 
@@ -168,6 +172,7 @@ namespace osgEarth { namespace Symbology
         optional<float>             _imageScaleS;
         optional<float>             _imageScaleT;
         optional<bool>              _atlasHint;
+		optional<int>				_SurfaceMaterialCode;
         optional<std::string>       _readOptions;
 
         osg::ref_ptr<osg::Image>    _image;

@@ -35,6 +35,7 @@
 #include <osg/LineWidth>
 #include <osg/PolygonOffset>
 #include <osg/FrontFace>
+#include <osg/ValueObject>
 
 #include <gdal_priv.h>
 #include <gdalwarper.h>
@@ -570,7 +571,12 @@ ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
 		{
 			walls->setTexCoordArray(1, tex);
 		}
-    }
+		if (wallSkin->SurfaceMaterialCode().isSet())
+		{
+			__int16 surface = (short)wallSkin->SurfaceMaterialCode().value();
+			walls->setUserValue("<UA:SMC>", surface);
+		}
+	}
 
     osg::Vec4Array* colors = 0L;
     if ( useColor )
@@ -745,7 +751,14 @@ ExtrudeGeometryFilter::buildRoofGeometry(const Structure&     structure,
 			roof->setTexCoordArray(1, tex);
 		}
     }
-
+	if (roofSkin)
+	{
+		if (roofSkin->SurfaceMaterialCode().isSet())
+		{
+			__int16 surface = (short)roofSkin->SurfaceMaterialCode().value();
+			roof->setUserValue("<UA:SMC>", surface);
+		}
+	}
     osg::Vec4Array* anchors = 0L;    
     if ( _gpuClamping )
     {
@@ -979,7 +992,9 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
     // seed our random number generators
     Random wallSkinPRNG( _wallSkinSymbol.valid()? *_wallSkinSymbol->randomSeed() : 0, Random::METHOD_FAST );
     Random roofSkinPRNG( _roofSkinSymbol.valid()? *_roofSkinSymbol->randomSeed() : 0, Random::METHOD_FAST );
-
+#ifdef _DEBUG
+	int fubar = 0;
+#endif
     for( FeatureList::iterator f = features.begin(); f != features.end(); ++f )
     {
         Feature* input = f->get();
@@ -1077,6 +1092,12 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
                     SkinSymbol querySymbol( *_wallSkinSymbol.get() );
                     querySymbol.objectHeight() = fabs(height);
                     wallSkin = _wallResLib->getSkin( &querySymbol, wallSkinPRNG, context.getDBOptions() );
+#ifdef _DEBUG
+					if (!wallSkin)
+					{
+						++fubar;
+					}
+#endif
                 }
 
                 else
@@ -1156,7 +1177,7 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
 					{
 						context.resourceCache()->getOrCreateMatStateSet(wallSkin, wallStateSet, context.getDBOptions());
 					}
-                }
+				}
             }
 
             // tessellate and add the roofs if necessary:
