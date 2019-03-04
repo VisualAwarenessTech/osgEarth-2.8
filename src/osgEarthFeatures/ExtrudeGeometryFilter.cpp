@@ -574,7 +574,9 @@ ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
 		if (wallSkin->SurfaceMaterialCode().isSet())
 		{
 			__int16 surface = (short)wallSkin->SurfaceMaterialCode().value();
+			__int16 fid = 180; //General Building
 			walls->setUserValue("<UA:SMC>", surface);
+			walls->setUserValue("<UA:FID>", fid);
 		}
 	}
 
@@ -756,7 +758,9 @@ ExtrudeGeometryFilter::buildRoofGeometry(const Structure&     structure,
 		if (roofSkin->SurfaceMaterialCode().isSet())
 		{
 			__int16 surface = (short)roofSkin->SurfaceMaterialCode().value();
+			__int16 fid = 180; //General Building
 			roof->setUserValue("<UA:SMC>", surface);
+			roof->setUserValue("<UA:FID>", fid);
 		}
 	}
     osg::Vec4Array* anchors = 0L;    
