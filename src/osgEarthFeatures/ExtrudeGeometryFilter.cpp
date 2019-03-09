@@ -35,6 +35,7 @@
 #include <osg/LineWidth>
 #include <osg/PolygonOffset>
 #include <osg/FrontFace>
+#include <osg/CullFace>
 #include <osg/ValueObject>
 
 #include <gdal_priv.h>
@@ -577,6 +578,7 @@ ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
 			__int16 fid = 180; //General Building
 			walls->setUserValue("<UA:SMC>", surface);
 			walls->setUserValue("<UA:FID>", fid);
+//			static osg::ref_ptr<osg::CullFace> cullFace = new osg::CullFace(osg::CullFace::BACK);
 		}
 	}
 
@@ -695,11 +697,16 @@ ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
                 (*tex)[vertptr+4].set( texRoofR.x(), texRoofR.y(), layer );
                 (*tex)[vertptr+5].set( texRoofL.x(), texRoofL.y(), layer );
             }
-
+#if 0
             for(int i=0; i<6; ++i)
             {
                 de->addElement( vertptr+i );
             }
+#endif
+			for (int i = 5; i >= 0; --i)
+			{
+				de->addElement(vertptr + i);
+			}
         }
     }
     
@@ -709,8 +716,10 @@ ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
     // TODO: reconsider this, given the new Structure setup
     // it won't actual smooth corners since we don't have shared edges.
 	//GAJ Normals comming out reversed
-//	walls->getOrCreateStateSet()->setAttributeAndModes(new osg::FrontFace(osg::FrontFace::COUNTER_CLOCKWISE), osg::StateAttribute::ON);
 
+	walls->getOrCreateStateSet()->setAttributeAndModes(new osg::FrontFace(osg::FrontFace::COUNTER_CLOCKWISE), osg::StateAttribute::ON);
+//	walls->getOrCreateStateSet()->setAttributeAndModes(new osg::CullFace(osg::CullFace::BACK), osg::StateAttribute::ON);
+	
 	osgUtil::SmoothingVisitor::smooth(
         *walls,
         osg::DegreesToRadians(_wallAngleThresh_deg) );
@@ -718,12 +727,14 @@ ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
 	osg::Array* normal = walls->getNormalArray();
 	int size = normal->getNumElements();
 	osg::Vec3Array * v3d = dynamic_cast <osg::Vec3Array*>(normal);
+#if 0
 	for (int i = 0; i < size; ++i)
 	{
 		(*v3d)[i][0] *= -1.0;
 		(*v3d)[i][1] *= -1.0;
 		(*v3d)[i][2] *= -1.0;
 	}
+#endif
     return madeGeom;
 }
 
@@ -1177,6 +1188,7 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
                 {
                     // Get a stateset for the individual wall stateset
                     context.resourceCache()->getOrCreateStateSet(wallSkin, wallStateSet, context.getDBOptions());
+					wallStateSet->setAttributeAndModes(new osg::CullFace(osg::CullFace::BACK), osg::StateAttribute::ON);
 					if (wallSkin->materialURI().isSet())
 					{
 						context.resourceCache()->getOrCreateMatStateSet(wallSkin, wallStateSet, context.getDBOptions());
@@ -1197,6 +1209,7 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
 				if (roofTextureIsFromImage)
 				{
 					roofStateSet = RoofHelper->CreateSetState(context.getDBOptions());
+					roofStateSet->setAttributeAndModes(new osg::CullFace(osg::CullFace::BACK), osg::StateAttribute::ON);
 					if (roofTextureHasMatIndex)
 						RoofHelper->AddMat2SetState(roofStateSet, context.getDBOptions());
 				}
@@ -1238,7 +1251,7 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
                 name = input->eval( _featureNameExpr, &context );
 
             FeatureIndexBuilder* index = context.featureIndex();
-
+		
             if ( walls.valid() && walls->getVertexArray() && walls->getVertexArray()->getNumElements() > 0 )
             {
                 addDrawable( walls.get(), wallStateSet.get(), name, input, index );
