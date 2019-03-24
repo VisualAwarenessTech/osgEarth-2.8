@@ -3277,6 +3277,8 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 			Fcode = "110_Light_Standard";
 		else if (Fcode == "030")
 			Fcode = "030_Power_Line";
+		else if (Fcode == "040")
+			Fcode = "040_Power_Pylon";
 		else if (Fcode == "010")
 			Fcode = "010_Power_Plant";
 		else if (Fcode == "240")
