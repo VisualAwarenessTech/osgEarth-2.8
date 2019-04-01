@@ -3256,16 +3256,19 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 		Facc1 = "Z_General";
 
 	//Second Level Directory
-	if (Facc2 == "D")
+	if (Facc2 == "C")
+		Facc2 = "C_Woodland";
+	else if (Facc2 == "D")
 		Facc2 = "D_Power_Gen";
+	else if (Facc2 == "E")
+		Facc2 = "E_Fab_Industry";
+	else if (Facc2 == "K")
+		Facc2 = "K_Recreational";
 	else if (Facc2 == "L")
 		Facc2 = "L_Misc_Feature";
 	else if (Facc2 == "T")
-		Facc2 = "T_Comm";
-	else if (Facc2 == "C")
-		Facc2 = "C_Woodland";
-	else if (Facc2 == "K")
-		Facc2 = "K_Recreational";
+		Facc2 = "T_Comm";	
+	
 
 	if (Facc1 == "A_Culture")
 	{
@@ -3280,7 +3283,12 @@ std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 		else if (Fcode == "040")
 			Fcode = "040_Power_Pylon";
 		else if (Fcode == "010")
-			Fcode = "010_Power_Plant";
+		{
+			if(Facc2 == "E_Fab_Industry")
+				Fcode = "010_Assembly_Plant";
+			else
+				Fcode = "010_Power_Plant";
+		}
 		else if (Fcode == "240")
 			Fcode = "240_Tower-NC";
 		else if (Fcode == "241")
