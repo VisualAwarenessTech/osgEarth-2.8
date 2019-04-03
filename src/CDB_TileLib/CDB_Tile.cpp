@@ -45,6 +45,7 @@ const int Gbl_CDB_Tile_Sizes[11] = {1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1}
 const double Gbl_CDB_Tiles_Per_LOD[18] = {1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0, 1024.0, 2048.0, 4096.0, 8192.0, 16384.0, 32768.0, 65536.0, 131072.0};
 
 OGR_File  Ogr_File_Instance;
+CDB_Data_Dictionary  CDB_Data_Dictionary_Instance;
 
 
 CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, bool lightmap, bool material, bool material_mask, int NLod, bool DataFromGlobal) :
@@ -52,7 +53,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
 				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
 				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false), m_Have_MaterialData(false), m_EnableLightMap(lightmap),
-				   m_EnableMaterials(material), m_EnableMaterialMask(material_mask), m_DataFromGlobal(DataFromGlobal), m_GlobalDataset(NULL)
+				   m_EnableMaterials(material), m_EnableMaterialMask(material_mask), m_DataFromGlobal(DataFromGlobal), m_GlobalDataset(NULL), m_HaveDataDictionary(false)
 {
 	m_GTModelSet.clear();
 	CDB_Global * gbls = CDB_Global::getInstance();
@@ -78,6 +79,11 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 
 	if (m_DataFromGlobal)
 		m_GlobalDataset = gbls->Get_Dataset();
+
+	CDB_Data_Dictionary* datDict = CDB_Data_Dictionary::GetInstance();
+	if (datDict->Init_Feature_Data_Dictionary(m_cdbRootDir))
+		m_HaveDataDictionary = true;
+	
 
 	if (m_TileType == Elevation)
 	{
@@ -3229,79 +3235,95 @@ std::string CDB_Tile::Model_FullFileName(std::string &FACC_value, std::string &F
 
 std::string CDB_Tile::GeoTypical_FullFileName(std::string &BaseFileName)
 {
+	std::string facc = BaseFileName.substr(0, 5);
 	std::string Facc1 = BaseFileName.substr(0, 1);
 	std::string Facc2 = BaseFileName.substr(1, 1);
 	std::string Fcode = BaseFileName.substr(2, 3);
-
-	//First Level subdirectory
-	if (Facc1 == "A")
-		Facc1 = "A_Culture";
-	else if (Facc1 == "E")
-		Facc1 = "E_Vegetation";
-	else if (Facc1 == "B")
-		Facc1 = "B_Hydrography";
-	else if (Facc1 == "C")
-		Facc1 = "C_Hypsography";
-	else if (Facc1 == "D")
-		Facc1 = "D_Physiography";
-	else if (Facc1 == "F")
-		Facc1 = "F_Demarcation";
-	else if (Facc1 == "G")
-		Facc1 = "G_Aeronautical_Information";
-	else if (Facc1 == "I")
-		Facc1 = "I_Cadastral";
-	else if (Facc1 == "S")
-		Facc1 = "S_Special_Use";
-	else
-		Facc1 = "Z_General";
-
-	//Second Level Directory
-	if (Facc2 == "C")
-		Facc2 = "C_Woodland";
-	else if (Facc2 == "D")
-		Facc2 = "D_Power_Gen";
-	else if (Facc2 == "E")
-		Facc2 = "E_Fab_Industry";
-	else if (Facc2 == "K")
-		Facc2 = "K_Recreational";
-	else if (Facc2 == "L")
-		Facc2 = "L_Misc_Feature";
-	else if (Facc2 == "T")
-		Facc2 = "T_Comm";	
-	
-
-	if (Facc1 == "A_Culture")
+	if (m_HaveDataDictionary)//pull the info from the xml file
 	{
-		if (Fcode == "015")
-			Fcode = "015_Building";
-		else if (Fcode == "050")
-			Fcode = "050_Display_Sign";
-		else if (Fcode == "110")
-			Fcode = "110_Light_Standard";
-		else if (Fcode == "030")
-			Fcode = "030_Power_Line";
-		else if (Fcode == "040")
-			Fcode = "040_Power_Pylon";
-		else if (Fcode == "010")
+		CDB_Data_Dictionary* datDict = CDB_Data_Dictionary::GetInstance();
+		
+		if (datDict->SelectFACC(facc, Facc1, Facc2, Fcode))
 		{
-			if(Facc2 == "E_Fab_Industry")
-				Fcode = "010_Assembly_Plant";
-			else
-				Fcode = "010_Power_Plant";
+			Facc1 = facc.substr(0, 1) + "_" + Facc1;
+
+			Facc2 = facc.substr(1, 1) + "_" + Facc2;
+
+			Fcode = facc.substr(2) + "_" + Fcode;
 		}
-		else if (Fcode == "240")
-			Fcode = "240_Tower-NC";
-		else if (Fcode == "241")
-			Fcode = "241_Tower_General";
-		else if (Fcode == "080")
-			Fcode = "080_Comm_Tower";
-		else if (Fcode == "020")
-			Fcode = "020_Built-Up_Area";
 	}
-	else if (Facc1 == "E_Vegetation")
+	else //don't have it so do it the old way for now
 	{
-		if (Fcode == "030")
-			Fcode = "030_Trees";
+		//First Level subdirectory
+		if (Facc1 == "A")
+			Facc1 = "A_Culture";
+		else if (Facc1 == "E")
+			Facc1 = "E_Vegetation";
+		else if (Facc1 == "B")
+			Facc1 = "B_Hydrography";
+		else if (Facc1 == "C")
+			Facc1 = "C_Hypsography";
+		else if (Facc1 == "D")
+			Facc1 = "D_Physiography";
+		else if (Facc1 == "F")
+			Facc1 = "F_Demarcation";
+		else if (Facc1 == "G")
+			Facc1 = "G_Aeronautical_Information";
+		else if (Facc1 == "I")
+			Facc1 = "I_Cadastral";
+		else if (Facc1 == "S")
+			Facc1 = "S_Special_Use";
+		else
+			Facc1 = "Z_General";
+
+		//Second Level Directory
+		if (Facc2 == "C")
+			Facc2 = "C_Woodland";
+		else if (Facc2 == "D")
+			Facc2 = "D_Power_Gen";
+		else if (Facc2 == "E")
+			Facc2 = "E_Fab_Industry";
+		else if (Facc2 == "K")
+			Facc2 = "K_Recreational";
+		else if (Facc2 == "L")
+			Facc2 = "L_Misc_Feature";
+		else if (Facc2 == "T")
+			Facc2 = "T_Comm";
+
+
+		if (Facc1 == "A_Culture")
+		{
+			if (Fcode == "015")
+				Fcode = "015_Building";
+			else if (Fcode == "050")
+				Fcode = "050_Display_Sign";
+			else if (Fcode == "110")
+				Fcode = "110_Light_Standard";
+			else if (Fcode == "030")
+				Fcode = "030_Power_Line";
+			else if (Fcode == "040")
+				Fcode = "040_Power_Pylon";
+			else if (Fcode == "010")
+			{
+				if (Facc2 == "E_Fab_Industry")
+					Fcode = "010_Assembly_Plant";
+				else
+					Fcode = "010_Power_Plant";
+			}
+			else if (Fcode == "240")
+				Fcode = "240_Tower-NC";
+			else if (Fcode == "241")
+				Fcode = "241_Tower_General";
+			else if (Fcode == "080")
+				Fcode = "080_Comm_Tower";
+			else if (Fcode == "020")
+				Fcode = "020_Built-Up_Area";
+		}
+		else if (Facc1 == "E_Vegetation")
+		{
+			if (Fcode == "030")
+				Fcode = "030_Trees";
+		}
 	}
 
 	std::stringstream modbuf;
@@ -3427,6 +3449,7 @@ std::string CDB_Tile::Model_KeyNameFromArchiveName(const std::string &ArchiveFil
 	return KeyName;
 
 }
+
 
 osgDB::Archive::FileNameList * CDB_Tile::Model_Archive_List(unsigned int pos)
 {
@@ -4041,4 +4064,121 @@ OGRFeature * OGR_File::Next_Valid_Feature(std::string &ModelKeyName, std::string
 			valid = false;
 	}
 	return f;
+}
+CDB_Data_Dictionary::CDB_Data_Dictionary() :  m_dataDictDoc(NULL), m_dataDictData(NULL), m_IsInitialized(false)
+{
+
+}
+
+bool CDB_Data_Dictionary::Init_Feature_Data_Dictionary(std::string CDB_Root_Dir)
+{
+	if (!m_IsInitialized)
+	{
+		std::string xmlFileName = CDB_Root_Dir + "\\Metadata\\Feature_Data_Dictionary.xml";
+		m_dataDictDoc = new osgEarth::XmlDocument();
+		m_dataDictData = m_dataDictDoc->load(xmlFileName);
+		if (m_dataDictData)
+		{
+			bool hasCategories;
+			hasCategories = Get_Model_Base_Catagory_List(m_BaseCategories);
+			m_IsInitialized = hasCategories;
+		}
+	}	
+	return m_IsInitialized;
+}
+
+bool CDB_Data_Dictionary::Get_Model_Base_Catagory_List(std::vector<CDB_Model_Code_Struct> &cats)
+{
+	osgEarth::XmlElement * mainNode = m_dataDictData->getSubElement("Feature_Data_Dictionary");
+	for (osgEarth::XmlNodeList::const_iterator i = mainNode->getChildren().begin(); i != mainNode->getChildren().end(); i++)
+	{
+		CDB_Model_Code_Struct codes;
+		osgEarth::XmlElement* e = (osgEarth::XmlElement*)i->get();
+		osgEarth::XmlElement* eLabel = (osgEarth::XmlElement*)e->findElement("Label");
+		codes.code = e->getAttr("code");
+		codes.label = eLabel->getText();
+		Get_Model_Sub_Catagory_List(e, codes);
+		cats.push_back(codes);
+	}
+	return true;
+}
+bool CDB_Data_Dictionary::Get_Model_Sub_Catagory_List(osgEarth::XmlElement* catElement, CDB_Model_Code_Struct &subCats)
+{
+	for (osgEarth::XmlNodeList::const_iterator i = catElement->getChildren().begin(); i != catElement->getChildren().end(); i++)
+	{
+
+		osgEarth::XmlElement* e = (osgEarth::XmlElement*)i->get();
+		if (e->getName() != "label")
+		{
+			CDB_Model_Code_Struct subCat;
+			osgEarth::XmlElement* eLabel = (osgEarth::XmlElement*)e->findElement("Label");
+			subCat.code = e->getAttr("code");
+			subCat.label = eLabel->getText();
+			Get_Model_Sub_Code_List(e, subCat);
+			subCats.subCodes.push_back(subCat);
+		}
+	}
+	return true;
+}
+
+bool CDB_Data_Dictionary::Get_Model_Sub_Code_List(osgEarth::XmlElement* subCodeElement, CDB_Model_Code_Struct &subCodes)
+{
+	for (osgEarth::XmlNodeList::const_iterator i = subCodeElement->getChildren().begin(); i != subCodeElement->getChildren().end(); i++)
+	{
+
+		osgEarth::XmlElement* e = (osgEarth::XmlElement*)i->get();
+		if (e->getName() != "label")
+		{
+			CDB_Model_Code_Struct subCode;
+			osgEarth::XmlElement* eLabel = (osgEarth::XmlElement*)e->findElement("Label");
+			subCode.code = e->getAttr("code");
+			subCode.label = eLabel->getText();
+			subCodes.subCodes.push_back(subCode);
+		}
+	}
+	return true;
+}
+
+CDB_Data_Dictionary * CDB_Data_Dictionary::GetInstance(void)
+{
+	return &CDB_Data_Dictionary_Instance;
+}
+
+CDB_Data_Dictionary::~CDB_Data_Dictionary()
+{
+	//clear stuff here
+}
+
+bool CDB_Data_Dictionary::SelectFACC(std::string FACC, std::string &CategoryLabel, std::string &SubCodeLabel, std::string &FeatureTypeLabel)
+{
+	std::string category = FACC.substr(0, 1);
+	std::string subCode = FACC.substr(1, 1);
+	std::string featureType = FACC.substr(2, 3);
+
+	for each(CDB_Model_Code_Struct base in m_BaseCategories)
+	{
+		if (base.code == category)
+		{
+			CategoryLabel = base.label;
+			for each(CDB_Model_Code_Struct subCodeObject in base.subCodes)
+			{
+				if (subCodeObject.code == subCode)
+				{
+					SubCodeLabel = subCodeObject.label;
+					for each(CDB_Model_Code_Struct featTypeObject in subCodeObject.subCodes)
+					{
+						if (featTypeObject.code == featureType)
+						{
+							FeatureTypeLabel = featTypeObject.label;
+							return true;
+						}
+					}
+
+				}
+
+			}
+
+		}
+	}
+	return false;
 }

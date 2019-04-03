@@ -30,6 +30,7 @@
 #include <ogr_attrind.h>
 #include <ogr_spatialref.h>
 #include <osgDB/Archive>
+#include <osgEarth/XmlUtils>
 using namespace std;
 
 #ifdef _MSC_VER
@@ -255,6 +256,20 @@ typedef CDB_GT_Model_Tile_Selector * CDB_GT_Model_Tile_SelectorP;
 typedef std::vector<CDB_GT_Model_Tile_Selector> CDB_GT_Tile_SelectorV;
 typedef std::vector<CDB_GT_Model_Tile_SelectorP> CDB_GT_Tile_SelectorPV;
 
+struct CDB_Model_Code_Struct
+{
+	std::string	code;
+	std::string	label;
+	std::vector<CDB_Model_Code_Struct> subCodes;
+	CDB_Model_Code_Struct() : code(""), label("")
+	{
+	}
+	CDB_Model_Code_Struct(std::string sCode, std::string sLabel) : code(sCode), label(sLabel)
+	{
+	}
+	
+};
+
 class CDB_Tile;
 typedef CDB_Tile * CDB_TileP;
 typedef vector<CDB_TileP> CDB_TilePV;
@@ -421,7 +436,9 @@ private:
 	bool					m_EnableMaterialMask;
 	bool					m_DataFromGlobal;
 	CDB_Model_Runtime_Class m_CurFeatureClass;
-	GDALDataset *			m_GlobalDataset;
+	GDALDataset *			m_GlobalDataset;	
+	bool					m_HaveDataDictionary;
+	
 
 	osgDB::Archive::FileNameList m_GTGeomerty_archiveFileList;
 
@@ -496,6 +513,7 @@ private:
 	std::string Model_TextureDir(void);
 
 	bool Open_GP_Map_Tile(void);
+	
 
 };
 
@@ -542,5 +560,32 @@ private:
 	bool					Set_Layer_Fields(osgEarth::Features::Feature * f, OGRLayer * poLayer);
 	bool					Check_Layer_Fields(osgEarth::Features::Feature * f, OGRLayer * poLayer);
 	int						Find_Field_Index(OGRFeatureDefn *poFDefn, std::string fieldname, OGRFieldType Type);
+
+};
+
+class CDBTILELIBRARYAPI CDB_Data_Dictionary
+{
+public:
+	CDB_Data_Dictionary(void);
+	virtual ~CDB_Data_Dictionary(void);
+	bool Init_Feature_Data_Dictionary(std::string CDB_Root_Dir);
+	bool Is_Initialized(void);
+	bool SelectFACC(std::string FACC, std::string & CategoryLabel, std::string & SubCodeLabel, std::string & FeatureTypeLabel);
+
+
+	static CDB_Data_Dictionary *	  GetInstance(void);
+
+
+private:
+	osgEarth::XmlDocument * m_dataDictDoc;
+	osgEarth::XmlDocument * m_dataDictData;
+	std::vector<CDB_Model_Code_Struct> m_BaseCategories;
+	bool m_IsInitialized;
+
+	bool Get_Model_Base_Catagory_List(std::vector<CDB_Model_Code_Struct> &files);
+
+	bool Get_Model_Sub_Catagory_List(osgEarth::XmlElement * catElement, CDB_Model_Code_Struct& subCats);
+
+	bool Get_Model_Sub_Code_List(osgEarth::XmlElement * subCodeElement, CDB_Model_Code_Struct& subCodes);
 
 };
