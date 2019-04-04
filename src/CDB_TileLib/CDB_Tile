@@ -587,5 +587,6 @@ private:
 	bool Get_Model_Sub_Catagory_List(osgEarth::XmlElement * catElement, CDB_Model_Code_Struct& subCats);
 
 	bool Get_Model_Sub_Code_List(osgEarth::XmlElement * subCodeElement, CDB_Model_Code_Struct& subCodes);
+	void ClearMaps(void);
 
 };

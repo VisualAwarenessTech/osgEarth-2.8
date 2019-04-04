@@ -4146,7 +4146,7 @@ CDB_Data_Dictionary * CDB_Data_Dictionary::GetInstance(void)
 
 CDB_Data_Dictionary::~CDB_Data_Dictionary()
 {
-	//clear stuff here
+	ClearMaps();
 }
 
 bool CDB_Data_Dictionary::SelectFACC(std::string FACC, std::string &CategoryLabel, std::string &SubCodeLabel, std::string &FeatureTypeLabel)
@@ -4181,4 +4181,17 @@ bool CDB_Data_Dictionary::SelectFACC(std::string FACC, std::string &CategoryLabe
 		}
 	}
 	return false;
+}
+
+void CDB_Data_Dictionary::ClearMaps()
+{
+	for each(CDB_Model_Code_Struct base in m_BaseCategories)
+	{
+		for each(CDB_Model_Code_Struct subCodeObject in base.subCodes)
+		{
+			subCodeObject.subCodes.clear();
+		}
+		base.subCodes.clear();
+	}
+	m_BaseCategories.clear();
 }
