@@ -123,6 +123,7 @@ public:
 	  _UsingFileInput(false),
 	  _GTGeomemtryTableName(""),
 	  _GTTextureTableName(""),
+	  _HaveEditLimits(false),
 	  _Materials(false)
 #ifdef _SAVE_OGR_OUTPUT
 	,_OGR_Output(NULL),
@@ -294,6 +295,25 @@ public:
 				OE_WARN << "Invalid Limits received by CDB Driver: Not using Limits" << std::endl;
 
 		}
+		if (_options.EditLimits().isSet())
+		{
+			std::string StrLimits = _options.EditLimits().value();
+			double	min_lon,
+					max_lon,
+					min_lat,
+					max_lat;
+
+			int count = sscanf(StrLimits.c_str(), "%lf,%lf,%lf,%lf", &min_lon, &min_lat, &max_lon, &max_lat);
+			if (count == 4)
+			{
+				_Edit_Tile_Extent.North = max_lat;
+				_Edit_Tile_Extent.South = min_lat;
+				_Edit_Tile_Extent.East = max_lon;
+				_Edit_Tile_Extent.West = min_lon;
+				_HaveEditLimits = true;
+			}
+		}
+
 		int minLod, maxLod;
 		if (_options.minLod().isSet())
 			minLod = _options.minLod().value();
@@ -402,7 +422,10 @@ public:
 		{
 			CDB_Tile_Extent  CDBTile_Tile_Extent = CDB_Tile::Actual_Extent_For_Tile(tileExtent);
 			mainTile = new CDB_Tile(_rootString, _cacheDir, tiletype, _dataSet, &CDBTile_Tile_Extent, false, false, false, 0, _UsingFileInput);
-			mainTile->Set_SpatialFilter_Extent(tileExtent);
+			if(_HaveEditLimits)
+				mainTile->Set_SpatialFilter_Extent(merge_extents(_Edit_Tile_Extent, tileExtent));
+			else
+				mainTile->Set_SpatialFilter_Extent(tileExtent);
 			subtile = true;
 			if (_BE_Verbose)
 			{
@@ -410,6 +433,9 @@ public:
 							CDBTile_Tile_Extent.East << " West " << CDBTile_Tile_Extent.West << std::endl;
 			}
 		}
+		if (_HaveEditLimits)
+			mainTile->Set_SpatialFilter_Extent(_Edit_Tile_Extent);
+
 		_CDBLodNum = mainTile->CDB_LOD_Num();
 		if (_BE_Verbose)
 		{
@@ -1053,6 +1079,12 @@ private:
 #endif
 	}
 
+	CDB_Tile_Extent merge_extents(CDB_Tile_Extent baseextent, CDB_Tile_Extent tileextent)
+	{
+		CDB_Tile_Extent Extent2use;
+		Extent2use = tileextent;
+		return Extent2use;
+	}
 
 	const CDBFeatureOptions         _options;
     FeatureSchema                   _schema;
@@ -1077,6 +1109,8 @@ private:
 	std::string						_GTTextureTableName;
 	int								_cur_Feature_Cnt;
 	bool							_Materials;
+	bool							_HaveEditLimits;
+	CDB_Tile_Extent					_Edit_Tile_Extent;
 #ifdef _SAVE_OGR_OUTPUT
 	OGR_File *						_OGR_Output;
 	std::string						_OGR_OutputName;

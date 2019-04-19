@@ -44,6 +44,8 @@ namespace osgEarth { namespace Drivers
 		const optional<std::string>& fileName() const { return _FileName; }
 		optional<std::string>& Limits() { return _Limits; }
 		const optional<std::string>& Limits() const { return _Limits; }
+		optional<std::string>& EditLimits() { return _EditLimits; }
+		const optional<std::string>& EditLimits() const { return _EditLimits; }
 		optional<int>& minLod() { return _minLod; }
 		const optional<int>& minLod() const { return _minLod; }
 		optional<int>& maxLod() { return _maxLod; }
@@ -84,6 +86,7 @@ namespace osgEarth { namespace Drivers
 			conf.updateIfSet("root_dir", _rootDir);
 			conf.updateIfSet("filename", _FileName);
 			conf.updateIfSet("limits", _Limits);
+			conf.updateIfSet("edit_limits", _EditLimits);
 			conf.updateIfSet("minlod", _minLod);
 			conf.updateIfSet("maxlod", _maxLod);
 			conf.updateIfSet("inflated", _inflated);
@@ -110,6 +113,7 @@ namespace osgEarth { namespace Drivers
 			conf.getIfSet("root_dir", _rootDir);
 			conf.getIfSet("filename", _FileName);
 			conf.getIfSet("limits", _Limits);
+			conf.getIfSet("edit_limits", _EditLimits);
 			conf.getIfSet("minlod", _minLod);
 			conf.getIfSet("maxlod", _maxLod);
 			conf.getIfSet("inflated", _inflated);
@@ -126,6 +130,7 @@ namespace osgEarth { namespace Drivers
 
 		optional<std::string> _rootDir;
 		optional<std::string> _Limits;
+		optional<std::string> _EditLimits;
 		optional<std::string> _FileName;
 		optional<int> _minLod;
 		optional<int> _maxLod;
