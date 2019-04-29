@@ -22,6 +22,7 @@
 
 #ifndef OSGEARTH_DRIVER_CDB_FEATURE_SOURCE_OPTIONS
 #define OSGEARTH_DRIVER_CDB_FEATURE_SOURCE_OPTIONS 1
+#include <ogc/ogc_IE>
 
 #include <osgEarth/Common>
 #include <osgEarth/URI>
@@ -46,6 +47,10 @@ namespace osgEarth { namespace Drivers
 		const optional<std::string>& Limits() const { return _Limits; }
 		optional<std::string>& EditLimits() { return _EditLimits; }
 		const optional<std::string>& EditLimits() const { return _EditLimits; }
+#ifdef _DO_GPKG_TESTS
+		optional<std::string>& OGC_IE_Tests() { return _OGC_IE_Test; }
+		const optional<std::string>& OGC_IE_Tests() const { return _OGC_IE_Test; }
+#endif
 		optional<int>& minLod() { return _minLod; }
 		const optional<int>& minLod() const { return _minLod; }
 		optional<int>& maxLod() { return _maxLod; }
@@ -87,6 +92,9 @@ namespace osgEarth { namespace Drivers
 			conf.updateIfSet("filename", _FileName);
 			conf.updateIfSet("limits", _Limits);
 			conf.updateIfSet("edit_limits", _EditLimits);
+#ifdef _DO_GPKG_TESTS
+			conf.updateIfSet("ogc_ie_test", _OGC_IE_Test);
+#endif
 			conf.updateIfSet("minlod", _minLod);
 			conf.updateIfSet("maxlod", _maxLod);
 			conf.updateIfSet("inflated", _inflated);
@@ -114,6 +122,9 @@ namespace osgEarth { namespace Drivers
 			conf.getIfSet("filename", _FileName);
 			conf.getIfSet("limits", _Limits);
 			conf.getIfSet("edit_limits", _EditLimits);
+#ifdef _DO_GPKG_TESTS
+			conf.getIfSet("ogc_ie_test", _OGC_IE_Test);
+#endif
 			conf.getIfSet("minlod", _minLod);
 			conf.getIfSet("maxlod", _maxLod);
 			conf.getIfSet("inflated", _inflated);
@@ -132,6 +143,9 @@ namespace osgEarth { namespace Drivers
 		optional<std::string> _Limits;
 		optional<std::string> _EditLimits;
 		optional<std::string> _FileName;
+#ifdef _DO_GPKG_TESTS
+		optional<std::string> _OGC_IE_Test;
+#endif
 		optional<int> _minLod;
 		optional<int> _maxLod;
 		optional<bool>_inflated;

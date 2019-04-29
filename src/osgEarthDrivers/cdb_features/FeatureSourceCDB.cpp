@@ -21,6 +21,8 @@
 // 2016-2017 Visual Awareness Technologies and Consulting Inc. St Petersburg FL
 
 #include "CDBFeatureOptions"
+#include <ogc/ogc_IE>
+
 #include <CDB_TileLib/CDB_Tile>
 #include <cdbGlobals\cdbGlobals>
 #include <osgEarth/Version>
@@ -313,7 +315,21 @@ public:
 				_HaveEditLimits = true;
 			}
 		}
-
+#ifdef _DO_GPKG_TESTS
+		if (_options.OGC_IE_Tests().isSet())
+		{
+			std::string ogcTest = _options.OGC_IE_Tests().value();
+			OGC_IE_Tracking * OGC_IE = OGC_IE_Tracking::getInstance();
+			if (ogcTest == "core")
+			{
+				OGC_IE->Set_Test(OGC_CDB_Core);
+			}
+			else if (ogcTest == "vatc_1")
+			{
+				OGC_IE->Set_Test(VATC_Test_1);
+			}
+		}
+#endif
 		int minLod, maxLod;
 		if (_options.minLod().isSet())
 			minLod = _options.minLod().value();
@@ -389,6 +405,7 @@ public:
 
     FeatureCursor* createFeatureCursor( const Symbology::Query& query )
     {
+		
         FeatureCursor* result = 0L;
 		_cur_Feature_Cnt = 0;
 		// Make sure the root directory is set
@@ -411,6 +428,13 @@ public:
 			tiletype = GeoTypicalModel;
 		else
 			tiletype = GeoSpecificModel;
+#ifdef _DO_GPKG_TESTS
+		OGC_IE_Tracking * OGC_IE = OGC_IE_Tracking::getInstance();
+		if (OGC_IE->Get_Test() != NO_IE_Test)
+		{
+			OGC_IE->StartTile(tiletype);
+		}
+#endif
 		CDB_Tile_Extent tileExtent(key_extent.north(), key_extent.south(), key_extent.east(), key_extent.west());
 		CDB_Tile *mainTile = NULL;
 		bool subtile = false;
@@ -531,6 +555,14 @@ public:
 		}
 
 		delete mainTile;
+
+#ifdef _DO_GPKG_TESTS
+		if (OGC_IE->Get_Test() != NO_IE_Test)
+		{
+			OGC_IE->EndTile(tiletype, features.size());
+		}
+#endif
+
 
 		result = dataOK ? new FeatureListCursor( features ) : 0L;
 

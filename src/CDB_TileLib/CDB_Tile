@@ -20,6 +20,7 @@
 // Modified for General Incorporation of Common Database (CDB) support within osgEarth
 //
 #include "CDB_Tile_Library.h"
+#include <ogc/ogc_IE>
 #include <sstream>
 #include <iomanip>
 #include <vector>
@@ -590,3 +591,50 @@ private:
 	void ClearMaps(void);
 
 };
+
+#ifdef _DO_GPKG_TESTS
+typedef enum
+{
+	NO_IE_Test = 0,
+	OGC_CDB_Core = 1,
+	VATC_Test_1 = 2,
+	IE_Unknown_Test = 3,
+}OGC_CDB_Test_Type;
+
+
+class CDBTILELIBRARYAPI OGC_IE_Tracking
+{
+public:
+	OGC_IE_Tracking(void);
+	virtual ~OGC_IE_Tracking(void);
+
+	void Init_Times(void);
+	void Set_Test(OGC_CDB_Test_Type test);
+	OGC_CDB_Test_Type Get_Test(void);
+
+	void StartTile(CDB_Tile_Type tt);
+	void EndTile(CDB_Tile_Type tt, size_t Feature_Count);
+
+	static OGC_IE_Tracking * getInstance();
+
+private:
+	time_t	m_Time_at_Run_Start;
+	time_t	m_Time_at_Run_End;
+	
+	time_t	m_Time_at_GS_Tile_Start;
+	time_t  m_Time_at_GS_Tile_End;
+	size_t	m_GS_Tile_Count;
+	size_t  m_GS_Feature_Count;
+	time_t	m_Average_GS_Tile_Load_Time;
+	time_t	m_Total_GS_Tile_Load_Time;
+
+	time_t	m_Time_at_GT_Tile_Start;
+	time_t  m_Time_at_GT_Tile_End;
+	size_t	m_GT_Tile_Count;
+	size_t  m_GT_Feature_Count;
+	time_t	m_Average_GT_Tile_Load_Time;
+	time_t	m_Total_GT_Tile_Load_Time;
+
+	OGC_CDB_Test_Type m_OGC_Test_Type;
+};
+#endif
