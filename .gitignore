@@ -52,3 +52,7 @@ msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user
 msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user
 msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user
 msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user
+msvc/src/applications/osgearth_qt_simple/application_osgearth_qt_simple.vcxproj.user
+msvc/src/applications/osgearth_qt_simple/application_osgearth_qt_simple.vcxproj.user
+msvc/src/applications/osgearth_viewer/application_osgearth_viewer.vcxproj.user
+msvc/src/applications/osgearth_qt_windows/application_osgearth_qt_windows.vcxproj.user

@@ -14,7 +14,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='vs2017_Release|x64'">
-    <LocalDebuggerCommandArguments>--verbose --window 50 50 900 900 --sky --coords --dd  "G:\EarthFiles\GeoPackageU0R2.earth"</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>--verbose --window 50 50 900 900 --sky --coords --dd  "E:\EarthFiles\GeoPackage_purtoCDB_GPKG_IMEL.earth"</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>
