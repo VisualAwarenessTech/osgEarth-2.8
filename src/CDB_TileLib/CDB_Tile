@@ -614,6 +614,8 @@ public:
 
 	void StartTile(CDB_Tile_Type tt);
 	void EndTile(CDB_Tile_Type tt, size_t Feature_Count);
+	void StartTileLoad(CDB_Tile_Type tt);
+	void EndTileLoad(CDB_Tile_Type tt, size_t Feature_Count);
 
 	static OGC_IE_Tracking * getInstance();
 
@@ -634,6 +636,20 @@ private:
 	size_t  m_GT_Feature_Count;
 	time_t	m_Average_GT_Tile_Load_Time;
 	time_t	m_Total_GT_Tile_Load_Time;
+
+	time_t	m_Time_at_GS_TileLoad_Start;
+	time_t  m_Time_at_GS_TileLoad_End;
+	size_t	m_GS_TileLoad_Count;
+	size_t  m_GS_FeatureLoad_Count;
+	time_t	m_Average_GS_TileLoad_Load_Time;
+	time_t	m_Total_GS_TileLoad_Load_Time;
+
+	time_t	m_Time_at_GT_TileLoad_Start;
+	time_t  m_Time_at_GT_TileLoad_End;
+	size_t	m_GT_TileLoad_Count;
+	size_t  m_GT_FeatureLoad_Count;
+	time_t	m_Average_GT_TileLoad_Load_Time;
+	time_t	m_Total_GT_TileLoad_Load_Time;
 
 	OGC_CDB_Test_Type m_OGC_Test_Type;
 };

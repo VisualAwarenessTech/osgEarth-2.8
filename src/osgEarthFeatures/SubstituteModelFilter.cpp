@@ -29,7 +29,8 @@
 #include <osgEarth/Capabilities>
 #include <osgEarth/ScreenSpaceLayout>
 #include <osgEarth/CullingUtils>
-
+#include <ogc/ogc_IE>
+#include <CDB_TileLib/CDB_Tile>
 #include <osg/AutoTransform>
 #include <osg/Drawable>
 #include <osg/Geode>
@@ -229,6 +230,14 @@ SubstituteModelFilter::process(const FeatureList&           features,
 
 	MultipleTextureVisitor v;
 
+#ifdef _DO_GPKG_TESTS
+	OGC_IE_Tracking * tracker = OGC_IE_Tracking::getInstance();
+	bool doTracking = (tracker->Get_Test() != NO_IE_Test);
+	bool trackingSet = false;
+	CDB_Tile_Type tt = CDB_Unknown;
+
+#endif
+
     for( FeatureList::const_iterator f = features.begin(); f != features.end(); ++f )
     {
         Feature* input = f->get();
@@ -247,7 +256,17 @@ SubstituteModelFilter::process(const FeatureList&           features,
 			ar = osgDB::openArchive(archiveName, osgDB::ReaderWriter::ArchiveStatus::READ);
 
 		}
-
+#ifdef _DO_GPKG_TESTS
+		if (!trackingSet)
+		{
+			if (ar)
+				tt = GeoSpecificModel;
+			else
+				tt = GeoTypicalModel;
+			tracker->StartTileLoad(tt);
+			trackingSet = true;
+		}
+#endif
 		bool feature_defined_model = input->hasAttr("osge_modelname");
 		bool skip_multitexdisable = input->hasAttr("osge_nomultidisable");
 		bool replace = false;
@@ -576,6 +595,13 @@ SubstituteModelFilter::process(const FeatureList&           features,
 		Orphaned->addChild(world2local);
 		attachPoint->addChild(Orphaned);
 	}
+
+#ifdef _DO_GPKG_TESTS
+	if (trackingSet)
+	{
+		tracker->EndTileLoad(tt, features.size());
+	}
+#endif
 
     if ( iconSymbol )
     {
