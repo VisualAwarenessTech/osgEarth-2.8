@@ -457,8 +457,8 @@ public:
 							CDBTile_Tile_Extent.East << " West " << CDBTile_Tile_Extent.West << std::endl;
 			}
 		}
-		if (_HaveEditLimits)
-			mainTile->Set_SpatialFilter_Extent(_Edit_Tile_Extent);
+//		if (_HaveEditLimits)
+//			mainTile->Set_SpatialFilter_Extent(_Edit_Tile_Extent);
 
 		_CDBLodNum = mainTile->CDB_LOD_Num();
 		if (_BE_Verbose)
