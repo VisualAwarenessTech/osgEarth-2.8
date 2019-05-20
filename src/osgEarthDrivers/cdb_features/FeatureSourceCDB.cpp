@@ -543,14 +543,17 @@ public:
 				if (fileOk)
 					dataOK = true;
 				else
-					Registry::instance()->blacklist(base);
+				{
+					if (!_UsingFileInput)
+						Registry::instance()->blacklist(base);
+				}
 			}
 			++FilesChecked;
 		}
 
 		if (!have_a_file)
 		{
-			if(Files2check > 0)
+			if(!_UsingFileInput && (Files2check > 0))
 				Registry::instance()->blacklist(base);
 		}
 
