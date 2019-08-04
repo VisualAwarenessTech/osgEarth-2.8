@@ -259,11 +259,14 @@ SubstituteModelFilter::process(const FeatureList&           features,
 #ifdef _DO_GPKG_TESTS
 		if (!trackingSet)
 		{
-			if (ar)
-				tt = GeoSpecificModel;
-			else
-				tt = GeoTypicalModel;
-			tracker->StartTileLoad(tt);
+			if (doTracking)
+			{
+				if (ar)
+					tt = GeoSpecificModel;
+				else
+					tt = GeoTypicalModel;
+				tracker->StartTileLoad(tt);
+			}
 			trackingSet = true;
 		}
 #endif
@@ -599,7 +602,10 @@ SubstituteModelFilter::process(const FeatureList&           features,
 #ifdef _DO_GPKG_TESTS
 	if (trackingSet)
 	{
-		tracker->EndTileLoad(tt, features.size());
+		if (doTracking)
+		{
+			tracker->EndTileLoad(tt, features.size());
+		}
 	}
 #endif
 
