@@ -22,7 +22,6 @@
 #include <osgEarth/XmlUtils>
 #include <osgDB/FileUtils>
 #include <osgDB/FileNameUtils>
-#include <cdbGlobals/cdbGlobals>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -47,9 +46,6 @@ const double Gbl_CDB_Tiles_Per_LOD[18] = {1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 
 OGR_File  Ogr_File_Instance;
 CDB_Data_Dictionary  CDB_Data_Dictionary_Instance;
 
-#ifdef _DO_GPKG_TESTS
-OGC_IE_Tracking OGC_IE_Tracking_Instance;
-#endif
 
 CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Type TileType, std::string dataset, CDB_Tile_Extent *TileExtent, bool lightmap, bool material, bool material_mask, int NLod, bool DataFromGlobal) :
 	               m_cdbRootDir(cdbRootDir), m_cdbCacheDir(cdbCacheDir),
@@ -4200,149 +4196,3 @@ void CDB_Data_Dictionary::ClearMaps()
 	m_BaseCategories.clear();
 }
 
-#ifdef _DO_GPKG_TESTS
-
-OGC_IE_Tracking::OGC_IE_Tracking(void) : m_OGC_Test_Type(NO_IE_Test)
-{
-	Init_Times();
-}
-
-OGC_IE_Tracking::~OGC_IE_Tracking(void)
-{
-
-}
-
-OGC_IE_Tracking * OGC_IE_Tracking::getInstance()
-{
-	return &OGC_IE_Tracking_Instance;
-}
-
-void OGC_IE_Tracking::Set_Test(OGC_CDB_Test_Type test)
-{
-	m_OGC_Test_Type = test;
-}
-
-OGC_CDB_Test_Type OGC_IE_Tracking::Get_Test(void)
-{
-	return m_OGC_Test_Type;
-}
-
-void OGC_IE_Tracking::Init_Times(void)
-{
-	m_Time_at_Run_Start = 0;
-	m_Time_at_Run_End = 0;
-
-	m_Time_at_GS_Tile_Start = 0;
-	m_Time_at_GS_Tile_End = 0;
-	m_GS_Tile_Count = 0;
-	m_GS_Feature_Count = 0;
-	m_Average_GS_Tile_Load_Time = 0;
-	m_Total_GS_Tile_Load_Time = 0;
-
-	m_Time_at_GT_Tile_Start = 0;
-	m_Time_at_GT_Tile_End = 0;
-	m_GT_Tile_Count = 0;
-	m_GT_Feature_Count = 0;
-	m_Average_GT_Tile_Load_Time = 0;
-	m_Total_GT_Tile_Load_Time = 0;
-
-	m_Time_at_GS_TileLoad_Start = 0;
-	m_Time_at_GS_TileLoad_End = 0;
-	m_GS_TileLoad_Count = 0;
-	m_GS_FeatureLoad_Count = 0;
-	m_Average_GS_TileLoad_Load_Time = 0;
-	m_Total_GS_TileLoad_Load_Time = 0;
-
-	m_Time_at_GT_TileLoad_Start = 0;
-	m_Time_at_GT_TileLoad_End = 0;
-	m_GT_TileLoad_Count = 0;
-	m_GT_FeatureLoad_Count = 0;
-	m_Average_GT_TileLoad_Load_Time = 0;
-	m_Total_GT_TileLoad_Load_Time = 0;
-}
-
-void OGC_IE_Tracking::StartTile(CDB_Tile_Type tt)
-{
-	if (tt == GeoSpecificModel)
-	{
-		m_Time_at_GS_Tile_Start = clock();
-
-	}
-	else if (tt == GeoTypicalModel)
-	{
-		m_Time_at_GT_Tile_Start = clock();
-	}
-}
-
-void OGC_IE_Tracking::StartTileLoad(CDB_Tile_Type tt)
-{
-	if (tt == GeoSpecificModel)
-	{
-		m_Time_at_GS_TileLoad_Start = clock();
-
-	}
-	else if (tt == GeoTypicalModel)
-	{
-		m_Time_at_GT_TileLoad_Start = clock();
-	}
-}
-
-void OGC_IE_Tracking::EndTile(CDB_Tile_Type tt, size_t Feature_Count)
-{
-	if (tt == GeoSpecificModel)
-	{
-		m_Time_at_GS_Tile_End = clock();
-		++m_GS_Tile_Count;
-		m_GS_Feature_Count += Feature_Count;
-		time_t tile_time = m_Time_at_GS_Tile_End - m_Time_at_GS_Tile_Start;
-		m_Total_GS_Tile_Load_Time += tile_time;
-		m_Average_GS_Tile_Load_Time = (size_t)((double)m_Total_GS_Tile_Load_Time / (double)m_GS_Tile_Count);
-
-		OSG_WARN << "Tile " << m_GS_Tile_Count << " Loaded GeoReference data in  " << tile_time << " Features " << Feature_Count << " Average Load time " <<
-			m_Average_GS_Tile_Load_Time << std::endl;
-
-	}
-	else if (tt == GeoTypicalModel)
-	{
-		m_Time_at_GT_Tile_End = clock();
-		++m_GT_Tile_Count;
-		m_GT_Feature_Count += Feature_Count;
-		time_t tile_time = m_Time_at_GT_Tile_End - m_Time_at_GT_Tile_Start;
-		m_Total_GT_Tile_Load_Time += tile_time;
-		m_Average_GT_Tile_Load_Time = (size_t)((double)m_Total_GT_Tile_Load_Time / (double)m_GT_Tile_Count);
-
-		OSG_WARN << "Tile " << m_GT_Tile_Count << " Loaded GeoReference data in  " << tile_time << " Features " << Feature_Count << " Average Load time " <<
-			m_Average_GT_Tile_Load_Time << std::endl;
-	}
-}
-
-void OGC_IE_Tracking::EndTileLoad(CDB_Tile_Type tt, size_t Feature_Count)
-{
-	if (tt == GeoSpecificModel)
-	{
-		m_Time_at_GS_TileLoad_End = clock();
-		++m_GS_TileLoad_Count;
-		m_GS_FeatureLoad_Count += Feature_Count;
-		time_t tile_time = m_Time_at_GS_TileLoad_End - m_Time_at_GS_TileLoad_Start;
-		m_Total_GS_TileLoad_Load_Time += tile_time;
-		m_Average_GS_TileLoad_Load_Time = (size_t)((double)m_Total_GS_TileLoad_Load_Time / (double)m_GS_TileLoad_Count);
-
-		OSG_WARN << "Tile " << m_GS_TileLoad_Count << " Loaded GeoReference data in  " << tile_time << " Features " << Feature_Count << " Average Load time " <<
-					m_Average_GS_TileLoad_Load_Time  << std::endl;
-
-	}
-	else if (tt == GeoTypicalModel)
-	{
-		m_Time_at_GT_TileLoad_End = clock();
-		++m_GT_TileLoad_Count;
-		m_GT_FeatureLoad_Count += Feature_Count;
-		time_t tile_time = m_Time_at_GT_TileLoad_End - m_Time_at_GT_TileLoad_Start;
-		m_Total_GT_TileLoad_Load_Time += tile_time;
-		m_Average_GT_TileLoad_Load_Time = (size_t)((double)m_Total_GT_TileLoad_Load_Time / (double)m_GT_TileLoad_Count);
-
-		OSG_WARN << "Tile " << m_GT_TileLoad_Count << " Loaded GeoReference data in  " << tile_time << " Features " << Feature_Count << " Average Load time " <<
-			m_Average_GT_TileLoad_Load_Time << std::endl;
-	}
-}
-
-#endif
