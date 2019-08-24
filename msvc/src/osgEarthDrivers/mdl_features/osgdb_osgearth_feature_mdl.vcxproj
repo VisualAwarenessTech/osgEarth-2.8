@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -362,11 +362,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -382,7 +382,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -406,11 +406,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -426,7 +426,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -450,11 +450,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -470,7 +470,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -494,11 +494,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -514,7 +514,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -538,11 +538,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -558,7 +558,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -582,11 +582,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -602,7 +602,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -626,11 +626,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -646,7 +646,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -670,11 +670,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -690,7 +690,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -714,11 +714,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -734,7 +734,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -758,11 +758,11 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Debug";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Debug\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -778,7 +778,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarthd.lib;CDB_TileLibd.lib;osgEarthFeaturesd.lib;osgEarthSymbologyd.lib;osgEarthUtild.lib;gdal_i.lib;osgEarthAnnotationd.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadowd.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidgetd.lib;geos_c.lib;osgd.lib;osgTextd.lib;osgSimd.lib;osgTerraind.lib;osgDBd.lib;osgFXd.lib;osgViewerd.lib;osgGAd.lib;osgManipulatord.lib;OpenThreadsd.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdbd.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdld.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -802,11 +802,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -822,7 +822,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -846,11 +846,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -866,7 +866,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -890,11 +890,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -910,7 +910,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -934,11 +934,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -954,7 +954,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -978,11 +978,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -998,7 +998,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -1022,11 +1022,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -1042,7 +1042,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -1066,11 +1066,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -1086,7 +1086,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -1110,11 +1110,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -1130,7 +1130,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -1154,11 +1154,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -1174,7 +1174,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
@@ -1198,11 +1198,11 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>
       </DebugInformationFormat>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR="Release";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
     <ResourceCompile>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_cdb_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;OSGEARTH_HAVE_MINIZIP;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;CMAKE_INTDIR=\"Release\";osgdb_osgearth_feature_mdl_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>..\..\..\..\src;..\..\..\..\..\$(OSG_DIR)\include;..\..\..\..\..\$(OSG_DIR)\msvc\include;..\..\..\..\..\$(GDAL_DIR)\frmts;..\..\..\..\..\$(GDAL_DIR)\alg;..\..\..\..\..\$(GDAL_DIR)\gcore;..\..\..\..\..\$(GDAL_DIR)\port;..\..\..\..\..\$(GDAL_DIR)\ogr;..\..\..\..\..\$(GDAL_DIR)\ogr\ogrsf_frmts;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
@@ -1218,7 +1218,7 @@
       <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;osgEarth.lib;CDB_TileLib.lib;osgEarthFeatures.lib;osgEarthSymbology.lib;osgEarthUtil.lib;gdal_i.lib;osgEarthAnnotation.lib;ws2_32.lib;winmm.lib;wldap32.lib;osgShadow.lib;libcurl_imp.lib;zlib.lib;tinyxml.lib;osgWidget.lib;geos_c.lib;osg.lib;osgUtil.lib;osgSim.lib;osgTerrain.lib;osgDB.lib;osgFX.lib;osgViewer.lib;osgText.lib;osgGA.lib;osgManipulator.lib;OpenThreads.lib;glu32.lib;opengl32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GDAL_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(OSG_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(CURL_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(ZLIB_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(TINYXML_DIR)\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\..\..\$(GEOS_DIR)\msvc\vc$(PlatformToolsetVersion)\$(Platform)\$(Configuration);..\..\..\lib\$(Configuration);%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_cdb.lib</ImportLibrary>
+      <ImportLibrary>$(OutDir)osgdb_osgearth_feature_mdl.lib</ImportLibrary>
       <ProgramDataBaseFile>$(OutDir)$(TargetName).pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
       <Version>
