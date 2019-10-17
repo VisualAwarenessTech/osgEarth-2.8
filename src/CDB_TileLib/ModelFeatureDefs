@@ -367,7 +367,11 @@ struct CDB_Model_Runtime_Class
 		std::string cnam = f->GetFieldAsString(key_index);
 		Model_Base_Name = f->GetFieldAsString(Model_Base_Index);
 		FACC_value = f->GetFieldAsString(FACC_Index);
-		int subcode = f->GetFieldAsInteger(FSC_Index);
+		int subcode;
+		if (FSC_Index >= 0)
+			subcode = f->GetFieldAsInteger(FSC_Index);
+		else
+			subcode = 0;
 		std::stringstream format_stream;
 		format_stream << std::setfill('0')
 			<< std::setw(3) << abs(subcode);
