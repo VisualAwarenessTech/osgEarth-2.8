@@ -237,7 +237,7 @@ SubstituteModelFilter::process(const FeatureList&           features,
 	CDB_Tile_Type tt = CDB_Unknown;
 
 #endif
-
+	
     for( FeatureList::const_iterator f = features.begin(); f != features.end(); ++f )
     {
         Feature* input = f->get();
@@ -248,7 +248,8 @@ SubstituteModelFilter::process(const FeatureList&           features,
             StringExpression scriptExpr(symbol->script().get());
             input->eval( scriptExpr, &context );
         }
-		if ((ar == NULL) && input->hasAttr("osge_modelzip"))  
+		bool hasAR = input->hasAttr("osge_modelzip");
+		if ((ar == NULL) && hasAR )  
 		{
 			//all model requests should come from the same archive
 			//the existance and validity of the archive has already been tested by the driver
@@ -438,7 +439,10 @@ SubstituteModelFilter::process(const FeatureList&           features,
             // Always clone the cached instance so we're not processing data that's
             // already in the scene graph. -gw
 			if (feature_defined_model)
-				context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, localoptions, ar);
+				if(hasAR)
+					context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, localoptions, ar);
+				else
+					context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, localoptions, NULL);
 			else
             	context.resourceCache()->cloneOrCreateInstanceNode(instance.get(), model, context.getDBOptions());	
 			if (model)

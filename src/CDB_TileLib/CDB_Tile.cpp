@@ -331,6 +331,25 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 
 		ModelSet.ModelTextureName = txbuf.str();
 
+		dataset2str = "_D310_S001_T001_";
+		filetype2str = ".flt";
+		layerName2 = "310_T2DModelGeometry";
+		std::stringstream t2dbuf;
+		if (!m_DataFromGlobal)
+		{
+			t2dbuf << cdbRootDir
+				<< "\\Tiles"
+				<< "\\" << m_lat_str
+				<< "\\" << m_lon_str
+				<< "\\" << layerName2
+				<< "\\" << m_lod_str
+				<< "\\" << m_uref_str
+				<< "\\" << m_lat_str << m_lon_str << dataset2str << m_lod_str
+				<< "_" << m_uref_str << "_" << m_rref_str << filetype2str;
+		}
+
+		ModelSet.T2dModelName = t2dbuf.str();
+
 		int Tnum = 1;
 		int i = 1;
 		std::stringstream laybuf;
@@ -455,6 +474,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 			m_ModelSet[0].ModelDbfNameExists = validate_tile_name(m_ModelSet[0].ModelDbfName);
 			m_ModelSet[0].ModelGeometryNameExists = validate_tile_name(m_ModelSet[0].ModelGeometryName);
 			m_ModelSet[0].ModelTextureNameExists = validate_tile_name(m_ModelSet[0].ModelTextureName);
+			m_ModelSet[0].T2DModelNameExists = validate_tile_name(m_ModelSet[0].T2dModelName);
 		}
 		else
 		{
@@ -1497,6 +1517,13 @@ OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string
 	return f;
 }
 
+OGRFeature * CDB_Tile::Get_T2dModel(std::string &ModelKeyName, std::string &FullModelName)
+{
+	OGRFeature *f = NULL;
+	osg::Node * modelNode = osgDB::readNodeFile(m_ModelSet[0].T2dModelName);
+	
+	return f;
+}
 OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, std::string &ArchiveFileName, bool &Model_in_Archive)
 {
 	bool valid = false;
@@ -1687,6 +1714,11 @@ bool CDB_Tile::Load_Class_Map(OGRLayer * poLayer, CDB_Model_RuntimeMap &clsMap)
 		OGRFeature::DestroyFeature(dbf_feature);
 	}
 	return true;
+}
+
+bool CDB_Tile::Has_T2dModel(void)
+{
+	return m_ModelSet[0].T2DModelNameExists;
 }
 
 int CDB_Tile::Find_Field_Index(OGRFeatureDefn *poFDefn, std::string fieldname, OGRFieldType Type)

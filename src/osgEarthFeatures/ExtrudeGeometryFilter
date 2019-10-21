@@ -227,6 +227,7 @@ namespace osgEarth { namespace Features
 							std::string				roof_mat_index_name,
 							ExtrudeGeomGDALHelper * RoofHelper);
 
+
         bool buildWallGeometry(const Structure&     structure,
                                osg::Geometry*       walls,
                                const osg::Vec4&     wallColor,
@@ -239,6 +240,11 @@ namespace osgEarth { namespace Features
                                const SkinResource*  roofSkin,
 							   const bool			have_roof_image,
 							   const bool			have_roof_mat_index);
+
+		bool buildT2DGeometry(Feature* input , 
+							   osg::Geometry * model, const osg::Vec4 &modelColor, 
+		                       const SkinResource * modelSkin,
+		                       const bool have_model_mat_index);
 
         bool buildOutlineGeometry(const Structure&  structure,
                                   osg::Geometry*    outline,

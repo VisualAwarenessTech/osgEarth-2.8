@@ -193,6 +193,7 @@ struct CDB_Model_Tile_Set
 	std::string			ModelDbfName;
 	std::string			PrimaryLayerName;
 	std::string			ClassLayerName;
+	std::string			T2dModelName;
 	GDALDataset *		PrimaryTileOgr;
 	GDALDataset *		ClassTileOgr;
 	OGRLayer *			PrimaryLayer;
@@ -200,6 +201,7 @@ struct CDB_Model_Tile_Set
 	bool				ModelGeometryNameExists;
 	bool				ModelTextureNameExists;
 	bool				ModelDbfNameExists;
+	bool				T2DModelNameExists;
 	CDB_Model_RuntimeMap clsMap;
 	osgDB::Archive::FileNameList archiveFileList;
 
@@ -389,6 +391,10 @@ public:
 
 	static int LodNumFromExtent(CDB_Tile_Extent &Tile_Extent);
 
+	bool Has_T2dModel(void);
+
+	OGRFeature * Get_T2dModel(std::string &ModelKeyName, std::string &FullModelName);
+
 
 private:
 	std::string				m_cdbRootDir;
@@ -496,7 +502,7 @@ private:
 	std::string Model_FileName(std::string &FACC_value, std::string &FSC_value, std::string &BaseFileName);
 
 	OGRFeature * Next_Valid_Geospecific_Feature(bool inflated, std::string &ModelKeyName, std::string &FullModelName, std::string &ArchiveFileName,
-												bool  &Model_in_Archive, unsigned int pos = 0);
+												bool  &Model_in_Archive, unsigned int pos = 0);	
 
 	OGRFeature * Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, std::string &ArchiveFileName, bool &Model_in_Archive);
 

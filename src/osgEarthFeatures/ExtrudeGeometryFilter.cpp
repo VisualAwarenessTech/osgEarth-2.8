@@ -533,6 +533,8 @@ ExtrudeGeometryFilter::buildStructure(const Geometry*         input,
 }
 
 
+
+
 bool
 ExtrudeGeometryFilter::buildWallGeometry(const Structure&     structure,
                                          osg::Geometry*       walls,
@@ -867,6 +869,94 @@ ExtrudeGeometryFilter::buildRoofGeometry(const Structure&     structure,
     return true;
 }
 
+bool
+ExtrudeGeometryFilter::buildT2DGeometry(Feature* input,
+	osg::Geometry*       model,
+	const osg::Vec4&     modelColor,
+	const SkinResource* modelSkin,
+	const bool			  have_model_mat_index)
+{
+	osg::Vec3Array* verts = new osg::Vec3Array();
+	model->setVertexArray(verts);
+
+	osg::Vec4Array* color = new osg::Vec4Array();
+	model->setColorArray(color);
+	model->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+
+	osg::Vec3Array* tex = 0L;
+	if (modelSkin)
+	{
+		tex = new osg::Vec3Array();
+		model->setTexCoordArray(0, tex);
+		if ((modelSkin && modelSkin->materialURI().isSet()) || have_model_mat_index)
+		{
+			model->setTexCoordArray(1, tex);
+		}
+	}
+	if (modelSkin)
+	{
+		if (modelSkin->SurfaceMaterialCode().isSet())
+		{
+			__int16 surface = (short)modelSkin->SurfaceMaterialCode().value();
+			__int16 fid = 180; //General Building
+			model->setUserValue("<UA:SMC>", surface);
+			model->setUserValue("<UA:FID>", fid);
+		}
+	}
+	osg::Vec4Array* anchors = 0L;
+	if (_gpuClamping)
+	{
+		// fake out the OSG tessellator. It does not preserve attrib arrays in the Tessellator.
+		// so we will put them in one of the texture arrays and copy them to an attrib array 
+		// after tessellation. #osghack
+		anchors = new osg::Vec4Array();
+		model->setTexCoordArray(1, anchors);
+	}
+
+	bool flatten =
+		_style.has<ExtrusionSymbol>() &&
+		_style.get<ExtrusionSymbol>()->flatten() == true;
+
+	// Create a series of line loops that the tessellator can reorganize
+	// into polygons.
+	unsigned vertptr = 0;
+	
+
+	osg::Vec3Array* normal = new osg::Vec3Array(verts->size());
+	model->setNormalArray(normal);
+	model->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+	normal->assign(verts->size(), osg::Vec3(0, 0, 1));
+
+	int v = verts->size();
+
+	// Tessellate the model lines into polygons.
+	osgEarth::Tessellator oeTess;
+	if (!oeTess.tessellateGeometry(*model))
+	{
+		//fallback to osg tessellator
+		OE_DEBUG << LC << "Falling back on OSG tessellator (" << model->getName() << ")" << std::endl;
+
+		osgUtil::Tessellator tess;
+		tess.setTessellationType(osgUtil::Tessellator::TESS_TYPE_GEOMETRY);
+		tess.setWindingType(osgUtil::Tessellator::TESS_WINDING_ODD);
+		tess.retessellatePolygons(*model);
+	}
+
+	// Move the anchors to the correct place. :)
+	if (_gpuClamping)
+	{
+		osg::Vec4Array* a = static_cast<osg::Vec4Array*>(model->getTexCoordArray(1));
+		if (a)
+		{
+			model->setVertexAttribArray(Clamping::AnchorAttrLocation, a);
+			model->setVertexAttribBinding(Clamping::AnchorAttrLocation, osg::Geometry::BIND_PER_VERTEX);
+			model->setVertexAttribNormalize(Clamping::AnchorAttrLocation, false);
+			model->setTexCoordArray(1, 0L);
+		}
+	}
+
+	return true;
+}
 
 bool
 ExtrudeGeometryFilter::buildOutlineGeometry(const Structure&  structure,
@@ -1021,117 +1111,133 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
             input->eval( temp, &context );
         }
 
-		bool roofTextureIsFromImage = false;
-		std::string roofTextureImageName = "";
-		bool roofTextureHasMatIndex = false;
-		std::string roofTextureMatIndexName = "";
-		ExtrudeGeomGDALHelper * RoofHelper = NULL;
-		if (input->hasAttr("UseNameAsRoofTexture") && input->hasAttr("teximagename"))
+		if (input->hasAttr("IsT2DModel"))
 		{
-			if (input->getString("UseNameAsRoofTexture") == "true")
+			if (input->getString("IsT2DModel") == "true")
 			{
-				roofTextureImageName = input->getString("teximagename");
-				roofTextureIsFromImage = true;
-				if (input->hasAttr("MatIndexUrl"))
+				FeatureIndexBuilder* index = context.featureIndex();
+				GeometryIterator iter(input->getGeometry(), false);
+				while (iter.hasMore())
 				{
-					roofTextureHasMatIndex = true;
-					roofTextureMatIndexName = input->getString("MatIndexUrl");
+					Geometry* part = iter.next();
+
+					osg::ref_ptr<osg::Geometry> walls = new osg::Geometry();
+
+					if (part->getType() == Geometry::TYPE_POLYGON)
+					{
+						
+
+						// prep the shapes by making sure all polys are open:
+						static_cast<Polygon*>(part)->open();
+						Structure structure;
+						SkinResource* roofSkin = 0L;
+						osg::Vec4f wallColor(1, 1, 1, 1);
+						osg::ref_ptr<osg::Geometry> walls = new osg::Geometry();
+						buildT2DGeometry(input, walls.get(), wallColor, roofSkin, false);
+						int test = walls->getVertexArray()->getNumElements();
+
+						if (walls.valid() && walls->getVertexArray() && test > 0)
+						{
+							addDrawable(walls.get(), 0L, "", input, index);
+						}
+					}
 				}
 			}
 		}
-		if (roofTextureIsFromImage)
+		else
 		{
-			RoofHelper = new ExtrudeGeomGDALHelper(roofTextureImageName);
-			if (roofTextureHasMatIndex)
+			bool roofTextureIsFromImage = false;
+			std::string roofTextureImageName = "";
+			bool roofTextureHasMatIndex = false;
+			std::string roofTextureMatIndexName = "";
+			ExtrudeGeomGDALHelper * RoofHelper = NULL;
+			if (input->hasAttr("UseNameAsRoofTexture") && input->hasAttr("teximagename"))
 			{
-				RoofHelper->Add_Mat_Index(roofTextureHasMatIndex, roofTextureMatIndexName);
-			}
-		}
-		// iterator over the parts.
-        GeometryIterator iter( input->getGeometry(), false );
-        while( iter.hasMore() )
-        {
-            Geometry* part = iter.next();
-
-            osg::ref_ptr<osg::Geometry> walls = new osg::Geometry();
-            
-            osg::ref_ptr<osg::Geometry> rooflines = 0L;
-            osg::ref_ptr<osg::Geometry> baselines = 0L;
-            osg::ref_ptr<osg::Geometry> outlines  = 0L;
-            
-            if ( part->getType() == Geometry::TYPE_POLYGON )
-            {
-                rooflines = new osg::Geometry();
-
-                // prep the shapes by making sure all polys are open:
-                static_cast<Polygon*>(part)->open();
-            }
-
-            // fire up the outline geometry if we have a line symbol.
-            if ( _outlineSymbol != 0L )
-            {
-                outlines = new osg::Geometry();
-            }
-
-            // make a base cap if we're doing stencil volumes.
-            if ( _makeStencilVolume )
-            {
-                baselines = new osg::Geometry();
-            }
-
-            // calculate the extrusion height:
-            float height;
-
-            if ( _heightCallback.valid() )
-            {
-                height = _heightCallback->operator()(input, context);
-            }
-            else if ( _heightExpr.isSet() )
-            {
-                height = input->eval( _heightExpr.mutable_value(), &context );
-            }
-            else
-            {
-                height = *_extrusionSymbol->height();
-            }
-
-			osg::ref_ptr<osg::StateSet> wallStateSet;
-			osg::ref_ptr<osg::StateSet> roofStateSet;
-
-            // calculate the wall texturing:
-            SkinResource* wallSkin = 0L;
-            if ( _wallSkinSymbol.valid() )
-            {
-                if ( _wallResLib.valid() )
-                {
-                    SkinSymbol querySymbol( *_wallSkinSymbol.get() );
-                    querySymbol.objectHeight() = fabs(height);
-                    wallSkin = _wallResLib->getSkin( &querySymbol, wallSkinPRNG, context.getDBOptions() );
-#ifdef _DEBUG
-					if (!wallSkin)
-					{
-						++fubar;
-					}
-#endif
-                }
-
-                else
-                {
-                    //TODO: simple single texture?
-                }
-            }
-
-
-            // calculate the rooftop texture:
-            SkinResource* roofSkin = 0L;
-			if (!roofTextureIsFromImage)
-			{
-				if (_roofSkinSymbol.valid())
+				if (input->getString("UseNameAsRoofTexture") == "true")
 				{
-					if (_roofResLib.valid())
+					roofTextureImageName = input->getString("teximagename");
+					roofTextureIsFromImage = true;
+					if (input->hasAttr("MatIndexUrl"))
 					{
-						SkinSymbol querySymbol(*_roofSkinSymbol.get());
-						roofSkin = _roofResLib->getSkin(&querySymbol, roofSkinPRNG, context.getDBOptions());
+						roofTextureHasMatIndex = true;
+						roofTextureMatIndexName = input->getString("MatIndexUrl");
+					}
+				}
+			}
+			if (roofTextureIsFromImage)
+			{
+				RoofHelper = new ExtrudeGeomGDALHelper(roofTextureImageName);
+				if (roofTextureHasMatIndex)
+				{
+					RoofHelper->Add_Mat_Index(roofTextureHasMatIndex, roofTextureMatIndexName);
+				}
+			}
+			// iterator over the parts.
+			GeometryIterator iter(input->getGeometry(), false);
+			while (iter.hasMore())
+			{
+				Geometry* part = iter.next();
+
+				osg::ref_ptr<osg::Geometry> walls = new osg::Geometry();
+
+				osg::ref_ptr<osg::Geometry> rooflines = 0L;
+				osg::ref_ptr<osg::Geometry> baselines = 0L;
+				osg::ref_ptr<osg::Geometry> outlines = 0L;
+
+				if (part->getType() == Geometry::TYPE_POLYGON)
+				{
+					rooflines = new osg::Geometry();
+
+					// prep the shapes by making sure all polys are open:
+					static_cast<Polygon*>(part)->open();
+				}
+
+				// fire up the outline geometry if we have a line symbol.
+				if (_outlineSymbol != 0L)
+				{
+					outlines = new osg::Geometry();
+				}
+
+				// make a base cap if we're doing stencil volumes.
+				if (_makeStencilVolume)
+				{
+					baselines = new osg::Geometry();
+				}
+
+				// calculate the extrusion height:
+				float height;
+
+				if (_heightCallback.valid())
+				{
+					height = _heightCallback->operator()(input, context);
+				}
+				else if (_heightExpr.isSet())
+				{
+					height = input->eval(_heightExpr.mutable_value(), &context);
+				}
+				else
+				{
+					height = *_extrusionSymbol->height();
+				}
+
+				osg::ref_ptr<osg::StateSet> wallStateSet;
+				osg::ref_ptr<osg::StateSet> roofStateSet;
+
+				// calculate the wall texturing:
+				SkinResource* wallSkin = 0L;
+				if (_wallSkinSymbol.valid())
+				{
+					if (_wallResLib.valid())
+					{
+						SkinSymbol querySymbol(*_wallSkinSymbol.get());
+						querySymbol.objectHeight() = fabs(height);
+						wallSkin = _wallResLib->getSkin(&querySymbol, wallSkinPRNG, context.getDBOptions());
+#ifdef _DEBUG
+						if (!wallSkin)
+						{
+							++fubar;
+						}
+#endif
 					}
 
 					else
@@ -1139,141 +1245,162 @@ ExtrudeGeometryFilter::process( FeatureList& features, FilterContext& context )
 						//TODO: simple single texture?
 					}
 				}
-			}
 
-            float verticalOffset = (float)input->getDouble("__oe_verticalOffset", 0.0);
 
-            // Build the data model for the structure.
-
-            Structure structure;
-
-            buildStructure(
-                part, 
-                height,
-                _extrusionSymbol->flatten().get(),
-                verticalOffset,
-                wallSkin,
-                roofSkin,
-                structure,
-                context,
-				roofTextureIsFromImage,
-			    roofTextureImageName,
-			    roofTextureHasMatIndex,
-			    roofTextureMatIndexName,
-				RoofHelper
-			);
-
-            // Create the walls.
-            if ( walls.valid() )
-            {
-                osg::Vec4f wallColor(1,1,1,1), wallBaseColor(1,1,1,1);
-
-                if ( _wallPolygonSymbol.valid() )
-                {
-                    wallColor = _wallPolygonSymbol->fill()->color();
-                }
-
-                if ( _extrusionSymbol->wallGradientPercentage().isSet() )
-                {
-                    wallBaseColor = Color(wallColor).brightness( 1.0 - *_extrusionSymbol->wallGradientPercentage() );
-                }
-                else
-                {
-                    wallBaseColor = wallColor;
-                }
-
-                buildWallGeometry(structure, walls.get(), wallColor, wallBaseColor, wallSkin);
-
-                if ( wallSkin )
-                {
-                    // Get a stateset for the individual wall stateset
-                    context.resourceCache()->getOrCreateStateSet(wallSkin, wallStateSet, context.getDBOptions());
-					wallStateSet->setAttributeAndModes(new osg::CullFace(osg::CullFace::BACK), osg::StateAttribute::ON);
-					if (wallSkin->materialURI().isSet())
-					{
-						context.resourceCache()->getOrCreateMatStateSet(wallSkin, wallStateSet, context.getDBOptions());
-					}
-				}
-            }
-
-            // tessellate and add the roofs if necessary:
-            if ( rooflines.valid() )
-            {
-                osg::Vec4f roofColor(1,1,1,1);
-                if ( _roofPolygonSymbol.valid() )
-                {
-                    roofColor = _roofPolygonSymbol->fill()->color();
-                }
-
-                buildRoofGeometry(structure, rooflines.get(), roofColor, roofSkin, roofTextureIsFromImage, roofTextureHasMatIndex);
-				if (roofTextureIsFromImage)
+				// calculate the rooftop texture:
+				SkinResource* roofSkin = 0L;
+				if (!roofTextureIsFromImage)
 				{
-					roofStateSet = RoofHelper->CreateSetState(context.getDBOptions());
-					roofStateSet->setAttributeAndModes(new osg::CullFace(osg::CullFace::BACK), osg::StateAttribute::ON);
-					if (roofTextureHasMatIndex)
-						RoofHelper->AddMat2SetState(roofStateSet, context.getDBOptions());
-				}
-				else if ( roofSkin )
-                {
-                    // Get a stateset for the individual roof skin
-                    context.resourceCache()->getOrCreateStateSet(roofSkin, roofStateSet, context.getDBOptions());
-					if (roofSkin->materialURI().isSet())
+					if (_roofSkinSymbol.valid())
 					{
-						context.resourceCache()->getOrCreateMatStateSet(roofSkin, roofStateSet, context.getDBOptions());
+						if (_roofResLib.valid())
+						{
+							SkinSymbol querySymbol(*_roofSkinSymbol.get());
+							roofSkin = _roofResLib->getSkin(&querySymbol, roofSkinPRNG, context.getDBOptions());
+						}
+
+						else
+						{
+							//TODO: simple single texture?
+						}
 					}
-                }
-            }
+				}
 
-            if ( outlines.valid() )
-            {
-                osg::Vec4f outlineColor(1,1,1,1);
-                if ( _outlineSymbol.valid() )
-                {
-                    outlineColor = _outlineSymbol->stroke()->color();
-                }
+				float verticalOffset = (float)input->getDouble("__oe_verticalOffset", 0.0);
 
-                float minCreaseAngle = _outlineSymbol->creaseAngle().value();
-                buildOutlineGeometry(structure, outlines.get(), outlineColor, minCreaseAngle);
-            }
+				// Build the data model for the structure.
 
-            if ( baselines.valid() )
-            {
-                //TODO.
-                osgUtil::Tessellator tess;
-                tess.setTessellationType( osgUtil::Tessellator::TESS_TYPE_GEOMETRY );
-                tess.setWindingType( osgUtil::Tessellator::TESS_WINDING_ODD );
-                tess.retessellatePolygons( *(baselines.get()) );
-            }
+				Structure structure;
 
-            // Set up for feature naming and feature indexing:
-            std::string name;
-            if ( !_featureNameExpr.empty() )
-                name = input->eval( _featureNameExpr, &context );
+				buildStructure(
+					part,
+					height,
+					_extrusionSymbol->flatten().get(),
+					verticalOffset,
+					wallSkin,
+					roofSkin,
+					structure,
+					context,
+					roofTextureIsFromImage,
+					roofTextureImageName,
+					roofTextureHasMatIndex,
+					roofTextureMatIndexName,
+					RoofHelper
+				);
 
-            FeatureIndexBuilder* index = context.featureIndex();
-		
-            if ( walls.valid() && walls->getVertexArray() && walls->getVertexArray()->getNumElements() > 0 )
-            {
-                addDrawable( walls.get(), wallStateSet.get(), name, input, index );
+				// Create the walls.
+				if (walls.valid())
+				{
+					osg::Vec4f wallColor(1, 1, 1, 1), wallBaseColor(1, 1, 1, 1);
+
+					if (_wallPolygonSymbol.valid())
+					{
+						wallColor = _wallPolygonSymbol->fill()->color();
+					}
+
+					if (_extrusionSymbol->wallGradientPercentage().isSet())
+					{
+						wallBaseColor = Color(wallColor).brightness(1.0 - *_extrusionSymbol->wallGradientPercentage());
+					}
+					else
+					{
+						wallBaseColor = wallColor;
+					}
+
+					buildWallGeometry(structure, walls.get(), wallColor, wallBaseColor, wallSkin);
+
+					if (wallSkin)
+					{
+						// Get a stateset for the individual wall stateset
+						context.resourceCache()->getOrCreateStateSet(wallSkin, wallStateSet, context.getDBOptions());
+						wallStateSet->setAttributeAndModes(new osg::CullFace(osg::CullFace::BACK), osg::StateAttribute::ON);
+						if (wallSkin->materialURI().isSet())
+						{
+							context.resourceCache()->getOrCreateMatStateSet(wallSkin, wallStateSet, context.getDBOptions());
+						}
+					}
+				}
+
+				// tessellate and add the roofs if necessary:
+				if (rooflines.valid())
+				{
+					osg::Vec4f roofColor(1, 1, 1, 1);
+					if (_roofPolygonSymbol.valid())
+					{
+						roofColor = _roofPolygonSymbol->fill()->color();
+					}
+
+					buildRoofGeometry(structure, rooflines.get(), roofColor, roofSkin, roofTextureIsFromImage, roofTextureHasMatIndex);
+					if (roofTextureIsFromImage)
+					{
+						roofStateSet = RoofHelper->CreateSetState(context.getDBOptions());
+						roofStateSet->setAttributeAndModes(new osg::CullFace(osg::CullFace::BACK), osg::StateAttribute::ON);
+						if (roofTextureHasMatIndex)
+							RoofHelper->AddMat2SetState(roofStateSet, context.getDBOptions());
+					}
+					else if (roofSkin)
+					{
+						// Get a stateset for the individual roof skin
+						context.resourceCache()->getOrCreateStateSet(roofSkin, roofStateSet, context.getDBOptions());
+						if (roofSkin->materialURI().isSet())
+						{
+							context.resourceCache()->getOrCreateMatStateSet(roofSkin, roofStateSet, context.getDBOptions());
+						}
+					}
+				}
+
+				if (outlines.valid())
+				{
+					osg::Vec4f outlineColor(1, 1, 1, 1);
+					if (_outlineSymbol.valid())
+					{
+						outlineColor = _outlineSymbol->stroke()->color();
+					}
+
+					float minCreaseAngle = _outlineSymbol->creaseAngle().value();
+					buildOutlineGeometry(structure, outlines.get(), outlineColor, minCreaseAngle);
+				}
+
+				if (baselines.valid())
+				{
+					//TODO.
+					osgUtil::Tessellator tess;
+					tess.setTessellationType(osgUtil::Tessellator::TESS_TYPE_GEOMETRY);
+					tess.setWindingType(osgUtil::Tessellator::TESS_WINDING_ODD);
+					tess.retessellatePolygons(*(baselines.get()));
+				}
+
+				// Set up for feature naming and feature indexing:
+				std::string name;
+				if (!_featureNameExpr.empty())
+					name = input->eval(_featureNameExpr, &context);
+
+				FeatureIndexBuilder* index = context.featureIndex();
+
+				if (walls.valid() && walls->getVertexArray() && walls->getVertexArray()->getNumElements() > 0)
+				{
+					addDrawable(walls.get(), wallStateSet.get(), name, input, index);
+				}
+
+				if (rooflines.valid() && rooflines->getVertexArray() && rooflines->getVertexArray()->getNumElements() > 0)
+				{
+					addDrawable(rooflines.get(), roofStateSet.get(), name, input, index);
+				}
+
+				if (baselines.valid() && baselines->getVertexArray() && baselines->getVertexArray()->getNumElements() > 0)
+				{
+					addDrawable(baselines.get(), 0L, name, input, index);
+				}
+
+				if (outlines.valid() && outlines->getVertexArray() && outlines->getVertexArray()->getNumElements() > 0)
+				{
+					addDrawable(outlines.get(), 0L, name, input, index);
+				}
 			}
+			if (RoofHelper)
+				delete RoofHelper;
 
-            if ( rooflines.valid() && rooflines->getVertexArray() && rooflines->getVertexArray()->getNumElements() > 0 )
-            {
-                addDrawable( rooflines.get(), roofStateSet.get(), name, input, index );
-			}
-
-            if ( baselines.valid() && baselines->getVertexArray() && baselines->getVertexArray()->getNumElements() > 0 )
-            {
-                addDrawable( baselines.get(), 0L, name, input, index );
-            }
-
-            if ( outlines.valid() && outlines->getVertexArray() && outlines->getVertexArray()->getNumElements() > 0 )
-            {
-                addDrawable( outlines.get(), 0L, name, input, index );
-            }
-        }
-		if (RoofHelper)
-			delete RoofHelper;
+		}
     }
 
     return true;

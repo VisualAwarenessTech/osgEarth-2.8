@@ -111,6 +111,7 @@ public:
 	  _CDB_geoTypical(false),
 	  _CDB_GS_uses_GTtex(false),
 	  _CDB_No_Second_Ref(true),
+	  _t2dModel(false),
 	  _CDB_Edit_Support(false),
 	  _GT_LOD0_FullStack(false),
 	  _GS_LOD0_FullStack(false),
@@ -186,6 +187,8 @@ public:
 			_CDB_Edit_Support = _options.Edit_Support().value();
 		if (_options.No_Second_Ref().isSet())
 			_CDB_No_Second_Ref = _options.No_Second_Ref().value();
+		if (_options.t2dModel().isSet())
+			_t2dModel = _options.t2dModel().value();
 		if (_options.GT_LOD0_FullStack().isSet())
 			_GT_LOD0_FullStack = _options.GT_LOD0_FullStack().value();
 		if (_options.GS_LOD0_FullStack().isSet())
@@ -540,6 +543,13 @@ public:
 					have_a_file = true;
 				}
 
+				if (mainTile->Has_T2dModel())
+				{
+					getT2dFeatures(mainTile, base, features, FilesChecked);
+				}
+				//check mainTile if it has T2dModel if it does process the T2dModel
+				//create a feature and add it to features vector
+				//set have a file to true if we do have one
 				if (fileOk)
 					dataOK = true;
 				else
@@ -978,6 +988,61 @@ private:
 		return true;
 	}
 
+	bool getT2dFeatures(CDB_Tile *mainTile, const std::string& buffer, FeatureList& features, int sel)
+	{
+		
+
+		const SpatialReference* srs = SpatialReference::create("EPSG:4326");
+
+		osg::ref_ptr<osgDB::Options> localoptions = _dbOptions->cloneOptions();
+		std::string ModelTextureDir = "";
+		std::string ModelZipFile = "";
+		std::string TextureZipFile = "";
+		std::string ModelZipDir = "";
+		
+		bool done = false;
+		
+		OGRFeature * feat_handle;
+		std::string FullModelName;
+		std::string ArchiveFileName;
+		std::string ModelKeyName;
+		bool Model_in_Archive = false;
+		bool valid_model = true;
+		feat_handle = mainTile->Get_T2dModel( ModelKeyName, FullModelName);
+		
+		
+		double ZoffsetPos = 0.0;
+		if (_M_Contains_ABS_Z)
+		{
+			OGRGeometry *geo = feat_handle->GetGeometryRef();
+			if (wkbFlatten(geo->getGeometryType()) == wkbPoint)
+			{
+				OGRPoint * poPoint = (OGRPoint *)geo;
+				double Mpos = poPoint->getM();
+				ZoffsetPos = poPoint->getZ(); //Used as altitude offset
+				poPoint->setZ(Mpos + ZoffsetPos);
+
+			}
+		}
+
+#if OSGEARTH_VERSION_GREATER_OR_EQUAL (2,7,0)
+		osg::ref_ptr<Feature> f = OgrUtils::createFeature((OGRFeatureH)feat_handle, getFeatureProfile());
+#else
+		osg::ref_ptr<Feature> f = OgrUtils::createFeature(feat_handle, srs);
+#endif
+		f->setFID(_s_CDB_FeatureID);
+		++_s_CDB_FeatureID;
+
+		f->set("osge_basename", ModelKeyName);
+
+			
+		features.push_back(f.release());
+			
+			
+		OGR_F_Destroy(feat_handle);
+		return true;
+	}
+
 	bool find_PreInstance(std::string &ModelKeyName, std::string &ModelReferenceName, bool &instanced, int &LOD)
 	{
 		//The model does not exist at this lod. It should have been loaded previously
@@ -1127,6 +1192,7 @@ private:
 	bool							_CDB_geoTypical;
 	bool							_CDB_GS_uses_GTtex;
 	bool							_CDB_No_Second_Ref;
+	bool							_t2dModel;
 	bool							_CDB_Edit_Support;
 	bool							_GS_LOD0_FullStack;
 	bool							_GT_LOD0_FullStack;
