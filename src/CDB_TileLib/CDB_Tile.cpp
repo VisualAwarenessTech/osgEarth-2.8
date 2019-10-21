@@ -1675,10 +1675,12 @@ bool CDB_Tile::Load_Class_Map(OGRLayer * poLayer, CDB_Model_RuntimeMap &clsMap)
 	}
 
 	int fsc_index = Find_Field_Index(poFDefn, "FSC", OFTInteger);
+#if 0
 	if (fsc_index < 0)
 	{
 		return false;
 	}
+#endif
 
 	int bsr_index = Find_Field_Index(poFDefn, "BSR", OFTReal);
 	if (bsr_index < 0)
@@ -1730,8 +1732,14 @@ int CDB_Tile::Find_Field_Index(OGRFeatureDefn *poFDefn, std::string fieldname, O
 		std::string thisname = po_FieldDefn->GetNameRef();
 		if (thisname.compare(fieldname) == 0)
 		{
-			if (po_FieldDefn->GetType() == Type)
-				return dbffieldIdx;
+			if (po_FieldDefn->GetType() != Type)
+			{
+				if (CDB_Global::getInstance()->CDB_Tile_Be_Verbose())
+				{
+					OSG_WARN << "Attribure " << fieldname << " is not field of type " << Type << " found " << po_FieldDefn->GetType() << std::endl;
+				}
+			}
+			return dbffieldIdx;
 		}
 	}
 	return -1;
