@@ -221,23 +221,38 @@ public:
 			_FileName = _options.fileName().value();
 			_UsingFileInput = true;
 			CDB_Global * gbls = CDB_Global::getInstance();
-			if (!gbls->Open_Vector_File(_FileName))
+			__int64 tileKey = CDB_Tile::Get_TileKeyValue(_FileName);
+			ModelOgrTileP filetile = NULL;
+			if (!gbls->HasVectorTile(tileKey))
+			{
+				filetile = new ModelOgrTile(tileKey, _FileName);
+				gbls->AddVectorTile(filetile);
+			}
+			else
+			{
+				filetile = gbls->GetVectorTile(tileKey);
+			}
+
+			if (!filetile->Open())
 			{
 				OE_WARN << "Failed to open " << _FileName << std::endl;
 			}
-			else if (_CDB_geoTypical)
+			else 
 			{
-				_GTGeomemtryTableName = "gpkg:GTModelGeometry_Mda.zip";
-				_GTTextureTableName = "gpkg:GTModelTexture_Mda.zip";
-				if (!gbls->Load_Media(_GTGeomemtryTableName))
+				if (_CDB_geoTypical)
 				{
-					OE_WARN << "GTGeometry not found in GeoPackage!" << std::endl;
+					_GTGeomemtryTableName = "gpkg:GTModelGeometry_Mda.zip";
+					_GTTextureTableName = "gpkg:GTModelTexture_Mda.zip";
+					if (!gbls->Load_Media(_GTGeomemtryTableName, tileKey))
+					{
+						OE_WARN << "GTGeometry not found in GeoPackage!" << std::endl;
+					}
+					if (!gbls->Load_Media(_GTTextureTableName, tileKey))
+					{
+						OE_WARN << "GTTexture not found in GeoPackage!" << std::endl;
+					}
+					_CDB_inflated = false;
 				}
-				if (!gbls->Load_Media(_GTTextureTableName))
-				{
-					OE_WARN << "GTTexture not found in GeoPackage!" << std::endl;
-				}
-				_CDB_inflated = false;
 			}
 			CDB_Limits = false;
 		}
@@ -921,7 +936,7 @@ private:
 				else
 					f.release();
 			}
-			OGR_F_Destroy(feat_handle);
+			mainTile->DestroyCurrentFeature(sel);
 		}
 		if (have_archive && !_CDB_geoTypical)
 		{

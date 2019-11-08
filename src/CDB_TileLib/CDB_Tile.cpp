@@ -52,7 +52,7 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 				   m_DataSet(dataset), m_TileExtent(*TileExtent), m_TileType(TileType), m_ImageContent_Status(NotSet), m_Tile_Status(Created), m_FileName(""), m_LayerName(""), m_FileExists(false),
 				   m_CDB_LOD_Num(0), m_Subordinate_Exists(false), m_SubordinateName(""), m_lat_str(""), m_lon_str(""), m_lod_str(""), m_uref_str(""), m_rref_str(""), m_Subordinate_Tile(false),
 				   m_Use_Spatial_Rect(false), m_SubordinateName2(""), m_Subordinate2_Exists(false), m_Have_MaterialMaskData(false), m_Have_MaterialData(false), m_EnableLightMap(lightmap),
-				   m_EnableMaterials(material), m_EnableMaterialMask(material_mask), m_DataFromGlobal(DataFromGlobal), m_GlobalDataset(NULL), m_HaveDataDictionary(false)
+				   m_EnableMaterials(material), m_EnableMaterialMask(material_mask), m_DataFromGlobal(DataFromGlobal), m_GlobalDataset(NULL), m_HaveDataDictionary(false), m_GlobalTile(NULL)
 {
 	m_GTModelSet.clear();
 	CDB_Global * gbls = CDB_Global::getInstance();
@@ -77,7 +77,16 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 	std::string subord2LayerName;
 
 	if (m_DataFromGlobal)
-		m_GlobalDataset = gbls->Get_Dataset();
+	{
+		double clat;
+		double clon;
+		m_TileExtent.Center(clat, clon);
+		m_GlobalTile = gbls->FindVectorTile(clat, clon);
+		if(m_GlobalTile)
+			m_GlobalDataset = m_GlobalTile->Get_Dataset();
+		else
+			m_GlobalDataset = NULL;
+	}
 
 	CDB_Data_Dictionary* datDict = CDB_Data_Dictionary::GetInstance();
 	if (datDict->Init_Feature_Data_Dictionary(m_cdbRootDir))
@@ -421,8 +430,10 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 			}
 			else
 			{
-				t.PrimaryExists = gbls->Has_Layer(t.TilePrimaryShapeName);
-				t.ClassExists = gbls->Has_Layer(t.TileSecondaryShapeName);
+				__int64 tileKey = m_GlobalTile->Get_Ref();
+				t.PrimaryExists = gbls->Has_Layer(t.TilePrimaryShapeName, tileKey);
+				t.ClassExists = t.PrimaryExists;
+//				t.ClassExists = gbls->Has_Layer(t.TileSecondaryShapeName);
 			}
 			t.RealSel = i - 1;
 			if (t.PrimaryExists && t.ClassExists)
@@ -458,15 +469,18 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 		}
 		else
 		{
-			m_FileExists = gbls->Has_Layer(m_FileName);
-			m_ModelSet[0].ModelDbfNameExists = gbls->Has_Layer(m_ModelSet[0].ModelDbfName);
+			__int64 tileKey = m_GlobalTile->Get_Ref();
+			m_FileExists = gbls->Has_Layer(m_FileName, tileKey);
+//			m_ModelSet[0].ModelDbfNameExists = gbls->Has_Layer(m_ModelSet[0].ModelDbfName);
+			m_ModelSet[0].ModelDbfNameExists = m_FileExists;
+
 			std::string temp = "gpkg:" + m_ModelSet[0].ModelGeometryName + ":" + m_uref_str + ":" + m_rref_str + ".zip";
 			m_ModelSet[0].ModelGeometryName = temp;
-			m_ModelSet[0].ModelGeometryNameExists = gbls->Load_Media(m_ModelSet[0].ModelGeometryName);
+			m_ModelSet[0].ModelGeometryNameExists = gbls->Load_Media(m_ModelSet[0].ModelGeometryName, tileKey);
 
 			temp = "gpkg:" + m_ModelSet[0].ModelTextureName + ":" + m_uref_str + ":" + m_rref_str + ".zip";
 			m_ModelSet[0].ModelTextureName = temp;
-			m_ModelSet[0].ModelTextureNameExists = gbls->Load_Media(m_ModelSet[0].ModelTextureName);
+			m_ModelSet[0].ModelTextureNameExists = gbls->Load_Media(m_ModelSet[0].ModelTextureName, tileKey);
 		}
 		m_ModelSet[0].ModelWorkingName = m_FileName;
 		m_ModelSet[0].ModelWorkingNameExists = m_FileExists;
@@ -511,15 +525,18 @@ CDB_Tile::CDB_Tile(std::string cdbRootDir, std::string cdbCacheDir, CDB_Tile_Typ
 
 	if (m_CDB_LOD_Num == 0)
 	{
-		if (m_TileType == GeoSpecificModel)
+		if (!m_DataFromGlobal)
 		{
-			if(gbls->LOD0_GS_FullStack())
-				Build_GS_Stack();
-		}
-		else if (m_TileType == GeoTypicalModel)
-		{
-			if(gbls->LOD0_GT_FullStack())
-				Build_GT_Stack();
+			if (m_TileType == GeoSpecificModel)
+			{
+				if (gbls->LOD0_GS_FullStack())
+					Build_GS_Stack();
+			}
+			else if (m_TileType == GeoTypicalModel)
+			{
+				if (gbls->LOD0_GT_FullStack())
+					Build_GT_Stack();
+			}
 		}
 	}
 
@@ -541,7 +558,16 @@ void CDB_Tile::Set_DataFromGlobal(bool value)
 {
 	m_DataFromGlobal = value;
 	if (m_DataFromGlobal)
-		m_GlobalDataset = CDB_Global::getInstance()->Get_Dataset();
+	{
+		double clat;
+		double clon;
+		m_TileExtent.Center(clat, clon);
+		m_GlobalTile = CDB_Global::getInstance()->FindVectorTile(clat, clon);
+		if (m_GlobalTile)
+			m_GlobalDataset = m_GlobalTile->Get_Dataset();
+		else
+			m_GlobalDataset = NULL;
+	}
 }
 
 bool CDB_Tile::DataFromGlobal(void)
@@ -803,6 +829,86 @@ int CDB_Tile::LodNumFromExtent(CDB_Tile_Extent &Tile_Extent)
 		}
 	}
 	return cdbLod;
+}
+
+__int64 CDB_Tile::Get_TileKeyValue(std::string FileName)
+{
+	std::string workingName = FileName;
+	size_t pos = workingName.find("\\");
+	while (pos != std::string::npos)
+	{
+		workingName.replace(pos, 1, "/");
+		pos = workingName.find("\\");
+	}
+
+	pos = workingName.find("/");
+	while (pos != std::string::npos)
+	{
+		if (pos < workingName.length())
+		{
+			workingName = workingName.substr(pos + 1);
+		}
+		else
+			break;
+		pos = workingName.find("/");
+	}
+	std::string latstr = workingName.substr(1, 2);
+	std::string lonstr = workingName.substr(4, 3);
+
+	std::string ustr;
+	pos = workingName.find("_U");
+	if (pos != std::string::npos)
+	{
+		if (pos + 2 < workingName.length())
+		{
+			std::string uworkstr = workingName.substr(pos + 2);
+			size_t nt = uworkstr.find("_");
+			if (nt != std::string::npos)
+			{
+				ustr = uworkstr.substr(0, nt);
+			}
+		}
+	}
+
+	std::string rstr;
+	pos = workingName.find("_R");
+	if (pos != std::string::npos)
+	{
+		if (pos + 2 < workingName.length())
+		{
+			std::string rworkstr = workingName.substr(pos + 2);
+			size_t nt = rworkstr.find(".");
+			if (nt != std::string::npos)
+			{
+				rstr = rworkstr.substr(0, nt);
+			}
+		}
+	}
+	__int64 retval = -1;
+	if (!latstr.empty() && !lonstr.empty() && !ustr.empty() && !rstr.empty())
+	{
+		int ilat = atoi(latstr.c_str());
+		if (workingName.substr(0, 1) == "S")
+			ilat *= -1;
+		ilat += 90;
+
+		int ilon = atoi(lonstr.c_str());
+		if (workingName.substr(3, 1) == "W")
+			ilon *= -1;
+		ilon += 180;
+
+		int iunum = atoi(ustr.c_str());
+		int irnum = atoi(rstr.c_str());
+		std::stringstream	buf;
+		buf << std::setfill('0')
+			<< std::setw(2) << ilat << std::setfill('0')
+			<< std::setw(3) << ilon << std::setfill('0')
+			<< std::setw(3) << iunum << std::setfill('0')
+			<< std::setw(3) << irnum;
+		std::string keystring = buf.str();
+		retval = _atoi64(keystring.c_str());
+	}
+	return retval;
 }
 
 int CDB_Tile::GetPathComponents(std::string& lat_str, std::string& lon_str, std::string& lod_str,
@@ -1432,6 +1538,26 @@ bool CDB_Tile::Model_Texture_Archive(std::string &TextureArchive, unsigned int p
 	return m_ModelSet[pos].ModelTextureNameExists;
 }
 
+bool CDB_Tile::DestroyCurrentFeature(int sel)
+{
+	if (m_TileType == GeoSpecificModel)
+		return DestroyCurrent_Geospecific_Feature(sel);
+	else
+		return DestroyCurrent_GeoTypical_Feature(sel);
+}
+
+bool CDB_Tile::DestroyCurrent_Geospecific_Feature(int sel)
+{
+	m_ModelSet[sel].FeatureSet.DestroyCurFeature();
+	return true;
+}
+
+bool CDB_Tile::DestroyCurrent_GeoTypical_Feature(int sel)
+{
+	m_GTModelSet[sel].FeatureSet.DestroyCurFeature();
+	return true;
+}
+
 OGRFeature * CDB_Tile::Next_Valid_Feature(int sel, bool inflated, std::string &ModelKeyName, std::string &FullModelName, std::string &ArchiveFileName,
 										  bool &Model_in_Archive)
 {
@@ -1447,10 +1573,15 @@ OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string
 	bool valid = false;
 	bool done = false;
 	OGRFeature *f = NULL;
+	CDB_Model_RuntimeMapP clsmap;
+	if (m_DataFromGlobal)
+		clsmap = NULL; // m_GlobalTile->GetGSClassMap(m_CDB_LOD_Num);
+	else
+		clsmap = &m_ModelSet[pos].clsMap;
 
 	while (!valid && !done)
 	{
-		f = m_ModelSet[pos].PrimaryLayer->GetNextFeature();
+		f = m_ModelSet[pos].FeatureSet.GetNextFeature();
 		if (!f)
 		{
 			done = true;
@@ -1468,12 +1599,24 @@ OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string
 		std::string cnam = f->GetFieldAsString("CNAM");
 		if (!cnam.empty())
 		{
-			CDB_Model_RuntimeMap::iterator mi = m_ModelSet[pos].clsMap.find(cnam);
-			if (mi == m_ModelSet[pos].clsMap.end())
-				valid = false;
+			if (clsmap)
+			{
+				CDB_Model_RuntimeMap::iterator mi = clsmap->find(cnam);
+				if (mi == clsmap->end())
+					valid = false;
+				else
+				{
+					m_CurFeatureClass = (*clsmap)[cnam];
+				}
+			}
 			else
 			{
-				m_CurFeatureClass = m_ModelSet[pos].clsMap[cnam];
+				std::string myCNAM = m_CurFeatureClass.inst_set_class(m_ModelSet[pos].PrimaryLayer, f);
+				if (myCNAM.empty())
+					valid = false;
+			}
+			if(valid)
+			{
 				ModelKeyName = Model_KeyName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 				if (inflated)
 				{
@@ -1493,6 +1636,10 @@ OGRFeature * CDB_Tile::Next_Valid_Geospecific_Feature(bool inflated, std::string
 		}
 		else
 			valid = false;
+		if (!valid)
+		{
+			m_ModelSet[pos].FeatureSet.DestroyCurFeature();
+		}
 	}
 	return f;
 }
@@ -1502,10 +1649,16 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 	bool valid = false;
 	bool done = false;
 	OGRFeature *f = NULL;
+	CDB_Model_RuntimeMapP clsmap;
+	if (m_DataFromGlobal)
+		clsmap = NULL; //m_GlobalTile->GetGTClassMap(m_CDB_LOD_Num, sel);
+	else
+		clsmap = &m_GTModelSet[sel].clsMap;
+
 
 	while (!valid && !done)
 	{
-		f = m_GTModelSet[sel].PrimaryLayer->GetNextFeature();
+		f = m_GTModelSet[sel].FeatureSet.GetNextFeature();
 		if (!f)
 		{
 			done = true;
@@ -1523,12 +1676,24 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 		std::string cnam = f->GetFieldAsString("CNAM");
 		if (!cnam.empty())
 		{
-			CDB_Model_RuntimeMap::iterator mi = m_GTModelSet[sel].clsMap.find(cnam);
-			if (mi == m_GTModelSet[sel].clsMap.end())
-				valid = false;
+			if (clsmap)
+			{
+				CDB_Model_RuntimeMap::iterator mi = clsmap->find(cnam);
+				if (mi == clsmap->end())
+					valid = false;
+				else
+				{
+					m_CurFeatureClass = (*clsmap)[cnam];
+				}
+			}
 			else
 			{
-				m_CurFeatureClass = m_GTModelSet[sel].clsMap[cnam];
+				std::string myCNAM = m_CurFeatureClass.inst_set_class(m_GTModelSet[sel].PrimaryLayer, f);
+				if (myCNAM.empty())
+					valid = false;
+			}
+			if(valid)
+			{
 				ModelKeyName = Model_KeyName(m_CurFeatureClass.FACC_value, m_CurFeatureClass.FSC_value, m_CurFeatureClass.Model_Base_Name);
 				ModelFullName = GeoTypical_FullFileName(ModelKeyName);
 				if(!m_DataFromGlobal)
@@ -1549,6 +1714,10 @@ OGRFeature * CDB_Tile::Next_Valid_GeoTypical_Feature(int sel, std::string &Model
 		}
 		else
 			valid = false;
+		if (!valid)
+		{
+			m_GTModelSet[sel].FeatureSet.DestroyCurFeature();
+		}
 	}
 	return f;
 }
@@ -1573,27 +1742,49 @@ bool CDB_Tile::Init_GS_Model_Tile(unsigned int pos)
 		if (!m_ModelSet[pos].ClassTileOgr)
 			return false;
 		m_ModelSet[pos].PrimaryLayer = m_ModelSet[pos].PrimaryTileOgr->GetLayer(0);
+		if (!m_ModelSet[pos].PrimaryLayer)
+			return false;
+		if (m_Use_Spatial_Rect)
+		{
+			m_ModelSet[pos].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
+		}
+		m_ModelSet[pos].FeatureSet.LoadFeatureSet(m_ModelSet[pos].PrimaryLayer);
 	}
 	else
 	{
 		m_ModelSet[pos].PrimaryLayer = m_GlobalDataset->GetLayerByName(m_FileName.c_str());
+		if (!m_ModelSet[pos].PrimaryLayer)
+			return false;
+		if (m_Use_Spatial_Rect)
+		{
+			m_ModelSet[pos].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
+		}
+		m_ModelSet[pos].FeatureSet.LoadFeatureSet(m_ModelSet[pos].PrimaryLayer);
+		m_CurFeatureClass.Init();
 	}
-	if (!m_ModelSet[pos].PrimaryLayer)
-		return false;
 
-	if (m_Use_Spatial_Rect)
-	{
-		m_ModelSet[pos].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
-	}
 
-	m_ModelSet[pos].PrimaryLayer->ResetReading();
 	OGRLayer *poLayer = NULL;
 	if (!m_DataFromGlobal)
 		poLayer = m_ModelSet[pos].ClassTileOgr->GetLayer(0);
 	else
 		poLayer = m_GlobalDataset->GetLayerByName(m_ModelSet[pos].ModelDbfName.c_str());
 
-	bool have_class = Load_Class_Map(poLayer, m_ModelSet[pos].clsMap);
+	bool have_class = false;
+	if (m_DataFromGlobal)
+	{
+		//CDB_Model_RuntimeMapP clsmap = NULL; // m_GlobalTile->GetGSClassMap(m_CDB_LOD_Num);
+		//if (clsmap->size() == 0)
+		//{
+		//	have_class = Load_Class_Map(poLayer, *clsmap);
+		//}
+		//else
+		have_class = true;
+	}
+	else
+	{
+		have_class = Load_Class_Map(poLayer, m_ModelSet[pos].clsMap);
+	}
 	bool have_archive = Load_Archive(m_ModelSet[pos].ModelGeometryName, m_ModelSet[pos].archiveFileList);
 	return (have_class && have_archive);
 }
@@ -1720,18 +1911,25 @@ bool CDB_Tile::Init_GT_Model_Tile(int sel)
 		if (!m_GTModelSet[sel].ClassTileOgr)
 			return false;
 		m_GTModelSet[sel].PrimaryLayer = m_GTModelSet[sel].PrimaryTileOgr->GetLayer(0);
+		if (m_Use_Spatial_Rect)
+		{
+			m_GTModelSet[sel].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
+		}
+		m_GTModelSet[sel].FeatureSet.LoadFeatureSet(m_GTModelSet[sel].PrimaryLayer);
 	}
 	else
 	{
 		m_GTModelSet[sel].PrimaryLayer = m_GlobalDataset->GetLayerByName(m_GTModelSet[sel].TilePrimaryShapeName.c_str());
+		if (m_Use_Spatial_Rect)
+		{
+			m_GTModelSet[sel].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
+		}
+		m_GTModelSet[sel].FeatureSet.LoadFeatureSet(m_GTModelSet[sel].PrimaryLayer);
+		m_CurFeatureClass.Init();
 	}
 	if (!m_GTModelSet[sel].PrimaryLayer)
 		return false;
 
-	if (m_Use_Spatial_Rect)
-	{
-		m_GTModelSet[sel].PrimaryLayer->SetSpatialFilterRect(m_SpatialRectExtent.West, m_SpatialRectExtent.South, m_SpatialRectExtent.East, m_SpatialRectExtent.North);
-	}
 
 	m_GTModelSet[sel].PrimaryLayer->ResetReading();
 	OGRLayer *poLayer = NULL;
@@ -1744,7 +1942,19 @@ bool CDB_Tile::Init_GT_Model_Tile(int sel)
 		poLayer = m_GlobalDataset->GetLayerByName(m_GTModelSet[sel].TileSecondaryShapeName.c_str());
 	}
 
-	bool have_class = Load_Class_Map(poLayer, m_GTModelSet[sel].clsMap);
+	bool have_class = false;
+	if (m_DataFromGlobal)
+	{
+		//CDB_Model_RuntimeMapP clsMap = m_GlobalTile->GetGTClassMap(m_CDB_LOD_Num, sel);
+		//if (clsMap->size() == 0)
+		//{
+		//	have_class = Load_Class_Map(poLayer, *clsMap);
+		//}
+		//else
+		have_class = true;
+	}
+	else
+		have_class = Load_Class_Map(poLayer, m_GTModelSet[sel].clsMap);
 	bool have_archive;
 	if (m_DataFromGlobal)
 	{

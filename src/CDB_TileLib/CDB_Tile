@@ -21,11 +21,17 @@
 //
 #include "CDB_Tile_Library.h"
 #include <ogc/ogc_IE>
+#if defined(_MSC_VER)
+#pragma warning( disable : 4251 )
+#endif
+
 #include <cdbGlobals/cdbGlobals>
 #include <sstream>
 #include <iomanip>
 #include <vector>
 #include <osgEarth/TileSource>
+
+
 #include <gdal_priv.h>
 #include <ogr_core.h>
 #include <ogrsf_frmts.h>
@@ -44,49 +50,6 @@ using namespace std;
 //This is based on the global profile in CDBTileSource
 #define MAXNLODNUM 5
 
-struct coord2d
-{
-	double	Xpos;
-	double	Ypos;
-	coord2d() : Xpos(0.0), Ypos(0.0)
-	{
-	}
-	coord2d(double x, double y) : Xpos(x), Ypos(y)
-	{
-	}
-	bool operator==(coord2d &coord)
-	{
-		if ((abs(Xpos - coord.Xpos) < DBL_EPSILON) &&
-			(abs(Ypos - coord.Ypos) < DBL_EPSILON))
-			return true;
-		else
-			return false;
-	}
-};
-
-typedef vector<coord2d> coord2dV;
-struct coord3d
-{
-	double	Xpos;
-	double	Ypos;
-	double  Zpos;
-	coord3d() : Xpos(0.0), Ypos(0.0), Zpos(0.0)
-	{
-	}
-	coord3d(double x, double y, double z) : Xpos(x), Ypos(y), Zpos(z)
-	{
-	}
-	bool operator==(coord3d &coord)
-	{
-		if ((abs(Xpos - coord.Xpos) < DBL_EPSILON) &&
-			(abs(Ypos - coord.Ypos) < DBL_EPSILON) &&
-			(abs(Zpos - coord.Zpos) < DBL_EPSILON))
-			return true;
-		else
-			return false;
-	}
-};
-typedef std::vector<coord3d> coord3dV;
 
 typedef enum
 {
@@ -104,17 +67,6 @@ typedef enum
 	Loaded = 2
 }CDB_Tile_Status;
 
-struct CDB_Tile_Pixels
-{
-	int		pixX;
-	int		pixY;
-	int		bands;
-	GDALDataType pixType;
-	coord2d degPerPix;
-	CDB_Tile_Pixels() : pixX(1024), pixY(1024), bands(3), pixType(GDT_Byte)
-	{
-	}
-};
 
 struct CDB_GDAL_Access
 {
@@ -159,31 +111,89 @@ struct CDB_GDAL_Drivers
 	}
 };
 
-struct CDB_Tile_Extent
+
+#include <cdbGlobals/ModelFeatureDefs>
+
+struct CDB_Tile_Pixels
 {
-	double	North;
-	double	South;
-	double	East;
-	double	West;
-	CDB_Tile_Extent() : North(0.0), South(0.0), East(0.0), West(0.0)
+	int		pixX;
+	int		pixY;
+	int		bands;
+	GDALDataType pixType;
+	coord2d degPerPix;
+	CDB_Tile_Pixels() : pixX(1024), pixY(1024), bands(3), pixType(GDT_Byte)
 	{
-	}
-	CDB_Tile_Extent(double n, double s, double e, double w) : North(n), South(s), East(e), West(w)
-	{
-	}
-	bool Contains(double x, double y)
-	{
-		if ((x >= West) && (x <= East) && (y >= South) && (y <= North))
-			return true;
-		else
-			return false;
 	}
 };
 
-typedef CDB_Tile_Extent * CDB_Tile_ExtentP;
-typedef vector<CDB_Tile_ExtentP> CDB_Tile_ExtentPV;
+struct CDB_ModelFeature_Set
+{
+	std::vector<OGRFeature *> FeatureSet;
+	int	curFeature;
 
-#include "ModelFeatureDefs"
+	CDB_ModelFeature_Set() : curFeature(-1)
+	{
+	}
+
+	~CDB_ModelFeature_Set()
+	{
+		Clear_Features();
+	}
+
+	void Reset(void)
+	{
+		curFeature = -1;
+	}
+
+	OGRFeature * GetNextFeature(void)
+	{
+		++curFeature;
+		if (curFeature < FeatureSet.size())
+		{
+			return FeatureSet[curFeature];
+		}
+		else
+			return NULL;
+	}
+
+	void DestroyCurFeature(void)
+	{
+		if (curFeature < FeatureSet.size())
+		{
+			OGRFeature::DestroyFeature(FeatureSet[curFeature]);
+			FeatureSet[curFeature] = NULL;
+		}
+	}
+
+	void Clear_Features(void)
+	{
+		for each(OGRFeature *f in FeatureSet)
+		{
+			if (f)
+			{
+				OGRFeature::DestroyFeature(f);
+				f = NULL;
+			}
+		}
+		FeatureSet.clear();
+	}
+
+	void AddFeature(OGRFeature *f)
+	{
+		FeatureSet.push_back(f);
+	}
+
+	bool LoadFeatureSet(OGRLayer * poLayer)
+	{
+		poLayer->ResetReading();
+		OGRFeature * poFeature = NULL;
+		while ((poFeature = poLayer->GetNextFeature()) != NULL)
+		{
+			FeatureSet.push_back(poFeature);
+		}
+		return FeatureSet.size() > 0;
+	}
+};
 
 struct CDB_Model_Tile_Set
 {
@@ -213,6 +223,8 @@ struct CDB_Model_Tile_Set
 	{
 		clsMap.clear();
 	}
+
+	CDB_ModelFeature_Set FeatureSet;
 };
 typedef CDB_Model_Tile_Set * CDB_Model_Tile_SetP;
 typedef std::vector<CDB_Model_Tile_Set> CDB_Model_Tile_SetV;
@@ -241,6 +253,8 @@ struct CDB_GT_Model_Tile_Selector
 	{
 		clsMap.clear();
 	}
+
+	CDB_ModelFeature_Set FeatureSet;
 };
 typedef CDB_GT_Model_Tile_Selector * CDB_GT_Model_Tile_SelectorP;
 typedef std::vector<CDB_GT_Model_Tile_Selector> CDB_GT_Tile_SelectorV;
@@ -332,6 +346,8 @@ public:
 	OGRFeature * Next_Valid_Feature(int sel, bool inflated, std::string &ModelKeyName, std::string &FullModelName, 
 									std::string &ArchiveFileName, bool &Model_in_Archive);
 
+	bool DestroyCurrentFeature(int sel);
+
 	bool Set_SpatialFilter_Extent(CDB_Tile_Extent &SpatialExtent);
 
 	bool Model_Geometry_Name(std::string &GeometryName, unsigned int pos = 0);
@@ -389,6 +405,7 @@ public:
 
 	static int LodNumFromExtent(CDB_Tile_Extent &Tile_Extent);
 
+	static __int64 Get_TileKeyValue(std::string FileName);
 
 private:
 	std::string				m_cdbRootDir;
@@ -426,7 +443,8 @@ private:
 	bool					m_EnableMaterialMask;
 	bool					m_DataFromGlobal;
 	CDB_Model_Runtime_Class m_CurFeatureClass;
-	GDALDataset *			m_GlobalDataset;	
+	GDALDataset *			m_GlobalDataset;
+	ModelOgrTileP			m_GlobalTile;
 	bool					m_HaveDataDictionary;
 	
 
@@ -499,6 +517,10 @@ private:
 												bool  &Model_in_Archive, unsigned int pos = 0);
 
 	OGRFeature * Next_Valid_GeoTypical_Feature(int sel, std::string &ModelKeyName, std::string &ModelFullName, std::string &ArchiveFileName, bool &Model_in_Archive);
+
+	bool DestroyCurrent_Geospecific_Feature(int sel);
+
+	bool DestroyCurrent_GeoTypical_Feature(int sel);
 
 	std::string Model_TextureDir(void);
 
