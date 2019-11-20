@@ -212,6 +212,10 @@ struct CDB_Model_Tile_Set
 	bool				ModelDbfNameExists;
 	CDB_Model_RuntimeMap clsMap;
 	osgDB::Archive::FileNameList archiveFileList;
+	CDB_ModelFeature_Set FeatureSet;
+#ifdef _DEBUG
+	CDB_ModelFeature_Set DebugFeatureSet;
+#endif
 
 	CDB_Model_Tile_Set() : ModelWorkingName(""), ModelGeometryName(""), ModelTextureName(""), ModelDbfName(""), ModelWorkingNameExists(false),
 		ModelGeometryNameExists(false), ModelTextureNameExists(false), ModelDbfNameExists(false), PrimaryTileOgr(NULL), ClassTileOgr(NULL), PrimaryLayer(NULL)
@@ -224,7 +228,6 @@ struct CDB_Model_Tile_Set
 		clsMap.clear();
 	}
 
-	CDB_ModelFeature_Set FeatureSet;
 };
 typedef CDB_Model_Tile_Set * CDB_Model_Tile_SetP;
 typedef std::vector<CDB_Model_Tile_Set> CDB_Model_Tile_SetV;
@@ -243,6 +246,10 @@ struct CDB_GT_Model_Tile_Selector
 	bool			ClassExists;
 	int				RealSel;
 	CDB_Model_RuntimeMap clsMap;
+	CDB_ModelFeature_Set FeatureSet;
+#ifdef _DEBUG
+	CDB_ModelFeature_Set DebugFeatureSet;
+#endif
 	CDB_GT_Model_Tile_Selector() : TilePrimaryShapeName(""), TileSecondaryShapeName(""), PrimaryExists(false),
 		ClassExists(false), PrimaryLayerName(""), PrimaryTileOgr(NULL), ClassTileOgr(NULL),PrimaryLayer(NULL),RealSel(0)
 	{
@@ -254,7 +261,6 @@ struct CDB_GT_Model_Tile_Selector
 		clsMap.clear();
 	}
 
-	CDB_ModelFeature_Set FeatureSet;
 };
 typedef CDB_GT_Model_Tile_Selector * CDB_GT_Model_Tile_SelectorP;
 typedef std::vector<CDB_GT_Model_Tile_Selector> CDB_GT_Tile_SelectorV;
@@ -445,6 +451,7 @@ private:
 	CDB_Model_Runtime_Class m_CurFeatureClass;
 	GDALDataset *			m_GlobalDataset;
 	ModelOgrTileP			m_GlobalTile;
+	GBLConnectionType		m_Globalcontype;
 	bool					m_HaveDataDictionary;
 	
 

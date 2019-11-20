@@ -43,6 +43,8 @@ namespace osgEarth { namespace Drivers
 		const optional<std::string>& rootDir() const { return _rootDir; }
 		optional<std::string>& fileName() { return _FileName; }
 		const optional<std::string>& fileName() const { return _FileName; }
+		optional<std::string>& devfileName() { return _DevFileName; }
+		const optional<std::string>& devfileName() const { return _DevFileName; }
 		optional<std::string>& Limits() { return _Limits; }
 		const optional<std::string>& Limits() const { return _Limits; }
 		optional<std::string>& EditLimits() { return _EditLimits; }
@@ -90,6 +92,7 @@ namespace osgEarth { namespace Drivers
             Config conf = FeatureSourceOptions::getConfig();
 			conf.updateIfSet("root_dir", _rootDir);
 			conf.updateIfSet("filename", _FileName);
+			conf.updateIfSet("devfilename", _DevFileName);
 			conf.updateIfSet("limits", _Limits);
 			conf.updateIfSet("edit_limits", _EditLimits);
 #ifdef _DO_GPKG_TESTS
@@ -120,6 +123,7 @@ namespace osgEarth { namespace Drivers
         void fromConfig( const Config& conf ) {
 			conf.getIfSet("root_dir", _rootDir);
 			conf.getIfSet("filename", _FileName);
+			conf.getIfSet("devfilename", _DevFileName);
 			conf.getIfSet("limits", _Limits);
 			conf.getIfSet("edit_limits", _EditLimits);
 #ifdef _DO_GPKG_TESTS
@@ -143,6 +147,7 @@ namespace osgEarth { namespace Drivers
 		optional<std::string> _Limits;
 		optional<std::string> _EditLimits;
 		optional<std::string> _FileName;
+		optional<std::string> _DevFileName;
 #ifdef _DO_GPKG_TESTS
 		optional<std::string> _OGC_IE_Test;
 #endif
