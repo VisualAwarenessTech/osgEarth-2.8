@@ -193,6 +193,11 @@ struct CDB_ModelFeature_Set
 		}
 		return FeatureSet.size() > 0;
 	}
+
+	size_t Size(void)
+	{
+		return FeatureSet.size();
+	}
 };
 
 struct CDB_Model_Tile_Set

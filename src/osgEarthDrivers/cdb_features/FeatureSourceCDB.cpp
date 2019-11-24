@@ -223,38 +223,11 @@ public:
 			CDB_Global * gbls = CDB_Global::getInstance();
 			bool isWFS = (_FileName.find(".xml") != std::string::npos);
 			std::string tileFileName = "";
+			__int64 tileKey = 0;
 			if (isWFS)
 			{
+
 				if (gbls->Open_Vector_File(_FileName))
-				{
-					if (_options.devfileName().isSet())
-					{
-						tileFileName = _options.devfileName().value();
-					}
-				}
-			}
-			else
-				tileFileName = _FileName;
-
-			if (!tileFileName.empty())
-			{
-				__int64 tileKey = CDB_Tile::Get_TileKeyValue(tileFileName);
-				ModelOgrTileP filetile = NULL;
-				if (!gbls->HasVectorTile(tileKey))
-				{
-					filetile = new ModelOgrTile(tileKey, tileFileName);
-					gbls->AddVectorTile(filetile);
-				}
-				else
-				{
-					filetile = gbls->GetVectorTile(tileKey);
-				}
-
-				if (!filetile->Open())
-				{
-					OE_WARN << "Failed to open " << tileFileName << std::endl;
-				}
-				else
 				{
 					if (_CDB_geoTypical)
 					{
@@ -270,6 +243,39 @@ public:
 						}
 						_CDB_inflated = false;
 					}
+
+					if (_options.devfileName().isSet())
+					{
+						tileFileName = _options.devfileName().value();
+					}
+
+				}
+				else
+				{
+					OE_WARN << "Failed to open " << _FileName << std::endl;
+				}
+			
+			}
+			else
+				tileFileName = _FileName;
+
+			if (!tileFileName.empty())
+			{
+				tileKey = CDB_Tile::Get_TileKeyValue(tileFileName);
+				ModelOgrTileP filetile = NULL;
+				if (!gbls->HasVectorTile(tileKey))
+				{
+					filetile = new ModelOgrTile(tileKey, tileFileName);
+					gbls->AddVectorTile(filetile);
+				}
+				else
+				{
+					filetile = gbls->GetVectorTile(tileKey);
+				}
+
+				if (!filetile->Open())
+				{
+					OE_WARN << "Failed to open " << tileFileName << std::endl;
 				}
 			}
 			CDB_Limits = false;
