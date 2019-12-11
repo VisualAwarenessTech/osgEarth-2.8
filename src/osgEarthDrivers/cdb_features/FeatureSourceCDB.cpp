@@ -277,6 +277,20 @@ public:
 				{
 					OE_WARN << "Failed to open " << tileFileName << std::endl;
 				}
+				else if (!isWFS)
+				{
+					_GTGeomemtryTableName = "gpkg:GTModelGeometry_Mda.zip";
+					_GTTextureTableName = "gpkg:GTModelTexture_Mda.zip";
+					if (!gbls->Load_Media(_GTGeomemtryTableName, tileKey))
+					{
+						OE_WARN << "GTGeometry not found in GeoPackage!" << std::endl;
+					}
+					if (!gbls->Load_Media(_GTTextureTableName, tileKey))
+					{
+						OE_WARN << "GTTexture not found in GeoPackage!" << std::endl;
+					}
+					_CDB_inflated = false;
+				}
 			}
 			CDB_Limits = false;
 		}
