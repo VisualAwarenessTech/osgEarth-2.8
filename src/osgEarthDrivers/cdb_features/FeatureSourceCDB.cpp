@@ -712,6 +712,8 @@ private:
 			TextureZipFile = _GTTextureTableName;
 		}
 		bool done = false;
+		bool zabsindex_set = false;
+		int zabsindex = -1;
 		while (!done)
 		{
 			OGRFeature * feat_handle;
@@ -728,9 +730,15 @@ private:
 			}
 			if (!Model_in_Archive)
 				valid_model = false;
-
+			if (!zabsindex_set)
+			{
+				zabsindex = feat_handle->GetFieldIndex("AHGT");
+				zabsindex_set = true;
+			}
 			double ZoffsetPos = 0.0;
-			int zsetabs = feat_handle->GetFieldAsInteger("AHGT");
+			int zsetabs = 0;
+			if(zabsindex >= 0)
+			   zsetabs = feat_handle->GetFieldAsInteger(zabsindex);
 			if (!zsetabs)
 			{
 				if (_M_Contains_ABS_Z)
